@@ -13,7 +13,11 @@
     const jsString = project.components.reduce((acc, cur) => {
       const jsFilename = `./app/${cur}/${cur}.js`;
       const fileExists = fs.existsSync(jsFilename);
-      return fileExists ? `${acc}import '${jsFilename}';\n` : acc;
+      let jsString = '';
+      if (fileExists) {
+        jsString = fs.readFileSync(jsFilename, 'utf8');
+      }
+      return acc + jsString + '\n';
     }, '');
     fs.writeFileSync(`${output}/${project.name}.js`, jsString);
   };
@@ -23,12 +27,13 @@
       const templateFilename = `./app/${cur}/${cur}.html`;
       const fileExists = fs.existsSync(templateFilename);
       if (fileExists) {
-        const templateString = fs.readFileSync(templateFilename);
-        return `${acc}${templateString}\n`
+        const componenetHTML = fs.readFileSync(templateFilename);
+        const templateString = `<template id="${cur}">\n${componenetHTML}\n</template>`
+        return `${acc}${templateString}\n\n`
       } else {
         return acc;
       }
-    }, '');
+    }, '\n');
 
     let htmlString = fs.readFileSync(`${__dirname}/templates/index.html`, 'utf8');
     htmlString = htmlString.replace(/\$\{project\.name\}/g, project.name);
