@@ -10,7 +10,27 @@ if (args.length < 3) {
   return;
 }
 
-const target = args[2];
+const targets = {
+  'build': 'build.js',
+  'clean': 'clean.js',
+  'generate': 'generate.js',
+  'init': null
+};
+
+let target = args[2];
+
+const targetCandidates = Object.keys(targets).filter(t => t.startsWith(target));
+if (targetCandidates.length === 0) {
+  console.error(`Target ${target} not found.`);
+  return;
+} else if (targetCandidates.length > 1) {
+  targetCandidates.forEach(t => {
+    console.log(t);
+  });
+  return;
+}
+
+target = targetCandidates[0];
 
 const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/leanweb.json`);
 
@@ -18,8 +38,7 @@ if (target === 'init') {
   if (args.length < 4) {
     console.error('leanweb init project-name');
     return;
-  }
-  if (leanwebJSONExisted) {
+  } else if (leanwebJSONExisted) {
     console.error('leanweb.json existed.');
     return;
   } else {
