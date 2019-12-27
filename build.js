@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 (async () => {
   const fs = require('fs');
   const utils = require('./utils.js');
@@ -11,7 +9,7 @@
 
   const buildJS = () => {
     const jsString = project.components.reduce((acc, cur) => {
-      const jsFilename = `./app/${cur}/${cur}.js`;
+      const jsFilename = `./src/components/${cur}/${cur}.js`;
       const fileExists = fs.existsSync(jsFilename);
       let jsString = '';
       if (fileExists) {
@@ -24,7 +22,7 @@
 
   const buildHTML = () => {
     const templates = project.components.reduce((acc, cur) => {
-      const templateFilename = `./app/${cur}/${cur}.html`;
+      const templateFilename = `./src/components/${cur}/${cur}.html`;
       const fileExists = fs.existsSync(templateFilename);
       if (fileExists) {
         const componenetHTML = fs.readFileSync(templateFilename);
@@ -42,7 +40,6 @@
 
     fs.writeFileSync(`${output}/index.html`, htmlString);
   };
-
 
   await utils.exec(`mkdir -p ${output}`);
   buildJS();
