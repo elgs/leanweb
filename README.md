@@ -14,7 +14,7 @@ I don't see any reason leanweb should be installed as `npm install leanweb`.
 
 ## Background
 
-I like the idea in Angular that 3 files (html/js/scss) as a component are be in
+I like the idea in Angular that 3 files (html/js/scss) as a component are in
 charge of a box, like a div, a rectangle area. But I don't like Angular in that
 my code has to be depending on so many bloated dependencies to run. I created
 leanweb as a set of tools to help me create web components based web projects,
