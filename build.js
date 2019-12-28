@@ -1,5 +1,6 @@
 (async () => {
   const fs = require('fs');
+  const sass = require('node-sass');
   const utils = require('./utils.js');
 
   const args = process.argv;
@@ -22,11 +23,23 @@
 
   const buildHTML = () => {
     const templates = project.components.reduce((acc, cur) => {
-      const templateFilename = `./src/components/${cur}/${cur}.html`;
-      const fileExists = fs.existsSync(templateFilename);
-      if (fileExists) {
-        const componenetHTML = fs.readFileSync(templateFilename);
-        const templateString = `<template id="${cur}">\n${componenetHTML}\n</template>`
+      const htmlFilename = `./src/components/${cur}/${cur}.html`;
+      const htmlFileExists = fs.existsSync(htmlFilename);
+      if (htmlFileExists) {
+
+        const scssFilename = `./src/components/${cur}/${cur}.scss`;
+        const scssFileExists = fs.existsSync(scssFilename);
+        let cssString = '';
+        if (scssFileExists) {
+          const scssString = fs.readFileSync(scssFilename, 'utf8');
+          if (scssString.trim()) {
+            const cssResult = sass.renderSync({ data: scssString });
+            cssString = cssResult.css.toString().trim();
+          }
+        }
+        const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
+        const htmlString = fs.readFileSync(htmlFilename, 'utf8');
+        const templateString = `<template id="${cur}">\n${styleString}${htmlString}\n</template>`
         return `${acc}${templateString}\n\n`
       } else {
         return acc;

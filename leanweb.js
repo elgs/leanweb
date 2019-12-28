@@ -16,7 +16,7 @@ const targets = {
   'clean': 'clean.js',
   'generate': 'generate.js',
   'init': 'init.js',
-  // 'destroy': 'destroy.js'
+  'destroy': 'destroy.js'
 };
 
 let target = args[2];

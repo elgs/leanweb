@@ -29,5 +29,9 @@
     if (!fs.existsSync(`${cmpPath}/${cmpName}.html`)) {
       fs.writeFileSync(`${cmpPath}/${cmpName}.html`, `<span>${cmp.toLowerCase()} works</span>`);
     }
+
+    if (!fs.existsSync(`${cmpPath}/${cmpName}.scss`)) {
+      fs.writeFileSync(`${cmpPath}/${cmpName}.scss`, '');
+    }
   }
 })();
