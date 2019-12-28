@@ -5,19 +5,26 @@ const utils = require('./utils.js');
 
 const args = process.argv;
 
+const targets = {
+  'init': 'init.js',
+  'generate': 'generate.js',
+  'build': 'build.js',
+  'clean': 'clean.js',
+  'destroy': 'destroy.js',
+  'help': 'help.js'
+};
 
 if (args.length < 3) {
   console.error('Usage: leanweb target parameters');
+  console.log('Targets:\n');
+  Object.keys(targets).forEach(t => {
+    console.log(t);
+  });
+  console.log();
   return;
 }
 
-const targets = {
-  'build': 'build.js',
-  'clean': 'clean.js',
-  'generate': 'generate.js',
-  'init': 'init.js',
-  'destroy': 'destroy.js'
-};
+
 
 let target = args[2];
 

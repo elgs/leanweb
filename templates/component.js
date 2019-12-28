@@ -3,7 +3,11 @@ customElements.define('${component}',
     constructor() {
       super();
       const template = document.querySelector('#${component}').content;
+
+      // attach to shadow dom
       this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
+
+      // attach to normal dom
       // this.appendChild(template.cloneNode(true));
     }
 

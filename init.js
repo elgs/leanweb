@@ -27,4 +27,5 @@
   fs.writeFileSync('leanweb.json', JSON.stringify(leanwebData, null, 2));
 
   await utils.exec(`npx leanweb g root`);
+  fs.writeFileSync(`src/${projectNameLower}.scss`, '');
 })();

@@ -1,6 +1,5 @@
 (async () => {
   const fs = require('fs');
-  const sass = require('node-sass');
   const utils = require('./utils.js');
 
   const args = process.argv;
@@ -32,10 +31,7 @@
         let cssString = '';
         if (scssFileExists) {
           const scssString = fs.readFileSync(scssFilename, 'utf8');
-          if (scssString.trim()) {
-            const cssResult = sass.renderSync({ data: scssString });
-            cssString = cssResult.css.toString().trim();
-          }
+          cssString = utils.buildCSS(scssString);
         }
         const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
         const htmlString = fs.readFileSync(htmlFilename, 'utf8');
@@ -54,7 +50,19 @@
     fs.writeFileSync(`${output}/index.html`, htmlString);
   };
 
+  const buildCSS = () => {
+    const scssFilename = `./src/${project.name}.scss`;
+    const scssFileExists = fs.existsSync(scssFilename);
+    let cssString = '';
+    if (scssFileExists) {
+      const scssString = fs.readFileSync(scssFilename, 'utf8');
+      cssString = utils.buildCSS(scssString);
+    }
+    fs.writeFileSync(`${output}/${project.name}.css`, cssString);
+  };
+
   await utils.exec(`mkdir -p ${output}`);
   buildJS();
+  buildCSS();
   buildHTML();
 })();
