@@ -1,7 +1,7 @@
 # leanweb
 Tool set for generating web components based web project.
 
-### Installation
+## Installation
 
 * `npm install leanweb -g` as a global tool, or
 * `npm install leanweb -D` in the project as a dev dependency.
@@ -12,7 +12,7 @@ tool.
 
 I don't see any reason leanweb should be installed as `npm install leanweb`.
 
-### Background
+## Background
 
 I like the idea in Angular that 3 files (html/js/scss) as a component are be in
 charge of a box, like a div, a rectangle area. But I don't like Angular in that
@@ -26,14 +26,14 @@ which:
 The principle is simply that 3 files (html/js/scss) as a web component will
 control a box.
 
-### Getting started
+## Getting started
 
 In this demo, I assume leanweb is installed as a global tool by running
 ```
 npm i leanweb -g
 ```
 
-#### leanweb init
+### leanweb init
 
 Create a directory called `demo` for this demo project.
 ```bash
@@ -117,4 +117,4 @@ created. There will be 3 files inside:
 If you deploy these 3 files to a web server, you should see `root works` in
 browser.
 
-#### leanweb generate
+### leanweb generate
