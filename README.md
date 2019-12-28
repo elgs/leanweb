@@ -125,7 +125,7 @@ demo$ leanweb g login
 demo$
 ```
 
-Now the `leabweb.json` has one more entry in the component list:
+Now the `leanweb.json` has one more entry in the component list:
 ```json
 {
   "name": "demo",
