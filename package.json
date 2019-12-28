@@ -1,6 +1,6 @@
 {
   "name": "leanweb",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "leanweb",
   "bin": {
     "leanweb": "leanweb.js"
@@ -14,7 +14,7 @@
   ],
   "author": "Qian Chen",
   "license": "MIT",
-  "devDependencies": {
+  "dependencies": {
     "node-sass": "*"
   }
 }
