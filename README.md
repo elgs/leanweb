@@ -163,3 +163,36 @@ demo$ leanweb build
 ```
 
 You should see `root works login works` in the browser.
+
+### leanweb clean
+
+`leanweb clean` will delete `build/` and `dist/` directories.
+
+### leanweb destroy
+
+`leanweb destrory project-name` will remove the `leanweb.json` file, `src/`, 
+`build/` and `dist/` directory. Please note the `src/` directory will be 
+deleted by this command.
+
+### leanweb help
+
+`leanweb help command-name` will print help information for the command. For
+example, `leanweb help build` or `leanweb h b` will print:
+
+```
+demo$ leanweb h b
+Usage: leanweb build
+This will create a build directory in which 3 files will be created:
+
+demo.html
+demo.js
+demo.css
+
+These 3 files could be deployed to a web server.
+
+demo$
+```
+
+### leanweb version
+
+`leanweb version` will print the version information of `leanweb`.
