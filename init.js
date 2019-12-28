@@ -26,6 +26,6 @@
   };
   fs.writeFileSync('leanweb.json', JSON.stringify(leanwebData, null, 2));
 
-  await utils.exec(`npx leanweb g root`);
+  await utils.exec(`npx leanweb generate root`);
   fs.writeFileSync(`src/${projectNameLower}.scss`, '');
 })();
