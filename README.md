@@ -118,3 +118,48 @@ If you deploy these 3 files to a web server, you should see `root works` in
 browser.
 
 ### leanweb generate
+
+Let's create a `login` web component with `leanweb generate` or `leanweb g`.
+```bash
+demo$ leanweb g login
+demo$
+```
+
+Now the `leabweb.json` has one more entry in the component list:
+```json
+{
+  "name": "demo",
+  "title": "demo",
+  "components": [
+    "demo-root",
+    "demo-login"
+  ]
+}
+```
+`demo-login` is the newly generated web component. The web component name is
+prefixed with project name `demo`. Inside `src/components/`, a new web
+web component directory `demo-login` is created containing 3 files:
+* demo-login.html
+* demo-login.js
+* demo-login.scss
+
+### leanweb build
+
+Let's open `src/components/demo-root/demo-root.html`, which previously looks 
+like:
+```html
+<span>root works</span>
+```
+
+Now let's add one line to this file:
+```html
+<span>root works</span>
+<demo-login></demo-login>
+```
+
+then run:
+```bash
+demo$ leanweb build
+```
+
+You should see `root works login works` in the browser.
