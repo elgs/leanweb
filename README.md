@@ -137,8 +137,8 @@ Now the `leanweb.json` has one more entry in the component list:
 }
 ```
 `demo-login` is the newly generated web component. The web component name is
-prefixed with project name `demo`. Inside `src/components/`, a new web
-web component directory `demo-login` is created containing 3 files:
+prefixed with project name `demo`. Inside `src/components/`, a new web 
+component directory `demo-login` is created containing 3 files:
 * demo-login.html
 * demo-login.js
 * demo-login.scss
