@@ -11,6 +11,16 @@
   const leanwebJSONPath = `${process.cwd()}/leanweb.json`;
   const leanwebJSON = require(leanwebJSONPath);
   const cmps = args.slice(2);
+
+  for (const cmpJSON of leanwebJSON.components) {
+    for (const cmp of cmps) {
+      if (cmpJSON === `${leanwebJSON.name}-${cmp.toLowerCase()}`) {
+        console.error(`Error: component ${cmpJSON} existed.`);
+        return;
+      }
+    }
+  }
+
   leanwebJSON.components.push(...cmps.map(cmp => `${leanwebJSON.name}-${cmp.toLowerCase()}`));
   fs.writeFileSync(leanwebJSONPath, JSON.stringify(leanwebJSON, null, 2));
 
