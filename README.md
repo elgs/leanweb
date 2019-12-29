@@ -108,7 +108,7 @@ customElements.define('demo-root',
 
 `demo-root.scss` is empty.
 
-Now if you run `leanweb build` or `leanweb b`, a `build/` directory will be
+Now if you run `leanweb dist` or `leanweb di`, a `dist/` directory will be
 created. There will be 3 files inside:
 * index.html
 * demo.js
@@ -164,6 +164,12 @@ demo$ leanweb build
 
 You should see `root works login works` in the browser.
 
+### leanweb dist
+
+Unlike `leanweb build`, `leanweb dist` will combine all js files into one
+`demo.js`. `index.html`, `demo.js` and `demo.css` will be created in the 
+`dist/` directory. 
+
 ### leanweb clean
 
 `leanweb clean` will delete `build/` and `dist/` directories.
@@ -177,14 +183,14 @@ deleted by this command.
 ### leanweb help
 
 `leanweb help command-name` will print help information for the command. For
-example, `leanweb help build` or `leanweb h b` will print:
+example, `leanweb help dist` or `leanweb h di` will print:
 
 ```
-demo$ leanweb h b
-Usage: leanweb build
-This will create a build directory in which 3 files will be created:
+demo$ npx leanweb h di
+Usage: leanweb dist
+This will create a dist directory in which 3 files will be created:
 
-demo.html
+index.html
 demo.js
 demo.css
 

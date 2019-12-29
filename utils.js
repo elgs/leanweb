@@ -67,9 +67,20 @@ Now, the demo-login component can be added in demo-root.html as follows:
 `;
 
 const buildNote = `Usage: leanweb build
-This will create a build directory in which 3 files will be created:
+This will create a build directory in which js files for all components will be
+copied over to, plus index.html, $project-name.js and $project-name.css.
 
-demo.html
+index.html
+demo.js
+demo.css
+demo-root.js
+demo-login.js
+`;
+
+const distNote = `Usage: leanweb dist
+This will create a dist directory in which 3 files will be created:
+
+index.html
 demo.js
 demo.css
 
@@ -99,6 +110,7 @@ module.exports.targets = {
   'init': { file: 'init.js', note: initNote },
   'generate': { file: 'generate.js', note: generateNote },
   'build': { file: 'build.js', note: buildNote },
+  'dist': { file: 'dist.js', note: distNote },
   'clean': { file: 'clean.js', note: cleanNote },
   'destroy': { file: 'destroy.js', note: destroyNote },
   'help': { file: 'help.js', note: helpNote },

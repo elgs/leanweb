@@ -2,19 +2,18 @@
   const fs = require('fs');
   const utils = require('./utils.js');
 
-  const output = 'build';
+  const output = 'dist';
   const project = require(`${process.cwd()}/leanweb.json`);
 
   const buildJS = () => {
     const jsString = project.components.reduce((acc, cur) => {
       const jsFilePath = `./src/components/${cur}/${cur}.js`;
       const fileExists = fs.existsSync(jsFilePath);
-      let importString = '';
+      let jsString = '';
       if (fileExists) {
-        utils.exec(`cp ${jsFilePath} ${output}/`);
-        importString = `import './${cur}.js';`
+        jsString = fs.readFileSync(jsFilePath, 'utf8');
       }
-      return acc + importString + '\n';
+      return acc + jsString + '\n';
     }, '');
     fs.writeFileSync(`${output}/${project.name}.js`, jsString);
   };
