@@ -5,6 +5,9 @@
   "bin": {
     "leanweb": "leanweb.js"
   },
+  "scripts": {
+    "tests": "npx jasmine tests/*.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/elgs/leanweb.git"
@@ -16,5 +19,8 @@
   "license": "MIT",
   "dependencies": {
     "node-sass": "*"
+  },
+  "devDependencies": {
+    "jasmine": "*"
   }
 }
