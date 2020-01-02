@@ -12,5 +12,8 @@ describe('leanweb lib tests', () => {
       expect(lwlib.tokenize('a==b')).toEqual(['a', '==', 'b']);
       expect(lwlib.tokenize('a!=b')).toEqual(['a', '!=', 'b']);
       expect(lwlib.tokenize('a!==b')).toEqual(['a', '!==', 'b']);
+      expect(lwlib.tokenize('a[3]===4')).toEqual(['a', '[', '3', ']', '===', '4']);
+      expect(lwlib.tokenize('a!=="asdf"')).toEqual(['a', '!==', '"asdf"']);
+      expect(lwlib.tokenize('a!==\'asdf\'')).toEqual(['a', '!==', "'asdf'"]);
    });
 });
