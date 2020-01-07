@@ -15,5 +15,6 @@ describe('leanweb lib tests', () => {
       expect(lwlib.tokenize('a[3]===4')).toEqual(['a', '[', '3', ']', '===', '4']);
       expect(lwlib.tokenize('a!=="asdf"')).toEqual(['a', '!==', '"asdf"']);
       expect(lwlib.tokenize('a!==\'asdf\'')).toEqual(['a', '!==', "'asdf'"]);
+      // expect(lwlib.tokenize('a+func(3+"x")')).toEqual(['a', '+', 'func', '(', '3', '+', '"x"', ')']);
    });
 });
