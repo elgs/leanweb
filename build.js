@@ -15,7 +15,9 @@
          const fileExists = fs.existsSync(jsFilePath);
          let importString = '';
          if (fileExists) {
-            utils.exec(`cp ${jsFilePath} ${output}/`);
+            let jsString = fs.readFileSync(jsFilePath, 'utf8');
+            jsString = jsString.replace(`import LWElement from './../../../lib/lw-element.js';`, `import LWElement from './lib/lw-element.js';`);
+            fs.writeFileSync(`${output}/${cur}.js`, jsString);
             importString = `import './${cur}.js';`
          }
          return acc + importString + '\n';

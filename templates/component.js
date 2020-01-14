@@ -1,4 +1,4 @@
-import LWElement from './lib/lw-element.js';
+import LWElement from './../../../lib/lw-element.js';
 
 customElements.define('${component}',
    class extends LWElement {
