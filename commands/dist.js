@@ -16,10 +16,10 @@
          let jsString = '';
          if (fileExists) {
             jsString = fs.readFileSync(jsFilePath, 'utf8');
-            jsString = jsString.replace(`import LWElement from './../../../lib/lw-element.js';\n`, '');
+            jsString = jsString.replace(/import\s+LWElement\s+from\s+(\'|\")\.\/(\.\.\/)*lib\/lw-element.js(\'|\")\s*;\s*/, '');
          }
          return acc + jsString + '\n';
-      }, `import LWElement from './lib/lw-element.js';\n`);
+      }, `import LWElement from './lib/lw-element.js';\n\n`);
       fs.writeFileSync(`${output}/${project.name}.js`, jsString);
    };
 
