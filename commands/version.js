@@ -1,2 +1,2 @@
-const packageJSON = require('./package.json');
+const packageJSON = require('../package.json');
 console.log(packageJSON.name, packageJSON.version);

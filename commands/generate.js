@@ -30,7 +30,7 @@
     await utils.exec(`mkdir -p ${cmpPath}`);
 
     if (!fs.existsSync(`${cmpPath}/${cmpName}.js`)) {
-      let jsString = fs.readFileSync(`${__dirname}/templates/component.js`, 'utf8');
+      let jsString = fs.readFileSync(`${__dirname}/../templates/component.js`, 'utf8');
       jsString = jsString.replace(/\$\{component\}/g, cmpName);
 
       fs.writeFileSync(`${cmpPath}/${cmpName}.js`, jsString);

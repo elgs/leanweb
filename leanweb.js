@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const utils = require('./utils.js');
+const utils = require('./commands/utils.js');
 
 const args = process.argv;
 
@@ -31,4 +31,4 @@ if (!leanwebJSONExisted && target !== 'init' && target !== 'help' && target !== 
   console.error('Error: leanweb.json not found.');
   return;
 }
-utils.exec(`node ${__dirname}/${utils.targets[target].file} ${args.slice(3).join(' ')}`);
+utils.exec(`node ${__dirname}/commands/${utils.targets[target].file} ${args.slice(3).join(' ')}`);

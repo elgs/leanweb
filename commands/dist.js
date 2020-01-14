@@ -45,7 +45,7 @@
          }
       }, '\n');
 
-      let htmlString = fs.readFileSync(`${__dirname}/templates/index.html`, 'utf8');
+      let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
       htmlString = htmlString.replace(/\$\{project\.name\}/g, project.name);
       htmlString = htmlString.replace(/\$\{project\.title\}/g, project.title);
       htmlString = htmlString.replace(/\$\{templates\}/g, templates);

@@ -3,7 +3,7 @@ const utils = require('./utils.js');
 const args = process.argv;
 if (args.length < 3) {
   console.log('Usage: leanweb destroy project-name');
-  console.log('This will delete leanweb.json, build/ dist/ and src/')
+  console.log('This will delete leanweb.json, build/ dist/ and src/ lib/')
   return;
 }
 
@@ -16,4 +16,4 @@ if (projectName !== project.name) {
   return;
 }
 
-utils.exec(`rm -rf leanweb.json build/ dist/ src/`);
+utils.exec(`rm -rf leanweb.json build/ dist/ src/ lib/`);
