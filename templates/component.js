@@ -1,7 +1,7 @@
 import LWElement from './../../../lib/lw-element.js';
 
 customElements.define('${component}',
-   class extends LWElement {
+   class extends LWElement {  // LWElement extends HTMLElement
       constructor() {
          super('${component}');
       }

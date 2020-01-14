@@ -2,7 +2,6 @@
 Tool set for generating web components based web project.
 
 ## Installation
-
 * `npm install leanweb -g` as a global tool, or
 * `npm install leanweb -D` in the project as a dev dependency.
 
@@ -13,7 +12,6 @@ tool.
 I don't see any reason leanweb should be installed as `npm install leanweb`.
 
 ## Background
-
 I like the idea in Angular that 3 files (html/js/scss) as a component are in
 charge of a box, like a div, a rectangle area. But I don't like Angular in that
 my code has to be depending on so many bloated dependencies to run. I created
@@ -27,14 +25,12 @@ The principle is simply that 3 files (html/js/scss) as a web component will
 control a box.
 
 ## Getting started
-
 In this demo, I assume leanweb is installed as a global tool by running
 ```
 npm i leanweb -g
 ```
 
 ### leanweb init
-
 Create a directory called `demo` for this demo project.
 ```bash
 $ mkdir demo
@@ -118,7 +114,6 @@ If you deploy these 3 files to a web server, you should see `root works` in
 browser.
 
 ### leanweb generate
-
 Let's create a `login` web component with `leanweb generate` or `leanweb g`.
 ```bash
 demo$ leanweb g login
@@ -144,7 +139,6 @@ component directory `demo-login` is created containing 3 files:
 * demo-login.scss
 
 ### leanweb build
-
 Let's open `src/components/demo-root/demo-root.html`, which previously looks 
 like:
 ```html
@@ -165,23 +159,19 @@ demo$ leanweb build
 You should see `root works login works` in the browser.
 
 ### leanweb dist
-
 Unlike `leanweb build`, `leanweb dist` will combine all js files into one
 `demo.js`. `index.html`, `demo.js` and `demo.css` will be created in the 
 `dist/` directory. 
 
 ### leanweb clean
-
 `leanweb clean` will delete `build/` and `dist/` directories.
 
 ### leanweb destroy
-
 `leanweb destrory project-name` will remove the `leanweb.json` file, `src/`, 
 `build/` and `dist/` directory. Please note the `src/` directory will be 
 deleted by this command.
 
 ### leanweb help
-
 `leanweb help command-name` will print help information for the command. For
 example, `leanweb help dist` or `leanweb h di` will print:
 
@@ -200,7 +190,6 @@ demo$
 ```
 
 ### leanweb version
-
 `leanweb version` will print the version information of `leanweb`.
 
 
