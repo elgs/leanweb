@@ -17,6 +17,8 @@
          if (fileExists) {
             jsString = fs.readFileSync(jsFilePath, 'utf8');
             jsString = jsString.replace(/import\s+LWElement\s+from\s+(\'|\")\.\/(\.\.\/)*lib\/lw-element.js(\'|\")\s*;\s*/, '');
+            jsString = jsString.replace(/\/\/.*$/gm, '');
+            jsString = jsString.replace(/^\s*\n/gm, '');
          }
          return acc + jsString + '\n';
       }, `import LWElement from './lib/lw-element.js';\n\n`);
