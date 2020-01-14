@@ -202,3 +202,8 @@ demo$
 ### leanweb version
 
 `leanweb version` will print the version information of `leanweb`.
+
+
+## Credits
+* https://github.com/soney/jsep
+* https://github.com/donmccurdy/expression-eval
