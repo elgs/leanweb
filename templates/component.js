@@ -1,12 +1,13 @@
 import LWElement from './../../../lib/lw-element.js';
 
-customElements.define('${component}',
+const componentName = '${component}';
+customElements.define(componentName,
    class extends LWElement {  // LWElement extends HTMLElement
       constructor() {
-         super('${component}');
+         super(componentName);
       }
 
-      name = '${component}';
+      name = componentName;
 
       // connectedCallback() {
       //    console.log(this.isConnected);

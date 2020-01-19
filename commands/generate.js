@@ -37,7 +37,7 @@
     }
 
     if (!fs.existsSync(`${cmpPath}/${cmpName}.html`)) {
-      fs.writeFileSync(`${cmpPath}/${cmpName}.html`, `<span lw-eval>name</span> works!`);
+      fs.writeFileSync(`${cmpPath}/${cmpName}.html`, `<slot></slot>\n<span lw-eval>name</span> works!`);
     }
 
     if (!fs.existsSync(`${cmpPath}/${cmpName}.scss`)) {
