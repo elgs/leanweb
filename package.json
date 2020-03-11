@@ -18,8 +18,8 @@
    "author": "Qian Chen",
    "license": "MIT",
    "dependencies": {
-      "node-sass": "*",
       "@babel/parser": "*",
-      "htmlparser2": "*"
+      "node-sass": "*",
+      "parse5": "*"
    }
 }
