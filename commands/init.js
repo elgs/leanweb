@@ -26,7 +26,7 @@
   };
   fs.writeFileSync('leanweb.json', JSON.stringify(leanwebData, null, 2));
 
-  await utils.exec(`cp -R ${__dirname}/../lib ${process.cwd()}`);
+  await utils.exec(`cp -R ${__dirname}/../templates/lib ${process.cwd()}/`);
   
   await utils.exec(`npx leanweb generate root`);
   fs.writeFileSync(`../src/${projectNameLower}.scss`, '');

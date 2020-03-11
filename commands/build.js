@@ -1,7 +1,6 @@
 (async () => {
    const fs = require('fs');
    const utils = require('./utils.js');
-   const parser = require('../lib/lw-parser');
 
    const output = 'build';
    const project = require(`${process.cwd()}/leanweb.json`);
