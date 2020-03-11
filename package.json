@@ -1,23 +1,25 @@
 {
-  "name": "leanweb",
-  "version": "0.0.8",
-  "description": "leanweb",
-  "bin": {
-    "leanweb": "leanweb.js"
-  },
-  "scripts": {
-    "tests": "npx jasmine tests/*.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/elgs/leanweb.git"
-  },
-  "keywords": [
-    "leanweb"
-  ],
-  "author": "Qian Chen",
-  "license": "MIT",
-  "dependencies": {
-    "node-sass": "*"
-  }
+   "name": "leanweb",
+   "version": "0.1.0",
+   "description": "leanweb",
+   "bin": {
+      "leanweb": "leanweb.js"
+   },
+   "scripts": {
+      "tests": "npx jasmine tests/*.js"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/elgs/leanweb.git"
+   },
+   "keywords": [
+      "leanweb"
+   ],
+   "author": "Qian Chen",
+   "license": "MIT",
+   "dependencies": {
+      "@babel/parser": "*",
+      "node-sass": "*",
+      "parse5": "*"
+   }
 }
