@@ -1,6 +1,7 @@
 (async () => {
    const fs = require('fs');
    const utils = require('./utils.js');
+   const parser = require('../lib/lw-parser');
 
    const output = 'build';
    const project = require(`${process.cwd()}/leanweb.json`);
@@ -40,7 +41,8 @@
             }
             const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
-            const templateString = `<template id="${cur}">\n${styleString}${htmlString}\n</template>`
+            const templateString = `<template id="${cur}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${htmlString}\n</template>`
+            console.log(templateString);
             return `${acc}${templateString}\n\n`
          } else {
             return acc;

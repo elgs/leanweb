@@ -40,7 +40,7 @@
             }
             const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
-            const templateString = `<template id="${cur}">\n${styleString}${htmlString}\n</template>`
+            const templateString = `<template id="${cur}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${htmlString}\n</template>`
             return `${acc}${templateString}\n\n`
          } else {
             return acc;
