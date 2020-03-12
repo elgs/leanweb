@@ -5,21 +5,11 @@
    const output = 'build';
    const project = require(`${process.cwd()}/leanweb.json`);
 
-   const buildLib = async () => {
-      await utils.exec(`cp -R ./lib ${output}/`);
-   };
-
-   const buildJS = () => {
-      const jsString = project.components.reduce((acc, cur) => {
-         const jsFilePath = `./src/components/${cur}/${cur}.js`;
-         const fileExists = fs.existsSync(jsFilePath);
-         let importString = '';
-         if (fileExists) {
-            let jsString = fs.readFileSync(jsFilePath, 'utf8');
-            jsString = jsString.replace(/import\s+LWElement\s+from\s+(\'|\")\.\/(\.\.\/)*lib\/lw-element.js(\'|\")\s*;/, `import LWElement from './lib/lw-element.js';`);
-            fs.writeFileSync(`${output}/${cur}.js`, jsString);
-            importString = `import './${cur}.js';`
-         }
+   const buildJS = async () => {
+      const jsString = await project.components.reduce(async (acc, cur) => {
+         await utils.exec(`mkdir -p ./${output}/components/${cur}/`);
+         await utils.exec(`cp -p ./src/components/${cur}/${cur}.js ./${output}/components/${cur}/`);
+         let importString = `import './components/${cur}/${cur}.js';`
          return acc + importString + '\n';
       }, '');
       fs.writeFileSync(`${output}/${project.name}.js`, jsString);
@@ -41,17 +31,14 @@
             const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const templateString = `<template id="${cur}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${htmlString}\n</template>`
-            console.log(templateString);
             return `${acc}${templateString}\n\n`
          } else {
             return acc;
          }
       }, '\n');
 
-      let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
-      htmlString = htmlString.replace(/\$\{project\.name\}/g, project.name);
-      htmlString = htmlString.replace(/\$\{project\.title\}/g, project.title);
-      htmlString = htmlString.replace(/\$\{templates\}/g, templates);
+      let htmlString = fs.readFileSync(`./src/index.html`, 'utf8');
+      htmlString += templates;
 
       fs.writeFileSync(`${output}/index.html`, htmlString);
    };
@@ -68,7 +55,6 @@
    };
 
    await utils.exec(`mkdir -p ${output}`);
-   buildLib();
    buildJS();
    buildCSS();
    buildHTML();
