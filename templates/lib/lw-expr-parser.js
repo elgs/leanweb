@@ -37,7 +37,7 @@ const unaryOperators = {
    '~': a => ~a,
    'typeof': a => typeof a,
    'void': a => void a,
-   'delete': a => delete a,
+   //  'delete': a => delete a,
    'throw': a => { throw a; },
 };
 
@@ -131,16 +131,12 @@ const evalNode = (node, table) => {
    return nodeHandlers[node.type](node, table);
 };
 
-const evaluate = (ast, table = {}) => {
+export const evaluate = (ast, table = {}) => {
    // console.log(ast);
    return ast.map(a => evalNode(a, table));
 };
 
-const parse = expr => parser.parse(expr);
-
-module.exports = { evaluate, parse };
-
-
+// module.exports = { evaluate };
 // const parser = require('@babel/parser');
 // const ast = parser.parse("/\\d+/.test(1);123").program.body;
 // console.log(ast);

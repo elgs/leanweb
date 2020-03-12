@@ -1,4 +1,4 @@
-import * as parser from './parser.js';
+import * as parser from './lw-expr-parser.js';
 
 function hasMethod(obj, name) {
    const desc = Object.getOwnPropertyDescriptor(obj, name);

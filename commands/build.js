@@ -33,7 +33,7 @@
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const parsed = parser.parse(htmlString);
             const templateString = `<template id="${cur}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`
-            fs.writeFileSync(`./${output}/components/${cur}/ast.json`, JSON.stringify(parsed.ast, null, 2));
+            fs.appendFileSync(`${output}/components/${cur}/${cur}.js`, `component.ast = ${JSON.stringify(parsed.ast)};`);
             return `${acc}${templateString}\n\n`
          } else {
             return acc;
@@ -55,7 +55,7 @@
    };
 
    await utils.exec(`mkdir -p ${output}`);
-   buildJS();
+   await buildJS();
    buildCSS();
    buildHTML();
 })();
