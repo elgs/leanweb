@@ -10,14 +10,13 @@ const classPrefix = 'lw-class:';
 const bindPrefix = 'lw-bind:';
 
 export default class LWElement extends HTMLElement {
-
-   constructor(templateId) {
+   constructor(component) {
       super();
 
       this._bindMethods();
 
-      const templateNode = document.getElementById(templateId).content.cloneNode(true);
-      this.attachShadow({ mode: 'open' }).appendChild(templateNode);
+      const node = document.getElementById(component.id).content.cloneNode(true);
+      this.attachShadow({ mode: 'open' }).appendChild(node);
 
       setTimeout(() => {
          this._bind();
