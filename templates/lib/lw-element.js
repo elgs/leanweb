@@ -152,10 +152,6 @@ export default class LWElement extends HTMLElement {
       if (node[classAttrName]) {
          return;
       }
-      // put a hook
-      if (!node.hasAttribute('lw-class')) {
-         node.setAttribute('lw-class', '');
-      }
       const ast = parser.parse(classExpression);
       node[classAttrName] = ast;
       const classValue = parser.eval(ast, context);
@@ -170,10 +166,6 @@ export default class LWElement extends HTMLElement {
       if (node[bindAttrName]) {
          return;
       }
-      // put a hook
-      if (!node.hasAttribute('lw-bind')) {
-         node.setAttribute('lw-bind', '');
-      }
       const ast = parser.parse(bindExpression);
       node[bindAttrName] = ast;
       const bindValue = parser.eval(ast, context);
@@ -186,10 +178,10 @@ export default class LWElement extends HTMLElement {
 
    update(selector = '', rootNode = this.shadowRoot, context = this) {
       this.updateEval(selector, rootNode, context);
-      // this.updateIf(selector, rootNode, context);
-      // this.updateClass(selector, rootNode, context);
+      this.updateIf(selector, rootNode, context);
+      this.updateClass(selector, rootNode, context);
       // this.updateModel(selector, rootNode, context);
-      // this.updateBind(selector, rootNode, context);
+      this.updateBind(selector, rootNode, context);
    }
 
    updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
@@ -206,56 +198,61 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateEval(selector = '', rootNode = this.shadowRoot, context = this) {
-      const evalNodes = [];
-      if (rootNode.matches && rootNode.matches(selector.trim() + '[lw]')) {
-         evalNodes.push(rootNode);
+   _querySelectorAllIncludingSelf(selector, rootNode) {
+      const nodes = [];
+      if (rootNode.matches && rootNode.matches(selector)) {
+         nodes.push(rootNode);
       }
-      rootNode.querySelectorAll(selector.trim() + '[lw]').forEach(evalNode => {
-         evalNodes.push(evalNode);
+      rootNode.querySelectorAll(selector).forEach(evalNode => {
+         nodes.push(evalNode);
       });
-      evalNodes.forEach(evalNode => {
+      return nodes;
+   }
+
+   updateEval(selector = '', rootNode = this.shadowRoot, context = this) {
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw]', rootNode);
+      nodes.forEach(evalNode => {
          const key = evalNode.getAttribute('lw');
          const interpolation = this.component.interpolation[key];
          const parsed = parser.evaluate(interpolation, context);
          evalNode.innerText = parsed[0];
-      })
+      });
    }
 
    updateIf(selector = '', rootNode = this.shadowRoot, context = this) {
-      rootNode.querySelectorAll(selector.trim() + '[lw-if]').forEach(ifNode => {
-         if (!ifNode['lw-if']) {
-            const expression = ifNode.getAttribute('lw-if');
-            const ast = parser.parse(expression);
-            ifNode['lw-if'] = ast;
-         }
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-if]', rootNode);
+      nodes.forEach(ifNode => {
+         const key = ifNode.getAttribute('lw-if');
+         const interpolation = this.component.interpolation[key];
+         const parsed = parser.evaluate(interpolation, context);
 
-         parser.evalAsync(ifNode['lw-if'], context).then(value => {
-            if (!value) {
-               const oldDisplayValue = getComputedStyle(ifNode).getPropertyValue('display') || '';
-               if (oldDisplayValue !== 'none') {
-                  ifNode['lw-if-display'] = oldDisplayValue;
-               }
-               ifNode.style.display = 'none';
-            } else {
-               const oldDisplayValue = ifNode['lw-if-display'] || '';
-               ifNode.style.display = oldDisplayValue;
+         if (!parsed[0]) {
+            const oldDisplayValue = getComputedStyle(ifNode).getPropertyValue('display') || '';
+            if (oldDisplayValue !== 'none') {
+               ifNode['lw-if-display'] = oldDisplayValue;
             }
-         });
+            ifNode.style.display = 'none';
+         } else {
+            const oldDisplayValue = ifNode['lw-if-display'] || '';
+            ifNode.style.display = oldDisplayValue;
+         }
       });
    }
 
    updateClass(selector = '', rootNode = this.shadowRoot, context = this) {
-      rootNode.querySelectorAll(selector.trim() + '[lw-class]').forEach(classNode => {
-         for (let attr of classNode.attributes) {
-            const classAttrName = attr.name;
-            if (classAttrName.startsWith(classPrefix)) {
-               const ast = classNode[classAttrName];
-               const classValue = parser.eval(ast, context);
-               if (!classValue) {
-                  classNode.classList.remove(classAttrName.substring(classPrefix.length));
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-class]', rootNode);
+      nodes.forEach(classNode => {
+         for (const attr of classNode.attributes) {
+            const attrName = attr.name;
+            const attrValue = attr.value;
+            if (attrName.startsWith(classPrefix)) {
+               const interpolation = this.component.interpolation[attrValue];
+               const parsed = parser.evaluate(interpolation, context);
+
+               if (!parsed[0]) {
+                  classNode.classList.remove(attrName.substring(classPrefix.length));
                } else {
-                  classNode.classList.add(classAttrName.substring(classPrefix.length));
+                  classNode.classList.add(attrName.substring(classPrefix.length));
                }
             }
          }
@@ -263,16 +260,19 @@ export default class LWElement extends HTMLElement {
    }
 
    updateBind(selector = '', rootNode = this.shadowRoot, context = this) {
-      rootNode.querySelectorAll(selector.trim() + '[lw-bind]').forEach(bindNode => {
-         for (let attr of bindNode.attributes) {
-            const bindAttrName = attr.name;
-            if (bindAttrName.startsWith(bindPrefix)) {
-               const ast = bindNode[bindAttrName];
-               const bindValue = parser.eval(ast, context);
-               if (!bindValue) {
-                  bindNode.removeAttribute(bindAttrName.substring(bindPrefix.length));
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-bind]', rootNode);
+      nodes.forEach(bindNode => {
+         for (const attr of bindNode.attributes) {
+            const attrName = attr.name;
+            const attrValue = attr.value;
+            if (attrName.startsWith(bindPrefix)) {
+               const interpolation = this.component.interpolation[attrValue];
+               const parsed = parser.evaluate(interpolation, context);
+
+               if (!parsed[0]) {
+                  bindNode.removeAttribute(attrName.substring(bindPrefix.length));
                } else {
-                  bindNode.setAttribute(bindAttrName.substring(bindPrefix.length), bindValue);
+                  bindNode.setAttribute(attrName.substring(bindPrefix.length), parsed[0]);
                }
             }
          }
