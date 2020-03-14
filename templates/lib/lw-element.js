@@ -180,22 +180,8 @@ export default class LWElement extends HTMLElement {
       this.updateEval(selector, rootNode, context);
       this.updateIf(selector, rootNode, context);
       this.updateClass(selector, rootNode, context);
-      // this.updateModel(selector, rootNode, context);
+      this.updateModel(selector, rootNode, context);
       this.updateBind(selector, rootNode, context);
-   }
-
-   updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
-      rootNode.querySelectorAll(selector.trim() + 'input[lw-model]').forEach(modelNode => {
-         if (!modelNode['lw-model']) {
-            const expression = modelNode.getAttribute('lw-model');
-            const ast = parser.parse(expression);
-            modelNode['lw-model'] = ast;
-         }
-
-         parser.evalAsync(modelNode['lw-model'], context).then(value => {
-            modelNode.value = value;
-         });
-      });
    }
 
    _querySelectorAllIncludingSelf(selector, rootNode) {
@@ -207,6 +193,16 @@ export default class LWElement extends HTMLElement {
          nodes.push(evalNode);
       });
       return nodes;
+   }
+
+   updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]', rootNode);
+      nodes.forEach(modelNode => {
+         const key = modelNode.getAttribute('lw-model');
+         const interpolation = this.component.interpolation[key];
+         const parsed = parser.evaluate(interpolation, context);
+         modelNode.value = parsed[0];
+      });
    }
 
    updateEval(selector = '', rootNode = this.shadowRoot, context = this) {
