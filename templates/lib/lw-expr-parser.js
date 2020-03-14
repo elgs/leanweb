@@ -126,19 +126,19 @@ const nodeHandlers = {
    'NewExpression': (node, table) => callFunction(node, table),
 };
 
-const evalNode = (node, table) => {
-   // console.log(node.type);
-   return nodeHandlers[node.type](node, table);
+const evalNode = (node, table) => nodeHandlers[node.type](node, table);
+
+export const evaluate = (interpolation, table = {}) => {
+   try {
+      return interpolation.ast.map(astNode => evalNode(astNode, table));
+   } catch (e) {
+      throw { error: e.message, location: interpolation.loc };
+   }
 };
 
-export const evaluate = (ast, table = {}) => {
-   // console.log(ast);
-   return ast.map(a => evalNode(a, table));
-};
-
-// module.exports = { evaluate };
-// const parser = require('@babel/parser');
-// const ast = parser.parse("/\\d+/.test(1);123").program.body;
-// console.log(ast);
-// const result = evaluate(JSON.parse(JSON.stringify(ast)), { a: {} });
-// console.log(result);
+ // module.exports = { evaluate };
+ // const parser = require('@babel/parser');
+ // const ast = parser.parse("/\\d+/.test(1);123").program.body;
+ // console.log(ast);
+ // const result = evaluate(JSON.parse(JSON.stringify(ast)), { a: {} });
+ // console.log(result);

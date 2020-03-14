@@ -10,8 +10,10 @@ const classPrefix = 'lw-class:';
 const bindPrefix = 'lw-bind:';
 
 export default class LWElement extends HTMLElement {
+   component;
    constructor(component) {
       super();
+      this.component = component;
 
       this._bindMethods();
 
@@ -19,7 +21,7 @@ export default class LWElement extends HTMLElement {
       this.attachShadow({ mode: 'open' }).appendChild(node);
 
       setTimeout(() => {
-         this._bind();
+         // this._bind();
          this.update();
       });
    }
@@ -184,10 +186,10 @@ export default class LWElement extends HTMLElement {
 
    update(selector = '', rootNode = this.shadowRoot, context = this) {
       this.updateEval(selector, rootNode, context);
-      this.updateIf(selector, rootNode, context);
-      this.updateClass(selector, rootNode, context);
-      this.updateModel(selector, rootNode, context);
-      this.updateBind(selector, rootNode, context);
+      // this.updateIf(selector, rootNode, context);
+      // this.updateClass(selector, rootNode, context);
+      // this.updateModel(selector, rootNode, context);
+      // this.updateBind(selector, rootNode, context);
    }
 
    updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
@@ -213,14 +215,10 @@ export default class LWElement extends HTMLElement {
          evalNodes.push(evalNode);
       });
       evalNodes.forEach(evalNode => {
-         if (!evalNode['lw-eval']) {
-            const expression = evalNode.innerText;
-            const ast = parser.parse(expression);
-            evalNode['lw-eval'] = ast;
-         }
-         parser.evalAsync(evalNode['lw-eval'], context).then(value => {
-            evalNode.innerText = value;
-         });
+         const key = evalNode.getAttribute('lw');
+         const interpolation = this.component.interpolation[key];
+         const parsed = parser.evaluate(interpolation, context);
+         evalNode.innerText = parsed[0];
       })
    }
 
