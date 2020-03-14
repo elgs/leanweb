@@ -32,8 +32,8 @@
             const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const parsed = parser.parse(htmlString);
-            const templateString = `<template id="${cur}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`
-            fs.writeFileSync(`${output}/components/${cur}/ast.js`, `export default ${JSON.stringify(parsed.ast)}`);
+            const templateString = `<template id="${cur}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`;
+            fs.writeFileSync(`${output}/components/${cur}/ast.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
             return `${acc}${templateString}\n\n`
          } else {
             return acc;
