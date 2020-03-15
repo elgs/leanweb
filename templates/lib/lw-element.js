@@ -10,47 +10,45 @@ const classPrefix = 'lw-class:';
 const bindPrefix = 'lw-bind:';
 
 export default class LWElement extends HTMLElement {
-   component;
+   _component;
    constructor(component) {
       super();
-      this.component = component;
-
-      this._bindMethods();
+      this._component = component;
 
       const node = document.getElementById(component.id).content.cloneNode(true);
       this.attachShadow({ mode: 'open' }).appendChild(node);
 
-      setTimeout(() => {
-         // this._bind();
+      this._bindMethods().then(() => {
+         this._bind();
          this.update();
       });
    }
 
    _bind(rootNode = this.shadowRoot, context = this) {
-      const nodes = [];
-      if (rootNode.attributes) {
-         nodes.push(rootNode);
-      }
-      const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
-      while (treeWalker.nextNode()) {
-         nodes.push(treeWalker.currentNode);
-      }
-      nodes.forEach(node => {
-         for (let attr of node.attributes) {
-            if (attr.name.startsWith(eventPrefix)) {
-               this._bindEvent(node, attr.name, attr.value, context);
-            } else if (attr.name.startsWith(classPrefix)) {
-               this._bindClass(node, attr.name, attr.value, context);
-            } else if (attr.name.startsWith(bindPrefix)) {
-               this._bindBind(node, attr.name, attr.value, context);
-            }
-         }
-      });
+      // const nodes = [];
+      // if (rootNode.attributes) {
+      //   nodes.push(rootNode);
+      // }
+      // const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
+      // while (treeWalker.nextNode()) {
+      //   nodes.push(treeWalker.currentNode);
+      // }
+      // nodes.forEach(node => {
+      //   for (let attr of node.attributes) {
+      //     if (attr.name.startsWith(eventPrefix)) {
+      //       this._bindEvent(node, attr.name, attr.value, context);
+      //     } else if (attr.name.startsWith(classPrefix)) {
+      //       this._bindClass(node, attr.name, attr.value, context);
+      //     } else if (attr.name.startsWith(bindPrefix)) {
+      //       this._bindBind(node, attr.name, attr.value, context);
+      //     }
+      //   }
+      // });
       this._bindModels(rootNode, context);
-      this._bindFors(rootNode, context);
+      // this._bindFors(rootNode, context);
    }
 
-   _bindMethods(context = this) {
+   async _bindMethods(context = this) {
       const methodNames = [];
       const proto = Object.getPrototypeOf(context);
       methodNames.push(...Object.getOwnPropertyNames(proto).filter(name => hasMethod(proto, name)));
@@ -60,30 +58,32 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   _bindModels(rootNode = this.shadowRoot, context = this) {
-      const modelNodes = rootNode.querySelectorAll('input[lw-model]');
-      if (rootNode.matches && rootNode.matches('input[lw-model]')) {
-         modelNodes.push(rootNode);
+   _querySelectorAllIncludingSelf(selector, rootNode) {
+      const nodes = [];
+      if (rootNode.matches && rootNode.matches(selector)) {
+         nodes.push(rootNode);
       }
-      for (const modelNode of modelNodes) {
+      rootNode.querySelectorAll(selector).forEach(evalNode => {
+         nodes.push(evalNode);
+      });
+      return nodes;
+   }
+
+   _bindModels(rootNode = this.shadowRoot, context = this) {
+      const nodes = this._querySelectorAllIncludingSelf('input[lw-model]', rootNode);
+      for (const modelNode of nodes) {
          if (modelNode['model_event_bound']) {
             continue;
          }
          modelNode['model_event_bound'] = true;
 
-         const expression = modelNode.getAttribute('lw-model');
-         const indexOfLastDot = expression.lastIndexOf('.');
-         if (indexOfLastDot > -1) {
-            const objectExpression = expression.substring(0, indexOfLastDot);
-            const ast = parser.parse(objectExpression);
-            modelNode['lw-model-object'] = ast;
-         }
+         const key = modelNode.getAttribute('lw-model');
+         const interpolation = this._component.interpolation[key];
 
          modelNode.addEventListener('keyup', (event => {
-            const indexOfLastDot = expression.lastIndexOf('.');
-            if (indexOfLastDot > -1) {
-               const valueExpression = expression.substring(indexOfLastDot + 1);
-               const object = parser.eval(modelNode['lw-model-object'], context);
+            const valueExpression = interpolation.value;
+            if (interpolation.astObj) {
+               const object = parser.evaluate(interpolation.astObj, context, interpolation.loc)[0];
                if (event.target.type === 'number') {
                   object[valueExpression] = event.target.value * 1;
                } else {
@@ -91,9 +91,9 @@ export default class LWElement extends HTMLElement {
                }
             } else {
                if (event.target.type === 'number') {
-                  context[expression] = event.target.value * 1;
+                  context[valueExpression] = event.target.value * 1;
                } else {
-                  context[expression] = event.target.value;
+                  context[valueExpression] = event.target.value;
                }
             }
             context.update();
@@ -184,23 +184,12 @@ export default class LWElement extends HTMLElement {
       this.updateBind(selector, rootNode, context);
    }
 
-   _querySelectorAllIncludingSelf(selector, rootNode) {
-      const nodes = [];
-      if (rootNode.matches && rootNode.matches(selector)) {
-         nodes.push(rootNode);
-      }
-      rootNode.querySelectorAll(selector).forEach(evalNode => {
-         nodes.push(evalNode);
-      });
-      return nodes;
-   }
-
    updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]', rootNode);
       nodes.forEach(modelNode => {
          const key = modelNode.getAttribute('lw-model');
-         const interpolation = this.component.interpolation[key];
-         const parsed = parser.evaluate(interpolation, context);
+         const interpolation = this._component.interpolation[key];
+         const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
          modelNode.value = parsed[0];
       });
    }
@@ -209,8 +198,8 @@ export default class LWElement extends HTMLElement {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw]', rootNode);
       nodes.forEach(evalNode => {
          const key = evalNode.getAttribute('lw');
-         const interpolation = this.component.interpolation[key];
-         const parsed = parser.evaluate(interpolation, context);
+         const interpolation = this._component.interpolation[key];
+         const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
          evalNode.innerText = parsed[0];
       });
    }
@@ -219,8 +208,8 @@ export default class LWElement extends HTMLElement {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-if]', rootNode);
       nodes.forEach(ifNode => {
          const key = ifNode.getAttribute('lw-if');
-         const interpolation = this.component.interpolation[key];
-         const parsed = parser.evaluate(interpolation, context);
+         const interpolation = this._component.interpolation[key];
+         const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
          if (!parsed[0]) {
             const oldDisplayValue = getComputedStyle(ifNode).getPropertyValue('display') || '';
@@ -242,8 +231,8 @@ export default class LWElement extends HTMLElement {
             const attrName = attr.name;
             const attrValue = attr.value;
             if (attrName.startsWith(classPrefix)) {
-               const interpolation = this.component.interpolation[attrValue];
-               const parsed = parser.evaluate(interpolation, context);
+               const interpolation = this._component.interpolation[attrValue];
+               const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
                if (!parsed[0]) {
                   classNode.classList.remove(attrName.substring(classPrefix.length));
@@ -262,8 +251,8 @@ export default class LWElement extends HTMLElement {
             const attrName = attr.name;
             const attrValue = attr.value;
             if (attrName.startsWith(bindPrefix)) {
-               const interpolation = this.component.interpolation[attrValue];
-               const parsed = parser.evaluate(interpolation, context);
+               const interpolation = this._component.interpolation[attrValue];
+               const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
                if (!parsed[0]) {
                   bindNode.removeAttribute(attrName.substring(bindPrefix.length));

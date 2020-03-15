@@ -128,11 +128,11 @@ const nodeHandlers = {
 
 const evalNode = (node, table) => nodeHandlers[node.type](node, table);
 
-export const evaluate = (interpolation, table = {}) => {
+export const evaluate = (ast, table = {}, loc = {}) => {
    try {
-      return interpolation.ast.map(astNode => evalNode(astNode, table));
+      return ast.map(astNode => evalNode(astNode, table));
    } catch (e) {
-      throw { error: e.message, location: interpolation.loc };
+      throw { error: e.message, location: loc };
    }
 };
 
