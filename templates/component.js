@@ -1,4 +1,4 @@
-import LWElement from './../../../lib/lw-element.js';
+import LWElement from './../../lib/lw-element.js';
 import * as interpolation from './interpolation.js';
 
 const component = { id: 'test-root', interpolation: interpolation.default };

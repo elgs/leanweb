@@ -6,10 +6,14 @@
    const output = 'build';
    const project = require(`${process.cwd()}/leanweb.json`);
 
+   const copyLIB = () => {
+      utils.exec(`cp -R ./src/lib ./${output}/`);
+   };
+
    const buildJS = async () => {
       const jsString = await project.components.reduce(async (acc, cur) => {
          await utils.exec(`mkdir -p ./${output}/components/${cur}/`);
-         await utils.exec(`cp -p ./src/components/${cur}/${cur}.js ./${output}/components/${cur}/`);
+         await utils.exec(`cp ./src/components/${cur}/${cur}.js ./${output}/components/${cur}/`);
          let importString = `import './components/${cur}/${cur}.js';`
          return acc + importString + '\n';
       }, '');
@@ -55,6 +59,8 @@
    };
 
    await utils.exec(`mkdir -p ${output}`);
+
+   copyLIB();
    await buildJS();
    buildCSS();
    buildHTML();

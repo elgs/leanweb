@@ -28,7 +28,7 @@
 
    await utils.exec(`npx leanweb generate root`);
 
-   await utils.exec(`cp -R ${__dirname}/../templates/lib ./`);
+   await utils.exec(`cp -R ${__dirname}/../templates/lib ./src/`);
    let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectNameLower);
    htmlString = htmlString.replace(/\$\{project\.title\}/g, projectName);
