@@ -25,26 +25,8 @@ export default class LWElement extends HTMLElement {
    }
 
    _bind(rootNode = this.shadowRoot, context = this) {
-      // const nodes = [];
-      // if (rootNode.attributes) {
-      //   nodes.push(rootNode);
-      // }
-      // const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT);
-      // while (treeWalker.nextNode()) {
-      //   nodes.push(treeWalker.currentNode);
-      // }
-      // nodes.forEach(node => {
-      //   for (let attr of node.attributes) {
-      //     if (attr.name.startsWith(eventPrefix)) {
-      //       this._bindEvent(node, attr.name, attr.value, context);
-      //     } else if (attr.name.startsWith(classPrefix)) {
-      //       this._bindClass(node, attr.name, attr.value, context);
-      //     } else if (attr.name.startsWith(bindPrefix)) {
-      //       this._bindBind(node, attr.name, attr.value, context);
-      //     }
-      //   }
-      // });
-      this._bindModels(rootNode, context);
+      this._bindEvents('', rootNode, context);
+      this._bindModels('', rootNode, context);
       // this._bindFors(rootNode, context);
    }
 
@@ -69,8 +51,8 @@ export default class LWElement extends HTMLElement {
       return nodes;
    }
 
-   _bindModels(rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf('input[lw-model]', rootNode);
+   _bindModels(selector = '', rootNode = this.shadowRoot, context = this) {
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]', rootNode);
       for (const modelNode of nodes) {
          if (modelNode['model_event_bound']) {
             continue;
@@ -80,7 +62,7 @@ export default class LWElement extends HTMLElement {
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
 
-         modelNode.addEventListener('keyup', (event => {
+         modelNode.addEventListener('change', (event => {
             const valueExpression = interpolation.value;
             if (interpolation.astObj) {
                const object = parser.evaluate(interpolation.astObj, context, interpolation.loc)[0];
@@ -123,7 +105,6 @@ export default class LWElement extends HTMLElement {
          const items = parser.eval(ast, context);
          items.forEach((item, index) => {
             const node = forNode.cloneNode(true);
-            console.log(node);
             node.removeAttribute('lw-for');
             forNode.insertAdjacentElement('afterend', node);
             const itemContext = { [itemExpression]: item, [indexExpression]: index };
@@ -133,47 +114,28 @@ export default class LWElement extends HTMLElement {
       }
    }
 
-   _bindEvent(node, eventAttrName, eventHandlerExpression, context = this) {
-      if (node[eventAttrName]) {
-         return;
-      }
-      const ast = parser.parse(eventHandlerExpression);
-      node[eventAttrName] = ast;
+   _bindEvents(selector = '', rootNode = this.shadowRoot, context = this) {
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-on]', rootNode);
+      nodes.forEach(eventNode => {
+         for (const attr of eventNode.attributes) {
+            const attrName = attr.name;
+            const attrValue = attr.value;
+            if (attrName.startsWith(eventPrefix)) {
+               if (eventNode[attr.name]) {
+                  continue;
+               }
+               eventNode[attr.name] = true;
+               const interpolation = this._component.interpolation[attrValue];
 
-      node.addEventListener(eventAttrName.substring(eventPrefix.length), (event => {
-         context['$event'] = event;
-         const ret = parser.eval(node[eventAttrName], context);
-         delete context['$event'];
-         return ret;
-      }).bind(context));
-   }
-
-   _bindClass(node, classAttrName, classExpression, context = this) {
-      if (node[classAttrName]) {
-         return;
-      }
-      const ast = parser.parse(classExpression);
-      node[classAttrName] = ast;
-      const classValue = parser.eval(ast, context);
-      if (!classValue) {
-         node.classList.remove(classAttrName.substring(classPrefix.length));
-      } else {
-         node.classList.add(classAttrName.substring(classPrefix.length));
-      }
-   }
-
-   _bindBind(node, bindAttrName, bindExpression, context = this) {
-      if (node[bindAttrName]) {
-         return;
-      }
-      const ast = parser.parse(bindExpression);
-      node[bindAttrName] = ast;
-      const bindValue = parser.eval(ast, context);
-      if (!bindValue) {
-         node.removeAttribute(bindAttrName.substring(bindPrefix.length));
-      } else {
-         node.setAttribute(bindAttrName.substring(bindPrefix.length), bindValue);
-      }
+               eventNode.addEventListener(interpolation.lwValue, (event => {
+                  context['$event'] = event;
+                  const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
+                  delete context['$event'];
+                  return parsed;
+               }).bind(context));
+            }
+         }
+      });
    }
 
    update(selector = '', rootNode = this.shadowRoot, context = this) {
@@ -235,9 +197,9 @@ export default class LWElement extends HTMLElement {
                const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
                if (!parsed[0]) {
-                  classNode.classList.remove(attrName.substring(classPrefix.length));
+                  classNode.classList.remove(interpolation.lwValue);
                } else {
-                  classNode.classList.add(attrName.substring(classPrefix.length));
+                  classNode.classList.add(interpolation.lwValue);
                }
             }
          }
@@ -255,9 +217,9 @@ export default class LWElement extends HTMLElement {
                const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
                if (!parsed[0]) {
-                  bindNode.removeAttribute(attrName.substring(bindPrefix.length));
+                  bindNode.removeAttribute(interpolation.lwValue);
                } else {
-                  bindNode.setAttribute(attrName.substring(bindPrefix.length), parsed[0]);
+                  bindNode.setAttribute(interpolation.lwValue, parsed[0]);
                }
             }
          }
