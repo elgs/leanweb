@@ -1,7 +1,7 @@
 import LWElement from './../../${pathLevels}lib/lw-element.js';
-import * as interpolation from './interpolation.js';
+import interpolation from './interpolation.js';
 
-const component = { id: '${projectName}-${component}', interpolation: interpolation.default };
+const component = { id: '${projectName}-${component}', interpolation };
 customElements.define(component.id,
    class extends LWElement {  // LWElement extends HTMLElement
       constructor() {
