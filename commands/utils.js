@@ -25,6 +25,15 @@ module.exports.getComponentName = cmp => {
    return cmp;
 };
 
+module.exports.getPathLevels = cmp => {
+   const numSlashes = cmp.replace(/[^\/]/g, "").length;
+   let ret = '';
+   for (let i = 0; i < numSlashes; ++i) {
+      ret += '../';
+   }
+   return ret;
+};
+
 const initNote = `Usage: leanweb init or leanweb init project-name
 leanweb init will initialize a leanweb project with the name of the current
 working directory, otherwise, if a project-name is provided, the provided

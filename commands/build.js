@@ -6,23 +6,33 @@
    const output = 'build';
    const project = require(`${process.cwd()}/leanweb.json`);
 
+   const replaceNodeModulesImport = (str, cmp) => {
+      // match import not starting with dot or slash
+      return str.replace(/^(\s*import\s+.*?from\s+['|"])([^\.|^\/].+?)(['|"].*)$/gm, (m, a, b, c) => {
+         const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
+         const package = require(nodeModulePath);
+         return a + `./../../../${utils.getPathLevels(cmp)}node_modules/` + b + '/' + package.main + c;
+      })
+   };
+
    const copyLIB = () => {
       utils.exec(`cp -R ./src/lib ./${output}/`);
    };
 
    const buildJS = async () => {
-      project.components.map(async cur => {
-         const cmpName = utils.getComponentName(cur);
+      const mkdirPromises = project.components.map(async cur => {
          await utils.exec(`mkdir -p ./${output}/components/${cur}/`);
-         await utils.exec(`cp ./src/components/${cur}/${cmpName}.js ./${output}/components/${cur}/`);
       });
+      await Promise.all(mkdirPromises);
 
       const jsString = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);
+         let jsFileString = fs.readFileSync(`./src/components/${cur}/${cmpName}.js`, 'utf8');
+         jsFileString = replaceNodeModulesImport(jsFileString, cur);
+         fs.writeFileSync(`./${output}/components/${cur}/${cmpName}.js`, jsFileString);
          let importString = `import './components/${cur}/${cmpName}.js';`;
          return acc + importString + '\n';
       }, '');
-
       fs.writeFileSync(`${output}/${project.name}.js`, jsString);
    };
 

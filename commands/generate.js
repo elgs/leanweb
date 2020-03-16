@@ -12,15 +12,6 @@
    const leanwebJSON = require(leanwebJSONPath);
    const cmps = args.slice(2);
 
-   const getPathLevels = str => {
-      const numSlashes = str.replace(/[^\/]/g, "").length;
-      let ret = '';
-      for (let i = 0; i < numSlashes; ++i) {
-         ret += '../';
-      }
-      return ret;
-   };
-
    for (const cmpJSON of leanwebJSON.components) {
       for (const cmp of cmps) {
          if (cmpJSON === cmp) {
@@ -42,7 +33,7 @@
          let jsString = fs.readFileSync(`${__dirname}/../templates/component.js`, 'utf8');
          jsString = jsString.replace(/\$\{projectName\}/g, leanwebJSON.name);
          jsString = jsString.replace(/\$\{component\}/g, cmp.replace(/\//g, '-'));
-         jsString = jsString.replace(/\$\{pathLevels\}/g, getPathLevels(cmp));
+         jsString = jsString.replace(/\$\{pathLevels\}/g, utils.getPathLevels(cmp));
 
          fs.writeFileSync(`${cmpPath}/${cmpName}.js`, jsString);
       }
