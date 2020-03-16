@@ -9,7 +9,10 @@
    const replaceNodeModulesImport = (str, cmp) => {
       // match import not starting with dot or slash
       return str.replace(/^(\s*import\s+.*?from\s+['|"])([^\.|^\/].+?)(['|"].*)$/gm, (m, a, b, c) => {
-         if (b.toLowerCase().endsWith('.js')) {
+         if (b.toLowerCase().endsWith('.js') || b.indexOf('/') > -1) {
+            if (!b.endsWith('.js')) {
+               b += '.js';
+            }
             return a + `./../../../${utils.getPathLevels(cmp)}node_modules/` + b + c;
          } else {
             const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
