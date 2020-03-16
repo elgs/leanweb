@@ -2,19 +2,27 @@ const { exec } = require('child_process');
 const sass = require('node-sass');
 
 module.exports.exec = command => new Promise((res =>
-  exec(command, (err, stdout, stderr) => {
-    process.stdout.write(stdout);
-    process.stderr.write(stderr);
-    res();
-  })
+   exec(command, (err, stdout, stderr) => {
+      process.stdout.write(stdout);
+      process.stderr.write(stderr);
+      res();
+   })
 ));
 
 module.exports.buildCSS = scssString => {
-  if (scssString.trim()) {
-    const cssResult = sass.renderSync({ data: scssString });
-    return cssResult.css.toString().trim();
-  }
-  return '';
+   if (scssString.trim()) {
+      const cssResult = sass.renderSync({ data: scssString });
+      return cssResult.css.toString().trim();
+   }
+   return '';
+};
+
+module.exports.getComponentName = cmp => {
+   const indexOfLastSlash = cmp.lastIndexOf('/');
+   if (indexOfLastSlash > -1) {
+      return cmp.substring(indexOfLastSlash + 1);
+   }
+   return cmp;
 };
 
 const initNote = `Usage: leanweb init or leanweb init project-name
@@ -107,12 +115,12 @@ const versionNote = `Usage: leanweb version
 Print version information for leanweb.`;
 
 module.exports.targets = {
-  'init': { file: 'init.js', note: initNote },
-  'generate': { file: 'generate.js', note: generateNote },
-  'build': { file: 'build.js', note: buildNote },
-  'dist': { file: 'dist.js', note: distNote },
-  'clean': { file: 'clean.js', note: cleanNote },
-  'destroy': { file: 'destroy.js', note: destroyNote },
-  'help': { file: 'help.js', note: helpNote },
-  'version': { file: 'version.js', note: versionNote },
+   'init': { file: 'init.js', note: initNote },
+   'generate': { file: 'generate.js', note: generateNote },
+   'build': { file: 'build.js', note: buildNote },
+   'dist': { file: 'dist.js', note: distNote },
+   'clean': { file: 'clean.js', note: cleanNote },
+   'destroy': { file: 'destroy.js', note: destroyNote },
+   'help': { file: 'help.js', note: helpNote },
+   'version': { file: 'version.js', note: versionNote },
 };

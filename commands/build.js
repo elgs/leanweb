@@ -11,22 +11,29 @@
    };
 
    const buildJS = async () => {
-      const jsString = await project.components.reduce(async (acc, cur) => {
+      project.components.map(async cur => {
+         const cmpName = utils.getComponentName(cur);
          await utils.exec(`mkdir -p ./${output}/components/${cur}/`);
-         await utils.exec(`cp ./src/components/${cur}/${cur}.js ./${output}/components/${cur}/`);
-         let importString = `import './components/${cur}/${cur}.js';`
+         await utils.exec(`cp ./src/components/${cur}/${cmpName}.js ./${output}/components/${cur}/`);
+      });
+
+      const jsString = project.components.reduce((acc, cur) => {
+         const cmpName = utils.getComponentName(cur);
+         let importString = `import './components/${cur}/${cmpName}.js';`;
          return acc + importString + '\n';
       }, '');
+
       fs.writeFileSync(`${output}/${project.name}.js`, jsString);
    };
 
    const buildHTML = () => {
       const templates = project.components.reduce((acc, cur) => {
-         const htmlFilename = `./src/components/${cur}/${cur}.html`;
+         const cmpName = utils.getComponentName(cur);
+         const htmlFilename = `./src/components/${cur}/${cmpName}.html`;
          const htmlFileExists = fs.existsSync(htmlFilename);
          if (htmlFileExists) {
 
-            const scssFilename = `./src/components/${cur}/${cur}.scss`;
+            const scssFilename = `./src/components/${cur}/${cmpName}.scss`;
             const scssFileExists = fs.existsSync(scssFilename);
             let cssString = '';
             if (scssFileExists) {
@@ -36,7 +43,7 @@
             const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const parsed = parser.parse(htmlString);
-            const templateString = `<template id="${cur}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`;
+            const templateString = `<template id="${project.name}-${cur.replace(/\//g, '-')}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`;
             fs.writeFileSync(`${output}/components/${cur}/interpolation.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
             return `${acc}${templateString}\n\n`
          } else {

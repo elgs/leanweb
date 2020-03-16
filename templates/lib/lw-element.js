@@ -5,10 +5,6 @@ function hasMethod(obj, name) {
    return !!desc && typeof desc.value === 'function';
 }
 
-const eventPrefix = 'lw-on:';
-const classPrefix = 'lw-class:';
-const bindPrefix = 'lw-bind:';
-
 export default class LWElement extends HTMLElement {
    _component;
    constructor(component) {
@@ -120,7 +116,7 @@ export default class LWElement extends HTMLElement {
          for (const attr of eventNode.attributes) {
             const attrName = attr.name;
             const attrValue = attr.value;
-            if (attrName.startsWith(eventPrefix)) {
+            if (attrName.startsWith('lw-on:')) {
                if (eventNode[attr.name]) {
                   continue;
                }
@@ -192,7 +188,7 @@ export default class LWElement extends HTMLElement {
          for (const attr of classNode.attributes) {
             const attrName = attr.name;
             const attrValue = attr.value;
-            if (attrName.startsWith(classPrefix)) {
+            if (attrName.startsWith('lw-class:')) {
                const interpolation = this._component.interpolation[attrValue];
                const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
@@ -212,7 +208,7 @@ export default class LWElement extends HTMLElement {
          for (const attr of bindNode.attributes) {
             const attrName = attr.name;
             const attrValue = attr.value;
-            if (attrName.startsWith(bindPrefix)) {
+            if (attrName.startsWith('lw-bind:')) {
                const interpolation = this._component.interpolation[attrValue];
                const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
