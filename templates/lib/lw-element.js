@@ -20,10 +20,9 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   _bind(rootNode = this.shadowRoot, context = this) {
-      this._bindEvents('', rootNode, context);
-      this._bindModels('', rootNode, context);
-      // this._bindFors(rootNode, context);
+   _bind(selector = '', rootNode = this.shadowRoot, context = this) {
+      this._bindEvents(selector, rootNode, context);
+      this._bindModels(selector, rootNode, context);
    }
 
    async _bindMethods(context = this) {
@@ -79,37 +78,6 @@ export default class LWElement extends HTMLElement {
       }
    }
 
-   _bindFors(rootNode = this.shadowRoot, context = this) {
-      const forNodes = rootNode.querySelectorAll('[lw-for]');
-      if (rootNode.matches && rootNode.matches('[lw-for]')) {
-         forNodes.push(rootNode);
-      }
-      for (const forNode of forNodes) {
-         if (forNode['model_for_bound']) {
-            continue;
-         }
-         forNode['model_for_bound'] = true;
-         const expression = forNode.getAttribute('lw-for').trim();
-         const tokens = expression.split(/\s+/g);
-         const itemExpression = tokens[0];
-         const itemsExpression = tokens[1];
-         let indexExpression = '$index';
-         if (tokens.length > 2) {
-            indexExpression = tokens[2];
-         }
-         const ast = parser.parse(itemsExpression, context);
-         const items = parser.eval(ast, context);
-         items.forEach((item, index) => {
-            const node = forNode.cloneNode(true);
-            node.removeAttribute('lw-for');
-            forNode.insertAdjacentElement('afterend', node);
-            const itemContext = { [itemExpression]: item, [indexExpression]: index };
-            this._bind(node, itemContext);
-            this.update('', node, itemContext);
-         });
-      }
-   }
-
    _bindEvents(selector = '', rootNode = this.shadowRoot, context = this) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-on]', rootNode);
       nodes.forEach(eventNode => {
@@ -140,6 +108,7 @@ export default class LWElement extends HTMLElement {
       this.updateClass(selector, rootNode, context);
       this.updateModel(selector, rootNode, context);
       this.updateBind(selector, rootNode, context);
+      this.updateFors(selector, rootNode, context);
    }
 
    updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
@@ -220,5 +189,23 @@ export default class LWElement extends HTMLElement {
             }
          }
       });
+   }
+
+   updateFors(selector = '', rootNode = this.shadowRoot, context = this) {
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-for]', rootNode);
+      for (const forNode of nodes) {
+         const key = forNode.getAttribute('lw-for');
+         const interpolation = this._component.interpolation[key];
+         console.log(interpolation, context);
+         const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0];
+         items.forEach((item, index) => {
+            const node = forNode.cloneNode(true);
+            node.removeAttribute('lw-for');
+            forNode.insertAdjacentElement('afterend', node);
+            const itemContext = { [interpolation.item]: item, [interpolation.index]: index };
+            this._bind(selector, node, itemContext);
+            this.update(selector, node, itemContext);
+         });
+      }
    }
 }

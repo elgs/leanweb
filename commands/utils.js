@@ -42,7 +42,6 @@ project-name will be used as the leanweb project name.
 leanweb init command will create leanweb.json file, which looks like:
 {
   "name": "demo",
-  "title": "demo",
   "components": [
     "demo-root",
   ]

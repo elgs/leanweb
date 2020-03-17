@@ -44,7 +44,6 @@ root. `leanweb.json` looks like:
 ```json
 {
   "name": "demo",
-  "title": "demo",
   "components": [
     "demo-root"
   ]
