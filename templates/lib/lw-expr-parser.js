@@ -27,7 +27,7 @@ const binaryOperations = {
 const logicalOperators = {
    '||': (a, b) => a || b,
    '&&': (a, b) => a && b,
-   // '??': (a, b) => a ?? b,
+   '??': (a, b) => a ?? b,
 };
 
 const unaryOperators = {

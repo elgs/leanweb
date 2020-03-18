@@ -1,9 +1,19 @@
 import * as parser from './lw-expr-parser.js';
 
-function hasMethod(obj, name) {
+const hasMethod = (obj, name) => {
    const desc = Object.getOwnPropertyDescriptor(obj, name);
    return !!desc && typeof desc.value === 'function';
 }
+
+const nextAllSiblings = (el, selector) => {
+   const siblings = [];
+   while ((el = el.nextSibling)) {
+      if (el.nodeType === Node.ELEMENT_NODE && (!selector || el.matches(selector))) {
+         siblings.push(el);
+      }
+   }
+   return siblings;
+};
 
 export default class LWElement extends HTMLElement {
    _component;
@@ -194,18 +204,35 @@ export default class LWElement extends HTMLElement {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-for]', rootNode);
       for (const forNode of nodes) {
          const key = forNode.getAttribute('lw-for');
+
          const interpolation = this._component.interpolation[key];
          const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0];
-         items.reduceRight((_, item, index) => {
-            const node = forNode.cloneNode(true);
-            node.removeAttribute('lw-for');
-            node.removeAttribute('lw-off');
-            forNode.insertAdjacentElement('afterend', node);
+
+         const rendered = nextAllSiblings(forNode, `[lw-for-parent="${key}"]`);
+         for (let i = items.length; i < rendered.length; ++i) {
+            rendered[i].remove();
+         }
+
+         let currentNode = forNode;
+         items.forEach((item, index) => {
+            let node;
+            if (rendered.length > index) {
+               node = rendered[index];
+            } else {
+               node = forNode.cloneNode(true);
+               node.removeAttribute('lw-for');
+               node.removeAttribute('lw-off');
+               node.setAttribute('lw-for-parent', key);
+               currentNode.insertAdjacentElement('afterend', node);
+            }
+            currentNode = node;
             const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
             node['lw-context'] = itemContext;
-            this._bind(selector, node, itemContext);
+            if (rendered.length > index) {
+               this._bind(selector, node, itemContext);
+            }
             this.update(selector, node, itemContext);
-         }, null);
+         });
       }
    }
 }
