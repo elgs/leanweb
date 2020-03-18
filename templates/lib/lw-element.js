@@ -127,6 +127,7 @@ export default class LWElement extends HTMLElement {
          const key = evalNode.getAttribute('lw');
          const interpolation = this._component.interpolation[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
+         console.log(interpolation.ast, context, parsed);
          evalNode.innerText = parsed[0];
       });
    }
@@ -196,16 +197,15 @@ export default class LWElement extends HTMLElement {
       for (const forNode of nodes) {
          const key = forNode.getAttribute('lw-for');
          const interpolation = this._component.interpolation[key];
-         console.log(interpolation, context);
          const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0];
-         items.forEach((item, index) => {
+         items.reduceRight((_, item, index) => {
             const node = forNode.cloneNode(true);
             node.removeAttribute('lw-for');
             forNode.insertAdjacentElement('afterend', node);
-            const itemContext = { [interpolation.item]: item, [interpolation.index]: index };
+            const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
             this._bind(selector, node, itemContext);
             this.update(selector, node, itemContext);
-         });
+         }, null);
       }
    }
 }
