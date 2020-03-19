@@ -135,7 +135,7 @@ const nodeHandlers = {
 
 const evalNode = (node, context) => nodeHandlers[node.type](node, context);
 
-export const evaluate = (ast, context = [], loc = {}) => {
+export const evaluate = (ast, context = {}, loc = {}) => {
    try {
       return ast.map(astNode => evalNode(astNode, context));
    } catch (e) {

@@ -30,6 +30,17 @@ export default class LWElement extends HTMLElement {
       });
    }
 
+   _querySelectorAllIncludingSelf(selector, rootNode) {
+      const nodes = [];
+      if (rootNode.matches && rootNode.matches(selector)) {
+         nodes.push(rootNode);
+      }
+      rootNode.querySelectorAll(selector).forEach(evalNode => {
+         nodes.push(evalNode);
+      });
+      return nodes;
+   }
+
    _bind(selector = '', rootNode = this.shadowRoot, context = this) {
       this._bindEvents(selector, rootNode, context);
       this._bindModels(selector, rootNode, context);
@@ -43,17 +54,6 @@ export default class LWElement extends HTMLElement {
       methodNames.filter(name => name !== 'constructor').forEach(name => {
          context[name] = context[name].bind(context);
       });
-   }
-
-   _querySelectorAllIncludingSelf(selector, rootNode) {
-      const nodes = [];
-      if (rootNode.matches && rootNode.matches(selector)) {
-         nodes.push(rootNode);
-      }
-      rootNode.querySelectorAll(selector).forEach(evalNode => {
-         nodes.push(evalNode);
-      });
-      return nodes;
    }
 
    _bindModels(selector = '', rootNode = this.shadowRoot, context = this) {
@@ -209,29 +209,20 @@ export default class LWElement extends HTMLElement {
          const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0];
 
          const rendered = nextAllSiblings(forNode, `[lw-for-parent="${key}"]`);
-         for (let i = items.length; i < rendered.length; ++i) {
-            rendered[i].remove();
-         }
+         rendered.forEach(r => r.remove());
 
          let currentNode = forNode;
          items.forEach((item, index) => {
-            let node;
-            if (rendered.length > index) {
-               node = rendered[index];
-            } else {
-               node = forNode.cloneNode(true);
-               node.removeAttribute('lw-for');
-               node.removeAttribute('lw-off');
-               node.setAttribute('lw-for-parent', key);
-               currentNode.insertAdjacentElement('afterend', node);
-            }
+            const node = forNode.cloneNode(true);
+            node.removeAttribute('lw-for');
+            node.removeAttribute('lw-off');
+            node.setAttribute('lw-for-parent', key);
+            currentNode.insertAdjacentElement('afterend', node);
             currentNode = node;
             const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
-            const localContext = [itemContext, context]
+            const localContext = [itemContext, context].flat(Infinity);
             node['lw-context'] = localContext;
-            if (rendered.length > index) {
-               this._bind(selector, node, localContext);
-            }
+            this._bind(selector, node, localContext);
             this.update(selector, node, localContext);
          });
       }
