@@ -227,11 +227,12 @@ export default class LWElement extends HTMLElement {
             }
             currentNode = node;
             const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
-            node['lw-context'] = itemContext;
+            const localContext = [itemContext, context]
+            node['lw-context'] = localContext;
             if (rendered.length > index) {
-               this._bind(selector, node, itemContext);
+               this._bind(selector, node, localContext);
             }
-            this.update(selector, node, itemContext);
+            this.update(selector, node, localContext);
          });
       }
    }

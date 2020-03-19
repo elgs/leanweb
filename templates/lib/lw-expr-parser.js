@@ -21,7 +21,7 @@ const binaryOperations = {
    '&': (a, b) => a & b,
    'in': (a, b) => a in b,
    'instanceof': (a, b) => a instanceof b,
-   // '|>': (a, b) => a |> b,
+   //  '|>': (a, b) => a |> b,
 };
 
 const logicalOperators = {
@@ -37,7 +37,7 @@ const unaryOperators = {
    '~': a => ~a,
    'typeof': a => typeof a,
    'void': a => void a,
-   //  'delete': a => delete a,
+   // 'delete': a => delete a,
    'throw': a => { throw a; },
 };
 
@@ -49,96 +49,103 @@ const updateOperators = (operator, prefix) => {
    }
 };
 
-const callFunction = (node, table) => {
-   const callee = evalNode(node.callee, table);
+const callFunction = (node, context) => {
+   const callee = evalNode(node.callee, context);
    if (node.callee.type === 'OptionalMemberExpression' && (callee === undefined || callee === null)) {
       return undefined;
    }
    const args = [];
    node.arguments.map(argument => {
       if (argument.type === 'SpreadElement') {
-         args.push(...evalNode(argument, table));
+         args.push(...evalNode(argument, context));
       } else {
-         args.push(evalNode(argument, table));
+         args.push(evalNode(argument, context));
       }
    });
    return callee(...args);
 };
 
 const nodeHandlers = {
-   'NumericLiteral': (node, table) => node.value,
-   'StringLiteral': (node, table) => node.value,
-   'BooleanLiteral': (node, table) => node.value,
-   'NullLiteral': (node, table) => null,
+   'NumericLiteral': (node, context) => node.value,
+   'StringLiteral': (node, context) => node.value,
+   'BooleanLiteral': (node, context) => node.value,
+   'NullLiteral': (node, context) => null,
 
-   'RegExpLiteral': (node, table) => new RegExp(node.pattern, node.flags),
+   'RegExpLiteral': (node, context) => new RegExp(node.pattern, node.flags),
 
-   'ExpressionStatement': (node, table) => evalNode(node.expression, table),
-   'BinaryExpression': (node, table) => binaryOperations[node.operator](evalNode(node.left, table), evalNode(node.right, table)),
-   'LogicalExpression': (node, table) => logicalOperators[node.operator](evalNode(node.left, table), evalNode(node.right, table)),
-   'UnaryExpression': (node, table) => unaryOperators[node.operator](evalNode(node.argument, table)),
-   'UpdateExpression': (node, table) => updateOperators(node.operator, node.prefix)(evalNode(node.argument, table)),
-   'ConditionalExpression': (node, table) => {
-      const test = evalNode(node.test, table);
-      const consequent = evalNode(node.consequent, table);
-      const alternate = evalNode(node.alternate, table);
+   'ExpressionStatement': (node, context) => evalNode(node.expression, context),
+   'BinaryExpression': (node, context) => binaryOperations[node.operator](evalNode(node.left, context), evalNode(node.right, context)),
+   'LogicalExpression': (node, context) => logicalOperators[node.operator](evalNode(node.left, context), evalNode(node.right, context)),
+   'UnaryExpression': (node, context) => unaryOperators[node.operator](evalNode(node.argument, context)),
+   'UpdateExpression': (node, context) => updateOperators(node.operator, node.prefix)(evalNode(node.argument, context)),
+   'ConditionalExpression': (node, context) => {
+      const test = evalNode(node.test, context);
+      const consequent = evalNode(node.consequent, context);
+      const alternate = evalNode(node.alternate, context);
       return test ? consequent : alternate;
    },
-   'MemberExpression': (node, table) => {
-      const object = evalNode(node.object, table);
-      const member = node.computed ? object[evalNode(node.property, table)] : object[node.property.name];
+   'MemberExpression': (node, context) => {
+      const object = evalNode(node.object, context);
+      const member = node.computed ? object[evalNode(node.property, context)] : object[node.property.name];
       if (node.object.type === 'RegExpLiteral' && typeof member === 'function') {
          return member.bind(object);
       }
       return member;
    },
-   'OptionalMemberExpression': (node, table) => {
-      const object = evalNode(node.object, table);
+   'OptionalMemberExpression': (node, context) => {
+      const object = evalNode(node.object, context);
       if (object === undefined || object === null) {
          return undefined;
       }
-      const member = node.computed ? (object[evalNode(node.property, table)]) : (object[node.property.name]);
+      const member = node.computed ? (object[evalNode(node.property, context)]) : (object[node.property.name]);
       if (node.object.type === 'RegExpLiteral' && typeof member === 'function') {
          return member.bind(object);
       }
       return member;
    },
 
-   'ArrayExpression': (node, table) => {
+   'ArrayExpression': (node, context) => {
       const arr = [];
       node.elements.map(elem => {
          if (elem.type === 'SpreadElement') {
-            arr.push(...evalNode(elem, table));
+            arr.push(...evalNode(elem, context));
          } else {
-            arr.push(evalNode(elem, table));
+            arr.push(evalNode(elem, context));
          }
       });
       return arr;
    },
-   'ObjectExpression': (node, table) => node.properties.reduce((acc, prop) => ({ ...acc, ...evalNode(prop, table) }), {}),
-   'ObjectProperty': (node, table) => ({ [evalNode(node.key, table)]: evalNode(node.value, table) }),
-   'SpreadElement': (node, table) => evalNode(node.argument, table),
+   'ObjectExpression': (node, context) => node.properties.reduce((acc, prop) => ({ ...acc, ...evalNode(prop, context) }), {}),
+   'ObjectProperty': (node, context) => ({ [evalNode(node.key, context)]: evalNode(node.value, context) }),
+   'SpreadElement': (node, context) => evalNode(node.argument, context),
 
-   'Identifier': (node, table) => table[node.name],
+   'Identifier': (node, context) => {
+      if (Array.isArray(context)) {
+         const hitContext = context.find(contextObj => node.name in contextObj);
+         return hitContext ? hitContext[node.name] : undefined;
+      } else if (typeof context === 'object') {
+         return context[node.name];
+      }
+   },
 
-   'CallExpression': (node, table) => callFunction(node, table),
-   'OptionalCallExpression': (node, table) => callFunction(node, table),
-   'NewExpression': (node, table) => callFunction(node, table),
+   'CallExpression': (node, context) => callFunction(node, context),
+   'OptionalCallExpression': (node, context) => callFunction(node, context),
+   'NewExpression': (node, context) => callFunction(node, context),
 };
 
-const evalNode = (node, table) => nodeHandlers[node.type](node, table);
+const evalNode = (node, context) => nodeHandlers[node.type](node, context);
 
-export const evaluate = (ast, table = {}, loc = {}) => {
+export const evaluate = (ast, context = [], loc = {}) => {
    try {
-      return ast.map(astNode => evalNode(astNode, table));
+      return ast.map(astNode => evalNode(astNode, context));
    } catch (e) {
       throw { error: e.message, location: loc };
    }
 };
 
- // module.exports = { evaluate };
- // const parser = require('@babel/parser');
- // const ast = parser.parse("/\\d+/.test(1);123").program.body;
- // console.log(ast);
- // const result = evaluate(JSON.parse(JSON.stringify(ast)), { a: {} });
- // console.log(result);
+  // module.exports = { evaluate };
+  // const parser = require('@babel/parser');
+  // const ast = parser.parse("/\\d+/.test(1);123").program.body;
+  // console.log(ast);
+  // const result = evaluate(JSON.parse(JSON.stringify(ast)), { a: {} });
+  // console.log(result);
