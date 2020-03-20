@@ -120,10 +120,16 @@ const nodeHandlers = {
    'SpreadElement': (node, context) => evalNode(node.argument, context),
 
    'Identifier': (node, context) => {
-      if (Array.isArray(context)) {
-         const hitContext = context.find(contextObj => node.name in contextObj);
-         return hitContext ? hitContext[node.name] : undefined;
-      } else if (typeof context === 'object') {
+      if (context._lw_complex_context) {
+         for (const subContextArray of context.sub) {
+            for (const subContext of subContextArray) {
+               if (subContext.expr === node.name) {
+                  return subContext.value;
+               }
+            }
+         }
+         return context.main[node.name];
+      } else {
          return context[node.name];
       }
    },

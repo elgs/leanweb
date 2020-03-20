@@ -46,13 +46,13 @@ export default class LWElement extends HTMLElement {
       this._bindModels(selector, rootNode, context);
    }
 
-   async _bindMethods(context = this) {
+   async _bindMethods() {
       const methodNames = [];
-      const proto = Object.getPrototypeOf(context);
+      const proto = Object.getPrototypeOf(this);
       methodNames.push(...Object.getOwnPropertyNames(proto).filter(name => hasMethod(proto, name)));
-      methodNames.push(...Object.getOwnPropertyNames(context).filter(name => hasMethod(context, name)));
+      methodNames.push(...Object.getOwnPropertyNames(this).filter(name => hasMethod(this, name)));
       methodNames.filter(name => name !== 'constructor').forEach(name => {
-         context[name] = context[name].bind(context);
+         this[name] = this[name].bind(this);
       });
    }
 
@@ -66,8 +66,7 @@ export default class LWElement extends HTMLElement {
 
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
-
-         modelNode.addEventListener('change', (event => {
+         modelNode.addEventListener('input', (event => {
             const valueExpression = interpolation.value;
             if (interpolation.astObj) {
                const object = parser.evaluate(interpolation.astObj, context, interpolation.loc)[0];
@@ -77,14 +76,21 @@ export default class LWElement extends HTMLElement {
                   object[valueExpression] = event.target.value;
                }
             } else {
-               if (event.target.type === 'number') {
-                  context[valueExpression] = event.target.value * 1;
-               } else {
-                  context[valueExpression] = event.target.value;
+               let object = context;
+               if (Array.isArray(context)) {
+                  object = context.find(contextObj => valueExpression in contextObj);
+               }
+               if (object) {
+                  if (event.target.type === 'number') {
+                     object[valueExpression] = event.target.value * 1;
+                  } else {
+                     console.log(object[valueExpression]);
+                     object[valueExpression] = event.target.value;
+                  }
                }
             }
-            context.update();
-         }).bind(context));
+            this.update();
+         }).bind(this));
       }
    }
 
@@ -102,9 +108,12 @@ export default class LWElement extends HTMLElement {
                const interpolation = this._component.interpolation[attrValue];
 
                eventNode.addEventListener(interpolation.lwValue, (event => {
-                  context['$event'] = event;
-                  const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
-                  delete context['$event'];
+                  const eventContext = [
+                     { name: 'event', expr: '$event', value: event },
+                  ];
+                  const localContext = { main: context, sub: [eventContext], _lw_complex_context: true };
+
+                  const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
                   return parsed;
                }).bind(context));
             }
@@ -201,7 +210,7 @@ export default class LWElement extends HTMLElement {
    }
 
    updateFors(selector = '', rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-for]', rootNode);
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-for]', rootNode); // todo need to change to get only first level
       for (const forNode of nodes) {
          const key = forNode.getAttribute('lw-for');
 
@@ -219,8 +228,12 @@ export default class LWElement extends HTMLElement {
             node.setAttribute('lw-for-parent', key);
             currentNode.insertAdjacentElement('afterend', node);
             currentNode = node;
-            const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
-            const localContext = [itemContext, context].flat(Infinity);
+            const itemContext = [
+               { name: 'items', expr: interpolation.itemsExpr, value: items },
+               { name: 'item', expr: interpolation.itemExpr, value: item },
+               { name: 'index', expr: interpolation.indexExpr, value: index }
+            ];
+            const localContext = { main: context, sub: [itemContext], _lw_complex_context: true };
             node['lw-context'] = localContext;
             this._bind(selector, node, localContext);
             this.update(selector, node, localContext);
