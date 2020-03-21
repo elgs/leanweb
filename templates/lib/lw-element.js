@@ -63,22 +63,22 @@ export default class LWElement extends HTMLElement {
             continue;
          }
          modelNode['model_event_bound'] = true;
-
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
          modelNode.addEventListener('input', (event => {
-            if (interpolation.astObject) {
-               const object = parser.evaluate([interpolation.astObject], context, interpolation.loc)[0];
+            const astModel = interpolation.ast[0].expression;
+            if (astModel.type === 'MemberExpression') {
+               const object = parser.evaluate([astModel.object], context, interpolation.loc)[0];
                if (event.target.type === 'number') {
-                  object[interpolation.propertyExpr] = event.target.value * 1;
+                  object[astModel.property.name] = event.target.value * 1;
                } else {
-                  object[interpolation.propertyExpr] = event.target.value;
+                  object[astModel.property.name] = event.target.value;
                }
-            } else {
+            } else if (astModel.type === 'Identifier') {
                if (event.target.type === 'number') {
-                  this[interpolation.propertyExpr] = event.target.value * 1;
+                  this[astModel.name] = event.target.value * 1;
                } else {
-                  this[interpolation.propertyExpr] = event.target.value;
+                  this[astModel.name] = event.target.value;
                }
             }
             this.update();
