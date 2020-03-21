@@ -153,7 +153,7 @@ export default class LWElement extends HTMLElement {
          const key = evalNode.getAttribute('lw');
          const interpolation = this._component.interpolation[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
-         evalNode.innerText = parsed[0];
+         evalNode.innerText = parsed[0] ?? '';
       });
    }
 
@@ -224,16 +224,23 @@ export default class LWElement extends HTMLElement {
          const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0];
 
          const rendered = nextAllSiblings(forNode, `[lw-for-parent="${key}"]`);
-         rendered.forEach(r => r.remove());
+         for (let i = items.length; i < rendered.length; ++i) {
+            rendered[i].remove();
+         }
 
          let currentNode = forNode;
          items.forEach((item, index) => {
-            const node = forNode.cloneNode(true);
-            node.removeAttribute('lw-for');
-            node.removeAttribute('lw-false');
-            node.setAttribute('lw-for-parent', key);
-            node.setAttribute('lw-context', '');
-            currentNode.insertAdjacentElement('afterend', node);
+            let node;
+            if (rendered.length > index) {
+               node = rendered[index];
+            } else {
+               node = forNode.cloneNode(true);
+               node.removeAttribute('lw-for');
+               node.removeAttribute('lw-false');
+               node.setAttribute('lw-for-parent', key);
+               node.setAttribute('lw-context', '');
+               currentNode.insertAdjacentElement('afterend', node);
+            }
             currentNode = node;
             const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
             const localContext = [itemContext, context].flat(Infinity);
