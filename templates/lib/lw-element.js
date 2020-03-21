@@ -41,9 +41,9 @@ export default class LWElement extends HTMLElement {
       return nodes;
    }
 
-   _bind(selector = '', rootNode = this.shadowRoot, context = this) {
-      this._bindEvents(selector, rootNode, context);
-      this._bindModels(selector, rootNode, context);
+   _bind(selector = '', rootNode = this.shadowRoot) {
+      this._bindEvents(selector, rootNode);
+      this._bindModels(selector, rootNode);
    }
 
    async _bindMethods() {
@@ -56,7 +56,7 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   _bindModels(selector = '', rootNode = this.shadowRoot, context = this) {
+   _bindModels(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]:not([lw-false])', rootNode);
       for (const modelNode of nodes) {
          if (modelNode['model_event_bound']) {
@@ -65,6 +65,7 @@ export default class LWElement extends HTMLElement {
          modelNode['model_event_bound'] = true;
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
+         const context = this._getNodeContext(modelNode);
          modelNode.addEventListener('input', (event => {
             const astModel = interpolation.ast[0].expression;
             if (astModel.type === 'MemberExpression') {
@@ -91,7 +92,16 @@ export default class LWElement extends HTMLElement {
       }
    }
 
-   _bindEvents(selector = '', rootNode = this.shadowRoot, context = this) {
+   _getNodeContext(node) {
+      const contextNode = node.closest('[lw-context]');
+      if (contextNode) {
+         return contextNode['lw-context'];
+      } else {
+         return this;
+      }
+   }
+
+   _bindEvents(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-on]:not([lw-false])', rootNode);
       nodes.forEach(eventNode => {
          for (const attr of eventNode.attributes) {
@@ -104,29 +114,31 @@ export default class LWElement extends HTMLElement {
                eventNode[attr.name] = true;
                const interpolation = this._component.interpolation[attrValue];
 
+               const context = this._getNodeContext(eventNode);
                eventNode.addEventListener(interpolation.lwValue, (event => {
                   const eventContext = { '$event': event };
                   const localContext = [eventContext, context].flat(Infinity);
                   const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
                   return parsed;
-               }).bind(context));
+               }).bind(this));
             }
          }
       });
    }
 
-   update(selector = '', rootNode = this.shadowRoot, context = this) {
-      this.updateEval(selector, rootNode, context);
-      this.updateIf(selector, rootNode, context);
-      this.updateClass(selector, rootNode, context);
-      this.updateModel(selector, rootNode, context);
-      this.updateBind(selector, rootNode, context);
-      this.updateFors(selector, rootNode, context);
+   update(selector = '', rootNode = this.shadowRoot) {
+      this.updateEval(selector, rootNode);
+      this.updateIf(selector, rootNode);
+      this.updateClass(selector, rootNode);
+      this.updateModel(selector, rootNode);
+      this.updateBind(selector, rootNode);
+      this.updateFors(selector, rootNode);
    }
 
-   updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
+   updateModel(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]:not([lw-false])', rootNode);
       nodes.forEach(modelNode => {
+         const context = this._getNodeContext(modelNode);
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
@@ -134,23 +146,21 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateEval(selector = '', rootNode = this.shadowRoot, context = this) {
+   updateEval(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw]:not([lw-false])', rootNode);
       nodes.forEach(evalNode => {
+         const context = this._getNodeContext(evalNode);
          const key = evalNode.getAttribute('lw');
          const interpolation = this._component.interpolation[key];
-         const localContext = evalNode['lw-context'];
-         if (localContext) {
-            context = localContext;
-         }
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
          evalNode.innerText = parsed[0];
       });
    }
 
-   updateIf(selector = '', rootNode = this.shadowRoot, context = this) {
+   updateIf(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-if]', rootNode);
       nodes.forEach(ifNode => {
+         const context = this._getNodeContext(ifNode);
          const key = ifNode.getAttribute('lw-if');
          const interpolation = this._component.interpolation[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
@@ -163,9 +173,10 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateClass(selector = '', rootNode = this.shadowRoot, context = this) {
+   updateClass(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-class]:not([lw-false])', rootNode);
       nodes.forEach(classNode => {
+         const context = this._getNodeContext(classNode);
          for (const attr of classNode.attributes) {
             const attrName = attr.name;
             const attrValue = attr.value;
@@ -183,9 +194,10 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateBind(selector = '', rootNode = this.shadowRoot, context = this) {
+   updateBind(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-bind]:not([lw-false])', rootNode);
       nodes.forEach(bindNode => {
+         const context = this._getNodeContext(bindNode);
          for (const attr of bindNode.attributes) {
             const attrName = attr.name;
             const attrValue = attr.value;
@@ -203,11 +215,11 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateFors(selector = '', rootNode = this.shadowRoot, context = this) {
+   updateFors(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-for]', rootNode); // todo need to change to get only first level
       for (const forNode of nodes) {
+         const context = this._getNodeContext(forNode);
          const key = forNode.getAttribute('lw-for');
-
          const interpolation = this._component.interpolation[key];
          const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0];
 
@@ -220,13 +232,14 @@ export default class LWElement extends HTMLElement {
             node.removeAttribute('lw-for');
             node.removeAttribute('lw-false');
             node.setAttribute('lw-for-parent', key);
+            node.setAttribute('lw-context', '');
             currentNode.insertAdjacentElement('afterend', node);
             currentNode = node;
             const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
             const localContext = [itemContext, context].flat(Infinity);
             node['lw-context'] = localContext;
-            this._bind(selector, node, localContext);
-            this.update(selector, node, localContext);
+            this._bind(selector, node);
+            this.update(selector, node);
          });
       }
    }
