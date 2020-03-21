@@ -51,8 +51,8 @@ const updateOperators = (operator, prefix) => {
 
 const callFunction = (node, context) => {
    const callee = evalNode(node.callee, context);
-   if (node.callee.type === 'OptionalMemberExpression' && (callee === undefined || callee === null)) {
-      return undefined;
+   if (node.callee.type === 'OptionalMemberExpression' && (callee === void 0 || callee === null)) {
+      return void 0;
    }
    const args = [];
    node.arguments.map(argument => {
@@ -94,8 +94,8 @@ const nodeHandlers = {
    },
    'OptionalMemberExpression': (node, context) => {
       const object = evalNode(node.object, context);
-      if (object === undefined || object === null) {
-         return undefined;
+      if (object === void 0 || object === null) {
+         return void 0;
       }
       const member = node.computed ? (object[evalNode(node.property, context)]) : (object[node.property.name]);
       if (node.object.type === 'RegExpLiteral' && typeof member === 'function') {

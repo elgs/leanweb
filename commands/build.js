@@ -74,7 +74,7 @@
    const buildCSS = () => {
       const scssFilename = `./src/${project.name}.scss`;
       const scssFileExists = fs.existsSync(scssFilename);
-      let cssString = '[lw-off]{display:none;}\n';
+      let cssString = '[lw-false]{display:none;}\n';
       if (scssFileExists) {
          const scssString = fs.readFileSync(scssFilename, 'utf8');
          cssString += utils.buildCSS(scssString);

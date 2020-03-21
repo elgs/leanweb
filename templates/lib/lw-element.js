@@ -57,7 +57,7 @@ export default class LWElement extends HTMLElement {
    }
 
    _bindModels(selector = '', rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]', rootNode);
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]:not([lw-false])', rootNode);
       for (const modelNode of nodes) {
          if (modelNode['model_event_bound']) {
             continue;
@@ -67,7 +67,7 @@ export default class LWElement extends HTMLElement {
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
          modelNode.addEventListener('input', (event => {
-            const valueExpression = interpolation.value;
+            const valueExpression = interpolation.valueExpr;
             if (interpolation.astObj) {
                const object = parser.evaluate(interpolation.astObj, context, interpolation.loc)[0];
                if (event.target.type === 'number') {
@@ -95,7 +95,7 @@ export default class LWElement extends HTMLElement {
    }
 
    _bindEvents(selector = '', rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-on]', rootNode);
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-on]:not([lw-false])', rootNode);
       nodes.forEach(eventNode => {
          for (const attr of eventNode.attributes) {
             const attrName = attr.name;
@@ -131,7 +131,7 @@ export default class LWElement extends HTMLElement {
    }
 
    updateModel(selector = '', rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]:not([lw-off])', rootNode);
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-model]:not([lw-false])', rootNode);
       nodes.forEach(modelNode => {
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
@@ -141,7 +141,7 @@ export default class LWElement extends HTMLElement {
    }
 
    updateEval(selector = '', rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw]:not([lw-off])', rootNode);
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw]:not([lw-false])', rootNode);
       nodes.forEach(evalNode => {
          const key = evalNode.getAttribute('lw');
          const interpolation = this._component.interpolation[key];
@@ -162,15 +162,15 @@ export default class LWElement extends HTMLElement {
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
          if (!parsed[0]) {
-            ifNode.setAttribute('lw-off', '');
+            ifNode.setAttribute('lw-false', '');
          } else {
-            ifNode.removeAttribute('lw-off');
+            ifNode.removeAttribute('lw-false');
          }
       });
    }
 
    updateClass(selector = '', rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-class]:not([lw-off])', rootNode);
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-class]:not([lw-false])', rootNode);
       nodes.forEach(classNode => {
          for (const attr of classNode.attributes) {
             const attrName = attr.name;
@@ -190,7 +190,7 @@ export default class LWElement extends HTMLElement {
    }
 
    updateBind(selector = '', rootNode = this.shadowRoot, context = this) {
-      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-bind]:not([lw-off])', rootNode);
+      const nodes = this._querySelectorAllIncludingSelf(selector.trim() + '[lw-bind]:not([lw-false])', rootNode);
       nodes.forEach(bindNode => {
          for (const attr of bindNode.attributes) {
             const attrName = attr.name;
@@ -224,7 +224,7 @@ export default class LWElement extends HTMLElement {
          items.forEach((item, index) => {
             const node = forNode.cloneNode(true);
             node.removeAttribute('lw-for');
-            node.removeAttribute('lw-off');
+            node.removeAttribute('lw-false');
             node.setAttribute('lw-for-parent', key);
             currentNode.insertAdjacentElement('afterend', node);
             currentNode = node;
