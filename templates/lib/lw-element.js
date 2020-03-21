@@ -67,26 +67,18 @@ export default class LWElement extends HTMLElement {
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
          modelNode.addEventListener('input', (event => {
-            const valueExpression = interpolation.valueExpr;
-            if (interpolation.astObj) {
-               const object = parser.evaluate(interpolation.astObj, context, interpolation.loc)[0];
+            if (interpolation.astObject) {
+               const object = parser.evaluate([interpolation.astObject], context, interpolation.loc)[0];
                if (event.target.type === 'number') {
-                  object[valueExpression] = event.target.value * 1;
+                  object[interpolation.propertyExpr] = event.target.value * 1;
                } else {
-                  object[valueExpression] = event.target.value;
+                  object[interpolation.propertyExpr] = event.target.value;
                }
             } else {
-               let object = context;
-               if (Array.isArray(context)) {
-                  object = context.find(contextObj => valueExpression in contextObj);
-               }
-               if (object) {
-                  if (event.target.type === 'number') {
-                     object[valueExpression] = event.target.value * 1;
-                  } else {
-                     console.log(object[valueExpression]);
-                     object[valueExpression] = event.target.value;
-                  }
+               if (event.target.type === 'number') {
+                  this[interpolation.propertyExpr] = event.target.value * 1;
+               } else {
+                  this[interpolation.propertyExpr] = event.target.value;
                }
             }
             this.update();
@@ -108,11 +100,8 @@ export default class LWElement extends HTMLElement {
                const interpolation = this._component.interpolation[attrValue];
 
                eventNode.addEventListener(interpolation.lwValue, (event => {
-                  const eventContext = [
-                     { name: 'event', expr: '$event', value: event },
-                  ];
-                  const localContext = { main: context, sub: [eventContext], _lw_complex_context: true };
-
+                  const eventContext = { '$event': event };
+                  const localContext = [eventContext, context].flat(Infinity);
                   const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
                   return parsed;
                }).bind(context));
@@ -228,12 +217,8 @@ export default class LWElement extends HTMLElement {
             node.setAttribute('lw-for-parent', key);
             currentNode.insertAdjacentElement('afterend', node);
             currentNode = node;
-            const itemContext = [
-               { name: 'items', expr: interpolation.itemsExpr, value: items },
-               { name: 'item', expr: interpolation.itemExpr, value: item },
-               { name: 'index', expr: interpolation.indexExpr, value: index }
-            ];
-            const localContext = { main: context, sub: [itemContext], _lw_complex_context: true };
+            const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
+            const localContext = [itemContext, context].flat(Infinity);
             node['lw-context'] = localContext;
             this._bind(selector, node, localContext);
             this.update(selector, node, localContext);
