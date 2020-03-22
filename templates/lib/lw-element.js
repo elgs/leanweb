@@ -35,10 +35,10 @@ export default class LWElement extends HTMLElement {
    _queryNodesExcudingLwFor = (selector = '', rootNode = this.shadowRoot, excludeLwFalse = true, excludeLwFor = true) => {
       const nodes = [];
       if (rootNode !== this.shadowRoot) {
-         if (excludeLwFalse && rootNode.matches(['[lw-false]'])) {
+         if (excludeLwFalse && rootNode.matches('[lw-false]')) {
             return nodes;
          }
-         if (excludeLwFor && rootNode.matches(['[lw-for]'])) {
+         if (excludeLwFor && rootNode.matches('[lw-for]')) {
             return nodes;
          }
          if (rootNode.matches(selector.trim())) {
@@ -47,10 +47,10 @@ export default class LWElement extends HTMLElement {
       }
       const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
          acceptNode: node => {
-            if (excludeLwFalse && node.matches(['[lw-false]'])) {
+            if (excludeLwFalse && node.matches('[lw-false]')) {
                return NodeFilter.FILTER_REJECT;
             }
-            if (excludeLwFor && node.matches(['[lw-for]'])) {
+            if (excludeLwFor && node.matches('[lw-for]')) {
                return NodeFilter.FILTER_REJECT;
             }
             if (node.matches(selector.trim())) {
