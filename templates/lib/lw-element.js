@@ -90,24 +90,24 @@ export default class LWElement extends HTMLElement {
          const context = this._getNodeContext(modelNode);
          modelNode.addEventListener('input', (event => {
             const astModel = interpolation.ast[0].expression;
+            let object;
+            let propertyExpr;
             if (astModel.type === 'MemberExpression') {
-               let propertyExpr = astModel.property.name;
+               propertyExpr = astModel.property.name;
                if (astModel.computed) {
                   // . false and [] true
                   propertyExpr = parser.evaluate([astModel.property], context, interpolation.loc)[0];
                }
-               const object = parser.evaluate([astModel.object], context, interpolation.loc)[0];
-               if (event.target.type === 'number') {
-                  object[propertyExpr] = event.target.value * 1;
-               } else {
-                  object[propertyExpr] = event.target.value;
-               }
+               object = parser.evaluate([astModel.object], context, interpolation.loc)[0];
             } else if (astModel.type === 'Identifier') {
-               if (event.target.type === 'number') {
-                  this[astModel.name] = event.target.value * 1;
-               } else {
-                  this[astModel.name] = event.target.value;
-               }
+               object = this;
+               propertyExpr = astModel.name;
+            }
+
+            if (event.currentTarget.type === 'number') {
+               object[propertyExpr] = event.currentTarget.value * 1;
+            } else {
+               object[propertyExpr] = event.currentTarget.value;
             }
             this.update();
          }).bind(this));
