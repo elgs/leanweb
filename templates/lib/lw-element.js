@@ -29,9 +29,19 @@ export default class LWElement extends HTMLElement {
       });
    }
 
+   _getNodeContext(node) {
+      const contextNode = node.closest('[lw-context]');
+      if (contextNode) {
+         return contextNode['lw-context'];
+      } else {
+         return this;
+      }
+   }
+
    // lw-if:   reject lw-for
    // lw-for:  reject lw-false
    // others:  reject both lw-for and lw-false 
+   // all:     reject lw-for-parent
    _queryNodesExcudingLwFor = (selector = '', rootNode = this.shadowRoot, excludeLwFalse = true, excludeLwFor = true) => {
       const nodes = [];
       if (rootNode !== this.shadowRoot) {
@@ -47,6 +57,9 @@ export default class LWElement extends HTMLElement {
       }
       const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
          acceptNode: node => {
+            if (node.matches('[lw-for-parent]')) {
+               return NodeFilter.FILTER_REJECT;
+            }
             if (excludeLwFalse && node.matches('[lw-false]')) {
                return NodeFilter.FILTER_REJECT;
             }
@@ -78,6 +91,31 @@ export default class LWElement extends HTMLElement {
       });
    }
 
+   _bindEvents(selector = '', rootNode = this.shadowRoot) {
+      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-on]', rootNode);
+      nodes.forEach(eventNode => {
+         for (const attr of eventNode.attributes) {
+            const attrName = attr.name;
+            const attrValue = attr.value;
+            if (attrName.startsWith('lw-on:')) {
+               if (eventNode[attr.name]) {
+                  continue;
+               }
+               eventNode[attr.name] = true;
+               const interpolation = this._component.interpolation[attrValue];
+
+               const context = this._getNodeContext(eventNode);
+               eventNode.addEventListener(interpolation.lwValue, (event => {
+                  const eventContext = { '$event': event };
+                  const localContext = [eventContext, context].flat(Infinity);
+                  const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
+                  return parsed;
+               }).bind(this));
+            }
+         }
+      });
+   }
+
    _bindModels(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-model]', rootNode);
       for (const modelNode of nodes) {
@@ -104,48 +142,26 @@ export default class LWElement extends HTMLElement {
                propertyExpr = astModel.name;
             }
 
-            if (event.currentTarget.type === 'number') {
-               object[propertyExpr] = event.currentTarget.value * 1;
+            if (modelNode.type === 'number') {
+               object[propertyExpr] = modelNode.value * 1;
+            } else if (modelNode.type === 'checkbox') {
+               if (!Array.isArray(object[propertyExpr])) {
+                  object[propertyExpr] = [];
+               }
+               if (modelNode.checked) {
+                  object[propertyExpr].push(modelNode.value);
+               } else {
+                  const index = object[propertyExpr].indexOf(modelNode.value);
+                  if (index > -1) {
+                     object[propertyExpr].splice(index, 1);
+                  }
+               }
             } else {
-               object[propertyExpr] = event.currentTarget.value;
+               object[propertyExpr] = modelNode.value;
             }
             this.update();
          }).bind(this));
       }
-   }
-
-   _getNodeContext(node) {
-      const contextNode = node.closest('[lw-context]');
-      if (contextNode) {
-         return contextNode['lw-context'];
-      } else {
-         return this;
-      }
-   }
-
-   _bindEvents(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-on]', rootNode);
-      nodes.forEach(eventNode => {
-         for (const attr of eventNode.attributes) {
-            const attrName = attr.name;
-            const attrValue = attr.value;
-            if (attrName.startsWith('lw-on:')) {
-               if (eventNode[attr.name]) {
-                  continue;
-               }
-               eventNode[attr.name] = true;
-               const interpolation = this._component.interpolation[attrValue];
-
-               const context = this._getNodeContext(eventNode);
-               eventNode.addEventListener(interpolation.lwValue, (event => {
-                  const eventContext = { '$event': event };
-                  const localContext = [eventContext, context].flat(Infinity);
-                  const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
-                  return parsed;
-               }).bind(this));
-            }
-         }
-      });
    }
 
    update(selector = '', rootNode = this.shadowRoot) {
@@ -164,7 +180,11 @@ export default class LWElement extends HTMLElement {
          const key = modelNode.getAttribute('lw-model');
          const interpolation = this._component.interpolation[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
-         modelNode.value = parsed[0];
+         if (modelNode.type === 'checkbox') {
+            modelNode.checked = parsed[0].includes(modelNode.value);
+         } else {
+            modelNode.value = parsed[0];
+         }
       });
    }
 
