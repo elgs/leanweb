@@ -19,7 +19,6 @@ export default class LWElement extends HTMLElement {
    constructor(component) {
       super();
       this._component = component;
-
       const node = document.getElementById(component.id).content.cloneNode(true);
       this.attachShadow({ mode: 'open' }).appendChild(node);
 

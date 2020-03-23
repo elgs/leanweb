@@ -1,3 +1,4 @@
-const utils = require('./utils.js');
-
-utils.exec(`rm -rf build/ dist/`);
+(async () => {
+   const utils = require('./utils.js');
+   await utils.exec(`rm -rf build/ dist/`);
+})();
