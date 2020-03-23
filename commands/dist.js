@@ -50,6 +50,6 @@ const utils = require('./utils.js');
       }
 
       await utils.exec(`cp -R ./${buildDir}/index.html ./${distDir}/`);
-      await utils.exec(`cp -R ./${buildDir}/test.css ./${distDir}/`);
+      await utils.exec(`cp -R ./${buildDir}/${project.name}.css ./${distDir}/`);
    });
 })();

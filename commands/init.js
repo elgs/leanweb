@@ -24,6 +24,12 @@
    };
    fs.writeFileSync('leanweb.json', JSON.stringify(leanwebData, null, 2));
 
+   await utils.exec(`npm i -D @babel/core`);
+   await utils.exec(`npm i -D babel-loader`);
+   await utils.exec(`npm i -D @babel/preset-env`);
+   await utils.exec(`npm i -D @babel/plugin-proposal-class-properties`);
+   await utils.exec(`npm i -D @babel/plugin-transform-runtime`);
+
    await utils.exec(`npx leanweb generate root`);
 
    await utils.exec(`cp -R ${__dirname}/../templates/lib ./src/`);
