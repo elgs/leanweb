@@ -182,6 +182,8 @@ export default class LWElement extends HTMLElement {
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
          if (modelNode.type === 'checkbox') {
             modelNode.checked = parsed[0].includes(modelNode.value);
+         } else if (modelNode.type === 'radio') {
+            modelNode.checked = parsed[0] === modelNode.value;
          } else {
             modelNode.value = parsed[0];
          }
