@@ -1,43 +1,55 @@
-const fs = require('fs');
-const parcel = require('parcel-bundler');
+const webpack = require('webpack');
 const utils = require('./utils.js');
 
-const options = {
-   outDir: process.cwd() + '/dist/',
-   outFile: 'index.html',
-   publicUrl: './',
-   watch: false,
-   cache: true,
-   cacheDir: process.cwd() + '/.cache',
-   contentHash: true,
-   // global: 'moduleName', // Expose modules as UMD under this name, disabled by default
-   minify: true,
-   scopeHoist: false,
-   target: 'browser',
-   sourceMaps: true,
-   detailedReport: true,
-   autoInstall: true,
-};
-
 (async () => {
+   const buildDir = 'build';
+   const distDir = 'dist';
+   const project = require(`${process.cwd()}/leanweb.json`);
+
    await utils.exec(`npx leanweb clean`);
    await utils.exec(`npx leanweb build`);
 
-   const index = fs.readFileSync(process.cwd() + '/build/index.html', 'utf8');
-
-   const scripts = [];
-   let _index = index.replace(/<script\s+type\s*=\s*["']module["']\s+src\s*=(.*?)><\/script>/g, (m, a) => {
-      scripts.push(a);
-      return '';
+   const compiler = webpack({
+      mode: 'production',
+      devtool: 'source-map',
+      entry: [process.cwd() + `/${buildDir}/${project.name}.js`],
+      output: {
+         path: process.cwd() + `/${distDir}/`,
+         filename: `${project.name}.js`
+      },
+      module: {
+         rules: [
+            {
+               test: process.cwd() + `/${buildDir}/`,
+               exclude: /(node_modules)/,
+               loader: 'babel-loader',
+               options: {
+                  presets: ['@babel/preset-env',
+                     {
+                        'plugins': [
+                           '@babel/plugin-proposal-class-properties',
+                           '@babel/plugin-transform-runtime'
+                        ]
+                     }
+                  ]
+               }
+            }
+         ]
+      }
    });
-   _index += scripts.map(script => `<script src=${script}></script>`).join('\n');
-   fs.writeFileSync(process.cwd() + '/build/_index.html', _index);
 
-   const babelrc = '{"plugins":["@babel/plugin-proposal-class-properties"],"presets":[["env",{"targets":{"browsers":["last 2 Chrome versions"]}}]]}';
-   fs.writeFileSync(process.cwd() + '/.babelrc', babelrc);
+   compiler.run(async (err, stats) => {
+      if (err) {
+         console.log(err);
+      }
+      if (stats.compilation.errors.length) {
+         console.log(stats.compilation.errors);
+      }
+      if (stats.compilation.warnings.length) {
+         console.log(stats.compilation.warnings);
+      }
 
-   const bundler = new parcel(process.cwd() + '/build/_index.html', options);
-   await bundler.bundle();
-   fs.unlinkSync(process.cwd() + '/.babelrc');
-   fs.unlinkSync(process.cwd() + '/build/_index.html');
+      await utils.exec(`cp -R ./${buildDir}/index.html ./${distDir}/`);
+      await utils.exec(`cp -R ./${buildDir}/test.css ./${distDir}/`);
+   });
 })();

@@ -3,7 +3,7 @@
    const utils = require('./utils.js');
    const parser = require('../lib/lw-html-parser.js');
 
-   const output = 'build';
+   const buildDir = 'build';
    const project = require(`${process.cwd()}/leanweb.json`);
 
    const replaceNodeModulesImport = (str, cmp) => {
@@ -23,12 +23,12 @@
    };
 
    const copyLIB = () => {
-      utils.exec(`cp -R ./src/lib ./${output}/`);
+      utils.exec(`cp -R ./src/lib ./${buildDir}/`);
    };
 
    const buildJS = async () => {
       const mkdirPromises = project.components.map(async cur => {
-         await utils.exec(`mkdir -p ./${output}/components/${cur}/`);
+         await utils.exec(`mkdir -p ./${buildDir}/components/${cur}/`);
       });
       await Promise.all(mkdirPromises);
 
@@ -36,11 +36,11 @@
          const cmpName = utils.getComponentName(cur);
          let jsFileString = fs.readFileSync(`./src/components/${cur}/${cmpName}.js`, 'utf8');
          jsFileString = replaceNodeModulesImport(jsFileString, cur);
-         fs.writeFileSync(`./${output}/components/${cur}/${cmpName}.js`, jsFileString);
+         fs.writeFileSync(`./${buildDir}/components/${cur}/${cmpName}.js`, jsFileString);
          let importString = `import './components/${cur}/${cmpName}.js';`;
          return acc + importString + '\n';
       }, '');
-      fs.writeFileSync(`${output}/${project.name}.js`, jsString);
+      fs.writeFileSync(`${buildDir}/${project.name}.js`, jsString);
    };
 
    const buildHTML = () => {
@@ -61,14 +61,14 @@
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const parsed = parser.parse(htmlString);
             const templateString = `<template id="${project.name}-${cur.replace(/\//g, '-')}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`;
-            fs.writeFileSync(`${output}/components/${cur}/interpolation.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
+            fs.writeFileSync(`${buildDir}/components/${cur}/interpolation.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
             return `${acc}${templateString}\n\n`
          } else {
             return acc;
          }
       }, '\n');
       const htmlString = fs.readFileSync(`./src/index.html`, 'utf8') + templates;
-      fs.writeFileSync(`${output}/index.html`, htmlString);
+      fs.writeFileSync(`${buildDir}/index.html`, htmlString);
    };
 
    const buildCSS = () => {
@@ -79,10 +79,10 @@
          const scssString = fs.readFileSync(scssFilename, 'utf8');
          cssString += utils.buildCSS(scssString);
       }
-      fs.writeFileSync(`${output}/${project.name}.css`, cssString);
+      fs.writeFileSync(`${buildDir}/${project.name}.css`, cssString);
    };
 
-   await utils.exec(`mkdir -p ${output}`);
+   await utils.exec(`mkdir -p ${buildDir}`);
 
    copyLIB();
    await buildJS();
