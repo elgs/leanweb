@@ -156,6 +156,17 @@ export default class LWElement extends HTMLElement {
                      object[propertyExpr].splice(index, 1);
                   }
                }
+            } else if (modelNode.type === 'select-multiple') {
+               if (!Array.isArray(object[propertyExpr])) {
+                  object[propertyExpr] = [];
+               }
+               object[propertyExpr].length = 0;
+               for (let i = 0; i < modelNode.options.length; ++i) {
+                  const option = modelNode.options[i];
+                  if (option.selected) {
+                     object[propertyExpr].push(option.value);
+                  }
+               }
             } else {
                object[propertyExpr] = modelNode.value;
             }
@@ -184,6 +195,13 @@ export default class LWElement extends HTMLElement {
             modelNode.checked = parsed[0].includes(modelNode.value);
          } else if (modelNode.type === 'radio') {
             modelNode.checked = parsed[0] === modelNode.value;
+         } else if (modelNode.type === 'select-multiple') {
+            for (let i = 0; i < modelNode.options.length; ++i) {
+               const option = modelNode.options[i];
+               if (parsed[0]) {
+                  option.selected = parsed[0].includes(option.value);
+               }
+            }
          } else {
             modelNode.value = parsed[0];
          }
