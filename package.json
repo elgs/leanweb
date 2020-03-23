@@ -21,6 +21,8 @@
       "@babel/parser": "*",
       "node-sass": "*",
       "parcel-bundler": "*",
-      "parse5": "*"
+      "parse5": "*",
+      "@babel/core": "*",
+      "@babel/plugin-proposal-class-properties": "*"
    }
 }

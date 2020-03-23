@@ -33,6 +33,11 @@ const options = {
    _index += scripts.map(script => `<script src=${script}></script>`).join('\n');
    fs.writeFileSync(process.cwd() + '/build/_index.html', _index);
 
+   const babelrc = '{"plugins":["@babel/plugin-proposal-class-properties"],"presets":[["env",{"targets":{"browsers":["last 2 Chrome versions"]}}]]}';
+   fs.writeFileSync(process.cwd() + '/.babelrc', babelrc);
+
    const bundler = new parcel(process.cwd() + '/build/_index.html', options);
    await bundler.bundle();
+   fs.unlinkSync(process.cwd() + '/.babelrc');
+   fs.unlinkSync(process.cwd() + '/build/_index.html');
 })();
