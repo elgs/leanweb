@@ -20,9 +20,7 @@
    "dependencies": {
       "@babel/parser": "*",
       "node-sass": "*",
-      "parcel-bundler": "*",
       "parse5": "*",
-      "@babel/core": "*",
-      "@babel/plugin-proposal-class-properties": "*"
+      "webpack": "*"
    }
 }
