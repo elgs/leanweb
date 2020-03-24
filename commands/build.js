@@ -26,11 +26,10 @@
       utils.exec(`cp -R ./src/lib ./${buildDir}/`);
    };
 
-   const buildJS = async () => {
-      const mkdirPromises = project.components.map(async cur => {
-         await utils.exec(`mkdir -p ./${buildDir}/components/${cur}/`);
+   const buildJS = () => {
+      project.components.map(cur => {
+         utils.exec(`mkdir -p ./${buildDir}/components/${cur}/`);
       });
-      await Promise.all(mkdirPromises);
 
       const jsString = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);
@@ -82,10 +81,10 @@
       fs.writeFileSync(`${buildDir}/${project.name}.css`, cssString);
    };
 
-   await utils.exec(`mkdir -p ${buildDir}`);
+   utils.exec(`mkdir -p ${buildDir}`);
 
    copyLIB();
-   await buildJS();
+   buildJS();
    buildCSS();
    buildHTML();
 })();

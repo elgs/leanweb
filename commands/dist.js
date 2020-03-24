@@ -6,8 +6,8 @@ const utils = require('./utils.js');
    const distDir = 'dist';
    const project = require(`${process.cwd()}/leanweb.json`);
 
-   await utils.exec(`npx leanweb clean`);
-   await utils.exec(`npx leanweb build`);
+   utils.exec(`npx leanweb clean`);
+   utils.exec(`npx leanweb build`);
 
    const compiler = webpack({
       mode: 'production',
@@ -49,7 +49,7 @@ const utils = require('./utils.js');
          console.log(stats.compilation.warnings);
       }
 
-      await utils.exec(`cp -R ./${buildDir}/index.html ./${distDir}/`);
-      await utils.exec(`cp -R ./${buildDir}/${project.name}.css ./${distDir}/`);
+      utils.exec(`cp -R ./${buildDir}/index.html ./${distDir}/`);
+      utils.exec(`cp -R ./${buildDir}/${project.name}.css ./${distDir}/`);
    });
 })();

@@ -27,7 +27,7 @@
    for (const cmp of cmps) {
       const cmpName = utils.getComponentName(cmp);
       const cmpPath = `src/components/${cmp}`;
-      await utils.exec(`mkdir -p ${cmpPath}/`);
+      utils.exec(`mkdir -p ${cmpPath}/`);
 
       if (!fs.existsSync(`${cmpPath}/${cmpName}.js`)) {
          let jsString = fs.readFileSync(`${__dirname}/../templates/component.js`, 'utf8');

@@ -1,13 +1,7 @@
-const { exec } = require('child_process');
+const { execSync } = require('child_process');
 const sass = require('node-sass');
 
-module.exports.exec = command => new Promise((res =>
-   exec(command, (err, stdout, stderr) => {
-      process.stdout.write(stdout);
-      process.stderr.write(stderr);
-      res();
-   })
-));
+module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
 module.exports.buildCSS = scssString => {
    if (scssString.trim()) {
@@ -32,6 +26,19 @@ module.exports.getPathLevels = cmp => {
       ret += '../';
    }
    return ret;
+};
+
+module.exports.throttle = (callback, limit = 1000) => {
+   let wait = false;
+   return function () {
+      if (!wait) {
+         callback.apply(null, arguments);
+         wait = true;
+         setTimeout(() => {
+            wait = false;
+         }, limit);
+      }
+   };
 };
 
 const initNote = `Usage: leanweb init or leanweb init project-name
@@ -82,6 +89,8 @@ Now, the demo-login component can be added in demo-root.html as follows:
 <demo-login></demo-login>
 `;
 
+const serveNote = ``;
+
 const buildNote = `Usage: leanweb build
 This will create a build directory in which js files for all components will be
 copied over to, plus index.html, $project-name.js and $project-name.css.
@@ -125,6 +134,7 @@ Print version information for leanweb.`;
 module.exports.targets = {
    'init': { file: 'init.js', note: initNote },
    'generate': { file: 'generate.js', note: generateNote },
+   'serve': { file: 'serve.js', daemon: true, note: serveNote },
    'build': { file: 'build.js', note: buildNote },
    'dist': { file: 'dist.js', note: distNote },
    'clean': { file: 'clean.js', note: cleanNote },
