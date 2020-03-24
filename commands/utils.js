@@ -28,7 +28,7 @@ module.exports.getPathLevels = cmp => {
    return ret;
 };
 
-module.exports.throttle = (callback, limit = 1000) => {
+module.exports.throttle = (callback, limit = 100) => {
    let wait = false;
    return function () {
       if (!wait) {

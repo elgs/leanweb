@@ -21,6 +21,7 @@
       "@babel/parser": "*",
       "node-sass": "*",
       "parse5": "*",
-      "webpack": "*"
+      "webpack": "*",
+      "live-server": "*"
    }
 }
