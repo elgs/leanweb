@@ -27,7 +27,9 @@
    };
 
    const copyElectron = () => {
-      utils.exec(`cp ./src/electron.js ./${buildDir}/`);
+      if (fs.existsSync(process.cwd() + '/src/electron.js')) {
+         utils.exec(`cp ./src/electron.js ./${buildDir}/`);
+      }
    };
 
    const buildJS = () => {

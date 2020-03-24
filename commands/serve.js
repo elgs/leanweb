@@ -14,6 +14,8 @@ const liveServer = require("live-server");
       host = process.argv[3];
    }
 
+   utils.exec(`npx leanweb build`);
+
    const build = (eventType, filename) => {
       // console.log(eventType + ': ', filename);
       utils.exec(`npx leanweb build`);
