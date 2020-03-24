@@ -116,6 +116,8 @@ const cleanNote = `Usage: leanweb clean
 This will remove the build and dist directory.
 `;
 
+const electronNote = ``;
+
 const destroyNote = `Usage leanweb destroy project-name
 This will remove the leanweb.json file, src, build and dist directory. Please
 note the src directory will be deleted by this command.
@@ -134,10 +136,11 @@ Print version information for leanweb.`;
 module.exports.targets = {
    'init': { file: 'init.js', note: initNote },
    'generate': { file: 'generate.js', note: generateNote },
-   'serve': { file: 'serve.js', daemon: true, note: serveNote },
+   'serve': { file: 'serve.js', note: serveNote },
    'build': { file: 'build.js', note: buildNote },
    'dist': { file: 'dist.js', note: distNote },
    'clean': { file: 'clean.js', note: cleanNote },
+   'electron': { file: 'electron.js', note: electronNote },
    'destroy': { file: 'destroy.js', note: destroyNote },
    'help': { file: 'help.js', note: helpNote },
    'version': { file: 'version.js', note: versionNote },

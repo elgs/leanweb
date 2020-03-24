@@ -22,8 +22,12 @@
       });
    };
 
-   const copyLIB = () => {
+   const copyLib = () => {
       utils.exec(`cp -R ./src/lib ./${buildDir}/`);
+   };
+
+   const copyElectron = () => {
+      utils.exec(`cp ./src/electron.js ./${buildDir}/`);
    };
 
    const buildJS = () => {
@@ -83,8 +87,9 @@
 
    utils.exec(`mkdir -p ${buildDir}`);
 
-   copyLIB();
+   copyLib();
    buildJS();
    buildCSS();
    buildHTML();
+   copyElectron();
 })();
