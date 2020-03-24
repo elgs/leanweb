@@ -27,8 +27,7 @@ const liveServer = require("live-server");
    const params = {
       port,
       host,
-      root: process.cwd() + "/",
-      open: true,
+      open: '/build/',
       wait: 1000,
       logLevel: 0, // 0 = errors only, 1 = some, 2 = lots
    };
