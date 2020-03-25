@@ -1,6 +1,7 @@
 const fs = require('fs');
 const utils = require('./utils.js');
 const liveServer = require("live-server");
+const watch = require('node-watch');
 
 (async () => {
 
@@ -22,7 +23,7 @@ const liveServer = require("live-server");
    };
 
    const throttledBuild = utils.throttle(build);
-   fs.watch(process.cwd() + '/src/', { recursive: true }, (eventType, filename) => {
+   watch(process.cwd() + '/src/', { recursive: true }, (eventType, filename) => {
       throttledBuild(eventType, filename);
    });
 
