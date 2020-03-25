@@ -62,7 +62,7 @@ global styles. `demo-root` web component directory is created at
 `root.html`
 ```html
 <slot></slot>
-<span lw>name</span> works!
+<div>demo-root works!</div>
 ```
 
 `root.js`
@@ -314,3 +314,6 @@ customElements.define(component.id,
 );
 ```
 <img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
+
+## More examples and tutorials
+https://leanweb.app

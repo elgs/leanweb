@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.1.2",
+   "version": "0.1.3",
    "description": "leanweb",
    "bin": {
       "leanweb": "leanweb.js"
