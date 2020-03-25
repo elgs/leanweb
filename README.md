@@ -1,13 +1,13 @@
 # leanweb
-Tool set for generating web components based web project.
+A set of tools (as opposed to framework) to generate web components based web 
+project.
 
 ## Installation
 * `npm install leanweb -g` as a global tool, or
 * `npm install leanweb -D` in the project as a dev dependency.
 
-If leanweb is installed as a dev dependency of the project, you will need to
-run `npx leanweb`, otherwise just run `leanweb` if it is installed as global
-tool.
+If leanweb is installed as a dev dependency, you will need to run 
+`npx leanweb`, otherwise just run `leanweb` if it is installed as global tool.
 
 I don't see any reason leanweb should be installed as `npm install leanweb`.
 
@@ -15,10 +15,10 @@ I don't see any reason leanweb should be installed as `npm install leanweb`.
 I like the idea in Angular that 3 files (html/js/scss) as a component are in
 charge of a box, like a div, a rectangle area. But I don't like Angular in that
 my code has to be depending on so many bloated dependencies to run. I created
-leanweb as a set of tools to help me create web components based web projects,
+leanweb as a set of tools to help create web components based web projects,
 which:
-* come with zero dependency
-* are based on native web components api
+* are assistive, not restrictive
+* are based on native DOM and web components api
 * are built to last
 
 The principle is simply that 3 files (html/js/scss) as a web component will
@@ -35,6 +35,7 @@ Create a directory called `demo` for this demo project.
 ```bash
 $ mkdir demo
 $ cd demo
+demo$ npm init -y # create package.json, skip this step if it's done before
 demo$ leanweb init
 demo$
 ```
@@ -45,72 +46,76 @@ root. `leanweb.json` looks like:
 {
   "name": "demo",
   "components": [
-    "demo-root"
+    "root"
   ]
 }
 ```
-which suggests a root web component `demo-root` is created by `leanweb init`.
-In `src/` directory, an empty `demo.scss` file is created, in which we can add
-global styling scss code. `demo-root` web component directory is created at
-`src/components/demo-root/`. There are 3 files in this directory:
+which suggests a root web component `demo-root` is created. In `src/` directory, 
+an `index.html` an empty `demo.scss` files are created, in `demo.scss` we can add
+global styles. `demo-root` web component directory is created at 
+`src/components/root/`. There are 3 files in this directory:
 
-* demo-root.html
-* demo-root.js
-* demo-root.scss 
+* root.html
+* root.js
+* root.scss 
 
-`demo-root.html`
+`root.html`
 ```html
-<span>root works</span>
+<slot></slot>
+<span lw>name</span> works!
 ```
 
-`demo-root.js`
+`root.js`
 ```javascript
-customElements.define('demo-root',
-  class extends HTMLElement {
-    constructor() {
-      super();
+import LWElement from './../../lib/lw-element.js';
+import interpolation from './interpolation.js';
 
-      const templateNode = document.querySelector('#demo-root').content.cloneNode(true);
-      // attach to shadow dom
-      this.attachShadow({ mode: 'open' }).appendChild(templateNode);
-      // attach to normal dom
-      // this.appendChild(templateNode);
-    }
+const component = { id: 'demo-root', interpolation };
+customElements.define(component.id,
+   class extends LWElement {  // LWElement extends HTMLElement
+      constructor() {
+         super(component);
+      }
 
-    // connectedCallback() {
-    //   console.log(this.isConnected);
-    //   console.log('Element added to page.');
-    // }
+      name = component.id;
 
-    // disconnectedCallback() {
-    //   console.log('Element removed from page.');
-    // }
+      // connectedCallback() {
+      //    console.log(this.isConnected);
+      //    console.log('Element added to page.');
+      // }
 
-    // adoptedCallback() {
-    //   console.log('Element moved to new page.');
-    // }
+      // disconnectedCallback() {
+      //    console.log('Element removed from page.');
+      // }
 
-    // static get observedAttributes() {
-    //   return [];
-    // }
+      // adoptedCallback() {
+      //    console.log('Element moved to new page.');
+      // }
 
-    // attributeChangedCallback(name, oldValue, newValue) {
-    //   console.log(name, oldValue, newValue);
-    // }
-  }
+      // static get observedAttributes() {
+      //    return [];
+      // }
+
+      // attributeChangedCallback(name, oldValue, newValue) {
+      //    console.log(name, oldValue, newValue);
+      // }
+   }
 );
 ```
 
-`demo-root.scss` is empty.
+`root.scss` is empty, which is for you to add web component specific styles.
 
-Now if you run `leanweb dist` or `leanweb di`, a `dist/` directory will be
-created. There will be 3 files inside:
-* index.html
-* demo.js
-* demo.css
 
-If you deploy these 3 files to a web server, you should see `root works` in
-browser.
+### leanweb serve
+Run `leanweb serve` and you should see a browser window open. Try make some changes in the code, and save, the browser should refresh automatically to refrelect your changes.
+<img src='https://leanweb.app/leanweb-serve.png' alt='leanweb serve' width='640'/>
+
+
+### leanweb electron
+Run `leanweb electron` and you should see an electron app window open as follows:
+
+<img src='https://leanweb.app/leanweb-electron.png' alt='leanweb electron' width='640'/>
+
 
 ### leanweb generate
 Let's create a `login` web component with `leanweb generate` or `leanweb g`.
@@ -123,44 +128,50 @@ Now the `leanweb.json` has one more entry in the component list:
 ```json
 {
   "name": "demo",
-  "title": "demo",
   "components": [
-    "demo-root",
-    "demo-login"
+    "root",
+    "login"
   ]
 }
 ```
 `demo-login` is the newly generated web component. The web component name is
 prefixed with project name `demo`. Inside `src/components/`, a new web 
-component directory `demo-login` is created containing 3 files:
-* demo-login.html
-* demo-login.js
-* demo-login.scss
+component directory `login` is created containing 3 files:
+* login.html
+* login.js
+* login.scss
 
-### leanweb build
-Let's open `src/components/demo-root/demo-root.html`, which previously looks 
-like:
-```html
-<span>root works</span>
-```
 
-Now let's add one line to this file:
+Now let's make two changes, first open up `src/components/root/root.html`, and
+add a new line `<demo-login></demo-login>`. The new `root.html` should look 
+like the following after the change:
+
 ```html
-<span>root works</span>
+<slot></slot>
+<div>demo-root works!</div>
 <demo-login></demo-login>
 ```
 
-then run:
-```bash
-demo$ leanweb build
+Then open up `src/components/login/login.scss`, and add the following style:
+```scss
+div {
+  color: red;
+}
 ```
 
-You should see `root works login works` in the browser.
+And you should see the changes in the browser. Please note the styles added to
+the `login` component does not affect other components.
+
+<img src='https://leanweb.app/leanweb-serve-1.png' alt='leanweb serve' width='640'/>
+
+Run `leanweb electron` again, and you will see the same changes reflected in 
+the electron app.
+
+<img src='https://leanweb.app/leanweb-electron-1.png' alt='leanweb serve' width='640'/>
 
 ### leanweb dist
-Unlike `leanweb build`, `leanweb dist` will combine all js files into one
-`demo.js`. `index.html`, `demo.js` and `demo.css` will be created in the 
-`dist/` directory. 
+Run `leanweb dist`, and a `dist` directory will be created with minified files
+for production
 
 ### leanweb clean
 `leanweb clean` will delete `build/` and `dist/` directories.
@@ -172,21 +183,8 @@ deleted by this command.
 
 ### leanweb help
 `leanweb help command-name` will print help information for the command. For
-example, `leanweb help dist` or `leanweb h di` will print:
-
-```
-demo$ npx leanweb h di
-Usage: leanweb dist
-This will create a dist directory in which 3 files will be created:
-
-index.html
-demo.js
-demo.css
-
-These 3 files could be deployed to a web server.
-
-demo$
-```
+example, `leanweb help dist` or `leanweb h di` will print help information for
+`lean dist`.
 
 ### leanweb version
 `leanweb version` will print the version information of `leanweb`.

@@ -32,10 +32,10 @@ module.exports.throttle = (callback, limit = 100) => {
    let wait = false;
    return function () {
       if (!wait) {
-         callback.apply(null, arguments);
          wait = true;
          setTimeout(() => {
             wait = false;
+            callback.apply(null, arguments);
          }, limit);
       }
    };

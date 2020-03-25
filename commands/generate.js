@@ -39,7 +39,7 @@
       }
 
       if (!fs.existsSync(`${cmpPath}/${cmpName}.html`)) {
-         fs.writeFileSync(`${cmpPath}/${cmpName}.html`, `<slot></slot>\n<span lw>name</span> works!`);
+         fs.writeFileSync(`${cmpPath}/${cmpName}.html`, `<slot></slot>\n<div>${leanwebJSON.name}-${cmpName} works!</div>`);
       }
 
       if (!fs.existsSync(`${cmpPath}/${cmpName}.scss`)) {
