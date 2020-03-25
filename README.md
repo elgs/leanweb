@@ -135,7 +135,7 @@ Now the `leanweb.json` has one more entry in the component list:
 }
 ```
 `demo-login` is the newly generated web component. The web component name is
-prefixed with project name `demo`. Inside `src/components/`, a new web 
+prefixed with project name `demo-`. Inside `src/components/`, a new web 
 component directory `login` is created containing 3 files:
 * login.html
 * login.js
@@ -167,7 +167,7 @@ the `login` component does not affect other components.
 Run `leanweb electron` again, and you will see the same changes reflected in 
 the electron app.
 
-<img src='https://leanweb.app/leanweb-electron-1.png' alt='leanweb serve' width='640'/>
+<img src='https://leanweb.app/leanweb-electron-1.png' alt='leanweb electron' width='640'/>
 
 ### leanweb dist
 Run `leanweb dist`, and a `dist` directory will be created with minified files
@@ -188,3 +188,129 @@ example, `leanweb help dist` or `leanweb h di` will print help information for
 
 ### leanweb version
 `leanweb version` will print the version information of `leanweb`.
+
+
+## lw directives
+
+### lw
+Contents inside a tag with `lw` directive are considered expressions that will 
+be evaluated. In the example below, the `<span lw>name</span>` will be 
+evaluated as `<span>Leanweb</span>`, because the variable `name` is defined
+in the web component js file with the value `Leanweb`.
+```html
+Hello <span lw>name</span>!
+```
+```javascript
+const component = { id: 'demo-root', interpolation };
+customElements.define(component.id,
+   class extends LWElement {  // LWElement extends HTMLElement
+      constructor() {
+         super(component);
+      }
+
+      name = 'Leanweb';
+   }
+);
+
+```
+```
+Hello Leanweb!
+```
+
+### lw-if
+```html
+<span lw-if='name==="Leanweb"'>Leanweb</span>
+```
+The `span` DOM node will be shown if `name==="Leanweb"` will evaluate true, 
+otherwise, it will not be shown.
+
+### lw-for
+The following example shows how `lw-for` directive helps to generate DOM nodes 
+for each `item` in the `items` array.
+```html
+<div lw-for="item, $index in items">
+   <span lw>$index+': '+item</span>
+</div>
+```
+```javascript
+const component = { id: 'demo-root', interpolation };
+customElements.define(component.id,
+   class extends LWElement {  // LWElement extends HTMLElement
+      constructor() {
+         super(component);
+      }
+
+      items = ['one', 'two', 'three'];
+   }
+);
+```
+```
+0: one
+1: two
+2: three
+```
+
+### lw-model and lw-on:
+```html
+<input type="text" lw-model="name">
+<span lw>name</span>
+<br>
+<button lw-on:click="resetName()"> Reset Name </button>
+```
+```javascript
+const component = { id: 'demo-root', interpolation };
+customElements.define(component.id,
+   class extends LWElement {  // LWElement extends HTMLElement
+      constructor() {
+         super(component);
+      }
+
+      resetName() {
+         this.name = 'Leanweb';
+         this.update();
+      }
+   }
+);
+```
+<img src='https://leanweb.app/lw-model.gif' alt='lw-model' width='640'/>
+
+### lw-class:
+```html
+<div lw lw-for='item, $index in items' lw-class:active='isActive($index)'>item</div>
+```
+```javascript
+const component = { id: 'demo-root', interpolation };
+customElements.define(component.id,
+   class extends LWElement {  // LWElement extends HTMLElement
+      constructor() {
+         super(component);
+      }
+
+      items = ['one', 'two', 'three'];
+
+      isActive(index) {
+         return index === 1;
+      }
+   }
+);
+```
+<img src='https://leanweb.app/lw-active.png' alt='lw-active' width='640'/>
+
+### lw-bind:
+```html
+<img lw-bind:src='imgSrc' lw-bind:width='imageWidth'>
+```
+```javascript
+const component = { id: 'demo-root', interpolation };
+customElements.define(component.id,
+   class extends LWElement {  // LWElement extends HTMLElement
+      constructor() {
+         super(component);
+      }
+
+      imgSrc = 'https://leanweb.app/az.gif';
+      imageWidth = 480;
+   }
+);
+```
+<img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>

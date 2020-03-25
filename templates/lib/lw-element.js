@@ -202,7 +202,7 @@ export default class LWElement extends HTMLElement {
                }
             }
          } else {
-            modelNode.value = parsed[0];
+            modelNode.value = parsed[0] ?? '';
          }
       });
    }
