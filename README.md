@@ -109,7 +109,7 @@ customElements.define(component.id,
 ### leanweb serve
 Run `leanweb serve` and you should see a browser window open. Try make some 
 changes in the code, and save, the browser should refresh automatically to 
-refleect your changes.
+reflect your changes.
 <img src='https://leanweb.app/leanweb-serve.png' alt='leanweb serve' width='640'/>
 
 
@@ -173,7 +173,7 @@ the electron app.
 
 ### leanweb dist
 Run `leanweb dist`, and a `dist` directory will be created with minified files
-for production
+for production.
 
 ### leanweb clean
 `leanweb clean` will delete `build/` and `dist/` directories.
