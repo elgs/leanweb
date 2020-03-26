@@ -228,9 +228,7 @@ otherwise, it will not be shown.
 The following example shows how `lw-for` directive helps to generate DOM nodes 
 for each `item` in the `items` array.
 ```html
-<div lw-for="item, $index in items">
-   <span lw>$index+': '+item</span>
-</div>
+<div lw lw-for="item, $index in items">$index+': '+item</div>
 ```
 ```javascript
 const component = { id: 'demo-root', interpolation };

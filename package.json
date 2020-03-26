@@ -1,12 +1,9 @@
 {
    "name": "leanweb",
-   "version": "0.1.4",
+   "version": "0.1.5",
    "description": "leanweb",
    "bin": {
       "leanweb": "leanweb.js"
-   },
-   "scripts": {
-      "tests": "npx jasmine tests/*.js"
    },
    "repository": {
       "type": "git",
