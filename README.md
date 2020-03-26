@@ -107,7 +107,9 @@ customElements.define(component.id,
 
 
 ### leanweb serve
-Run `leanweb serve` and you should see a browser window open. Try make some changes in the code, and save, the browser should refresh automatically to refrelect your changes.
+Run `leanweb serve` and you should see a browser window open. Try make some 
+changes in the code, and save, the browser should refresh automatically to 
+refleect your changes.
 <img src='https://leanweb.app/leanweb-serve.png' alt='leanweb serve' width='640'/>
 
 
