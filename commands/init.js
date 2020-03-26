@@ -1,5 +1,6 @@
 (async () => {
    const fs = require('fs');
+   const fse = require('fs-extra');
    const path = require('path');
    const args = process.argv;
    const utils = require('./utils.js');
@@ -32,7 +33,8 @@
 
    utils.exec(`npx leanweb generate root`);
 
-   utils.exec(`cp -R ${__dirname}/../templates/lib ./src/`);
+   fse.copySync(`${__dirname}/../templates/lib`, `./src/lib/`);
+
    let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
    fs.writeFileSync(`./src/index.html`, htmlString);

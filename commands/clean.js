@@ -1,4 +1,6 @@
+const fs = require('fs');
+
 (async () => {
-   const utils = require('./utils.js');
-   utils.exec(`rm -rf build/ dist/`);
+   fs.rmdirSync('build/', { recursive: true });
+   fs.rmdirSync('dist/', { recursive: true });
 })();

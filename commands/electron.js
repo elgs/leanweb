@@ -1,8 +1,9 @@
 (async () => {
    const fs = require('fs');
+   const fse = require('fs-extra');
    const utils = require('./utils.js');
    if (!fs.existsSync(process.cwd() + '/src/electron.js')) {
-      utils.exec(`cp ${__dirname}/../templates/electron.js ${process.cwd()}/src/`);
+      fse.copySync(`${__dirname}/../templates/electron.js`, `${process.cwd()}/src/electron.js`);
    }
 
    const leanwebJSONPath = `${process.cwd()}/leanweb.json`;

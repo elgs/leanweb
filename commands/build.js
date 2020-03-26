@@ -1,5 +1,6 @@
 (async () => {
    const fs = require('fs');
+   const fse = require('fs-extra');
    const utils = require('./utils.js');
    const parser = require('../lib/lw-html-parser.js');
 
@@ -23,19 +24,20 @@
    };
 
    const copyLib = () => {
-      utils.exec(`cp -R ./src/lib ./${buildDir}/`);
+      fse.copySync('./src/lib/', `./${buildDir}/lib/`)
    };
 
    const copyElectron = () => {
       if (fs.existsSync(process.cwd() + '/src/electron.js')) {
-         utils.exec(`cp ./src/electron.js ./${buildDir}/`);
+         fse.copySync('./src/electron.js', `./${buildDir}/electron.js`);
       }
    };
 
    const buildJS = () => {
       project.components.map(cur => {
-         utils.exec(`mkdir -p ./${buildDir}/components/${cur}/`);
+         fs.mkdirSync(`./${buildDir}/components/${cur}/`, { recursive: true });
       });
+
 
       const jsString = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);
@@ -87,7 +89,7 @@
       fs.writeFileSync(`${buildDir}/${project.name}.css`, cssString);
    };
 
-   utils.exec(`mkdir -p ${buildDir}`);
+   fs.mkdirSync(buildDir, { recursive: true });
 
    copyLib();
    buildJS();

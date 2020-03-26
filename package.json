@@ -16,6 +16,7 @@
    "license": "MIT",
    "dependencies": {
       "@babel/parser": "*",
+      "fs-extra": "*",
       "live-server": "*",
       "node-sass": "*",
       "node-watch": "*",

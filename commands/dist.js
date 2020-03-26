@@ -1,5 +1,7 @@
+const path = require('path');
 const webpack = require('webpack');
 const utils = require('./utils.js');
+const fse = require('fs-extra');
 
 (async () => {
    const buildDir = 'build';
@@ -20,8 +22,8 @@ const utils = require('./utils.js');
       module: {
          rules: [
             {
-               test: process.cwd() + `/${buildDir}/`,
-               exclude: /(node_modules)/,
+               test: path.resolve(process.cwd() + `/${buildDir}/`),
+               exclude: /node_modules/,
                loader: 'babel-loader',
                options: {
                   presets: ['@babel/preset-env',
@@ -49,7 +51,7 @@ const utils = require('./utils.js');
          console.log(stats.compilation.warnings);
       }
 
-      utils.exec(`cp -R ./${buildDir}/index.html ./${distDir}/`);
-      utils.exec(`cp -R ./${buildDir}/${project.name}.css ./${distDir}/`);
+      fse.copySync(`./${buildDir}/index.html`, `./${distDir}/index.html`);
+      fse.copySync(`./${buildDir}/${project.name}.css`, `./${distDir}/${project.name}.css`);
    });
 })();

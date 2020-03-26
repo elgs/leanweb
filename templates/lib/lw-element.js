@@ -7,7 +7,7 @@ const hasMethod = (obj, name) => {
 
 const nextAllSiblings = (el, selector) => {
    const siblings = [];
-   while ((el = el.nextSibling)) {
+   while (el = el.nextSibling) {
       if (el.nodeType === Node.ELEMENT_NODE && (!selector || el.matches(selector))) {
          siblings.push(el);
       }
@@ -41,7 +41,7 @@ export default class LWElement extends HTMLElement {
    // lw-for:  reject lw-false
    // others:  reject both lw-for and lw-false 
    // all:     reject lw-for-parent
-   _queryNodesExcudingLwFor = (selector = '', rootNode = this.shadowRoot, excludeLwFalse = true, excludeLwFor = true) => {
+   _queryNodesExcudingLwFor(selector = '', rootNode = this.shadowRoot, excludeLwFalse = true, excludeLwFor = true) {
       const nodes = [];
       if (rootNode !== this.shadowRoot) {
          if (excludeLwFalse && rootNode.matches('[lw-false]')) {
@@ -73,7 +73,7 @@ export default class LWElement extends HTMLElement {
       });
       while (treeWalker.nextNode()) { }
       return nodes;
-   };
+   }
 
    _bind(selector = '', rootNode = this.shadowRoot) {
       this._bindEvents(selector, rootNode);
