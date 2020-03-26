@@ -201,16 +201,15 @@ in the web component js file with the value `Leanweb`.
 Hello <span lw>name</span>!
 ```
 ```javascript
-const component = { id: 'demo-root', interpolation };
-customElements.define(component.id,
-   class extends LWElement {  // LWElement extends HTMLElement
-      constructor() {
-         super(component);
-      }
-
-      name = 'Leanweb';
-   }
-);
+// const component = { id: 'demo-root', interpolation };
+// customElements.define(component.id,
+//    class extends LWElement {  // LWElement extends HTMLElement
+//       constructor() {
+//          super(component);
+//       }
+         name = 'Leanweb';
+//    }
+// );
 
 ```
 ```
@@ -231,16 +230,15 @@ for each `item` in the `items` array.
 <div lw lw-for="item, $index in items">$index+': '+item</div>
 ```
 ```javascript
-const component = { id: 'demo-root', interpolation };
-customElements.define(component.id,
-   class extends LWElement {  // LWElement extends HTMLElement
-      constructor() {
-         super(component);
-      }
-
-      items = ['one', 'two', 'three'];
-   }
-);
+// const component = { id: 'demo-root', interpolation };
+// customElements.define(component.id,
+//    class extends LWElement {  // LWElement extends HTMLElement
+//       constructor() {
+//          super(component);
+//       }
+         items = ['one', 'two', 'three'];
+//    }
+// );
 ```
 ```
 0: one
@@ -256,19 +254,18 @@ customElements.define(component.id,
 <button lw-on:click="resetName()"> Reset Name </button>
 ```
 ```javascript
-const component = { id: 'demo-root', interpolation };
-customElements.define(component.id,
-   class extends LWElement {  // LWElement extends HTMLElement
-      constructor() {
-         super(component);
-      }
-
-      resetName() {
-         this.name = 'Leanweb';
-         this.update();
-      }
-   }
-);
+// const component = { id: 'demo-root', interpolation };
+// customElements.define(component.id,
+//    class extends LWElement {  // LWElement extends HTMLElement
+//       constructor() {
+//          super(component);
+//       }
+         resetName() {
+            this.name = 'Leanweb';
+            this.update();
+         }
+//    }
+// );
 ```
 <img src='https://leanweb.app/lw-model.gif' alt='lw-model' width='640'/>
 
@@ -277,20 +274,18 @@ customElements.define(component.id,
 <div lw lw-for='item, $index in items' lw-class:active='isActive($index)'>item</div>
 ```
 ```javascript
-const component = { id: 'demo-root', interpolation };
-customElements.define(component.id,
-   class extends LWElement {  // LWElement extends HTMLElement
-      constructor() {
-         super(component);
-      }
-
-      items = ['one', 'two', 'three'];
-
-      isActive(index) {
-         return index === 1;
-      }
-   }
-);
+// const component = { id: 'demo-root', interpolation };
+// customElements.define(component.id,
+//    class extends LWElement {  // LWElement extends HTMLElement
+//       constructor() {
+//          super(component);
+//       }
+         items = ['one', 'two', 'three'];
+         isActive(index) {
+            return index === 1;
+         }
+//    }
+// );
 ```
 <img src='https://leanweb.app/lw-active.png' alt='lw-active' width='640'/>
 
@@ -299,17 +294,16 @@ customElements.define(component.id,
 <img lw-bind:src='imgSrc' lw-bind:width='imageWidth'>
 ```
 ```javascript
-const component = { id: 'demo-root', interpolation };
-customElements.define(component.id,
-   class extends LWElement {  // LWElement extends HTMLElement
-      constructor() {
-         super(component);
-      }
-
-      imgSrc = 'https://leanweb.app/az.gif';
-      imageWidth = 480;
-   }
-);
+// const component = { id: 'demo-root', interpolation };
+// customElements.define(component.id,
+//    class extends LWElement {  // LWElement extends HTMLElement
+//       constructor() {
+//          super(component);
+//       }
+         imgSrc = 'https://leanweb.app/az.gif';
+         imageWidth = 480;
+//    }
+// );
 ```
 <img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
 
