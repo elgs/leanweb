@@ -8,8 +8,8 @@ const fse = require('fs-extra');
    const distDir = 'dist';
    const project = require(`${process.cwd()}/leanweb.json`);
 
-   utils.exec(`npx leanweb clean`);
-   utils.exec(`npx leanweb build`);
+   utils.exec(`npx lw clean`);
+   utils.exec(`npx lw build`);
 
    const compiler = webpack({
       mode: 'production',

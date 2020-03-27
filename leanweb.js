@@ -8,7 +8,7 @@
    const args = process.argv;
 
    if (args.length < 3) {
-      utils.exec('npx leanweb help');
+      utils.exec('npx lw help');
       return;
    }
 

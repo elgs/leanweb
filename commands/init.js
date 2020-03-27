@@ -31,7 +31,7 @@
    utils.exec(`npm i -D @babel/plugin-proposal-class-properties --loglevel=error`);
    utils.exec(`npm i -D @babel/plugin-transform-runtime --loglevel=error`);
 
-   utils.exec(`npx leanweb generate root`);
+   utils.exec(`npx lw generate root`);
 
    fse.copySync(`${__dirname}/../templates/lib`, `./src/lib/`);
 

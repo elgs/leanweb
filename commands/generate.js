@@ -4,7 +4,7 @@
 
    const args = process.argv;
    if (args.length < 3) {
-      console.error('Error: leanweb generate component-names');
+      console.error('Usage: lw generate component-names');
       return;
    }
 

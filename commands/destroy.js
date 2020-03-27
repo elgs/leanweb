@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const args = process.argv;
 if (args.length < 3) {
-   console.log('Usage: leanweb destroy project-name');
+   console.log('Usage: lw destroy project-name');
    console.log('This will delete leanweb.json, build/ dist/ and src/ lib/')
    return;
 }

@@ -7,7 +7,7 @@ project.
 * `npm install leanweb -D` in the project as a dev dependency.
 
 If leanweb is installed as a dev dependency, you will need to run 
-`npx leanweb`, otherwise just run `leanweb` if it is installed as global tool.
+`npx lw`, otherwise just run `lw` if it is installed as global tool.
 
 I don't see any reason leanweb should be installed as `npm install leanweb`.
 
@@ -30,13 +30,13 @@ In this demo, I assume leanweb is installed as a global tool by running
 npm i leanweb -g
 ```
 
-### leanweb init
+### `leanweb` init or `lw init`
 Create a directory called `demo` for this demo project.
 ```bash
 $ mkdir demo
 $ cd demo
 demo$ npm init -y # create package.json, skip this step if it's done before
-demo$ leanweb init
+demo$ lw init
 demo$
 ```
 
@@ -106,23 +106,24 @@ customElements.define(component.id,
 `root.scss` is empty, which is for you to add web component specific styles.
 
 
-### leanweb serve
-Run `leanweb serve` and you should see a browser window open. Try make some 
+### `leanweb serve` or `lw serve`
+Run `lw serve` and you should see a browser window open. Try make some 
 changes in the code, and save, the browser should refresh automatically to 
 reflect your changes.
-<img src='https://leanweb.app/leanweb-serve.png' alt='leanweb serve' width='640'/>
+<img src='https://leanweb.app/leanweb-serve.png' alt='lw serve' width='640'/>
 
 
-### leanweb electron
-Run `leanweb electron` and you should see an electron app window open as follows:
+### `leanweb electron` or `lw electron`
+Run `lw electron` or even `lw elec` and you should see an electron app window
+open as follows:
 
-<img src='https://leanweb.app/leanweb-electron.png' alt='leanweb electron' width='640'/>
+<img src='https://leanweb.app/leanweb-electron.png' alt='lw electron' width='640'/>
 
 
-### leanweb generate
-Let's create a `login` web component with `leanweb generate` or `leanweb g`.
+### `leanweb generate` or `lw generate`
+Let's create a `login` web component with `lw generate` or `lw g`.
 ```bash
-demo$ leanweb g login
+demo$ lw g login
 demo$
 ```
 
@@ -164,32 +165,32 @@ div {
 And you should see the changes in the browser. Please note the styles added to
 the `login` component does not affect other components.
 
-<img src='https://leanweb.app/leanweb-serve-1.png' alt='leanweb serve' width='640'/>
+<img src='https://leanweb.app/leanweb-serve-1.png' alt='lw serve' width='640'/>
 
-Run `leanweb electron` again, and you will see the same changes reflected in 
+Run `lw electron` again, and you will see the same changes reflected in 
 the electron app.
 
-<img src='https://leanweb.app/leanweb-electron-1.png' alt='leanweb electron' width='640'/>
+<img src='https://leanweb.app/leanweb-electron-1.png' alt='lw electron' width='640'/>
 
-### leanweb dist
-Run `leanweb dist`, and a `dist` directory will be created with minified files
+### `leanweb dist` or `lw dist`
+Run `lw dist`, and a `dist` directory will be created with minified files
 for production.
 
-### leanweb clean
-`leanweb clean` will delete `build/` and `dist/` directories.
+### `leanweb clean` or `lw clean`
+`lw clean` will delete `build/` and `dist/` directories.
 
-### leanweb destroy
-`leanweb destrory project-name` will remove the `leanweb.json` file, `src/`, 
+### `leanweb destroy` or `lw destroy`
+`lw destrory project-name` will remove the `leanweb.json` file, `src/`, 
 `build/` and `dist/` directory. Please note the `src/` directory will be 
 deleted by this command.
 
-### leanweb help
-`leanweb help command-name` will print help information for the command. For
-example, `leanweb help dist` or `leanweb h di` will print help information for
+### `leanweb help` or `lw help`
+`lw help command-name` will print help information for the command. For
+example, `lw help dist` or `lw h di` will print help information for
 `lean dist`.
 
-### leanweb version
-`leanweb version` will print the version information of `leanweb`.
+### `leanweb version` or `lw version`
+`lw version` will print version information.
 
 
 ## lw directives

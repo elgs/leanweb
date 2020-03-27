@@ -14,6 +14,6 @@
       fs.writeFileSync(leanwebJSONPath, JSON.stringify(leanwebJSON, null, 2));
    }
 
-   utils.exec(`npx leanweb build`);
+   utils.exec(`npx lw build`);
    utils.exec(`npx electron ${process.cwd()}/build/electron.js`);
 })();

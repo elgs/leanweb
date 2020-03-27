@@ -1,16 +1,17 @@
 {
    "name": "leanweb",
-   "version": "0.1.5",
+   "version": "0.1.6",
    "description": "leanweb",
    "bin": {
-      "leanweb": "leanweb.js"
+      "leanweb": "leanweb.js",
+      "lw": "leanweb.js"
    },
    "repository": {
       "type": "git",
       "url": "git+https://github.com/elgs/leanweb.git"
    },
    "keywords": [
-      "leanweb"
+      "leanweb lw"
    ],
    "author": "Qian Chen",
    "license": "MIT",

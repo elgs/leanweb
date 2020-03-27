@@ -15,11 +15,11 @@ const watch = require('node-watch');
       host = process.argv[3];
    }
 
-   utils.exec(`npx leanweb build`);
+   utils.exec(`npx lw build`);
 
    const build = (eventType, filename) => {
       // console.log(eventType + ': ', filename);
-      utils.exec(`npx leanweb build`);
+      utils.exec(`npx lw build`);
    };
 
    const throttledBuild = utils.throttle(build);

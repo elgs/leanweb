@@ -3,8 +3,8 @@
    const utils = require('./utils.js');
 
    if (process.argv.length < 3) {
-      utils.exec('npx leanweb version');
-      console.log('Usage: leanweb target parameters');
+      utils.exec('npx lw version');
+      console.log('Usage: lw target parameters');
       console.log('Targets:\n');
       Object.keys(utils.targets).forEach(t => {
          console.log(t);
