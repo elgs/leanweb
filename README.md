@@ -30,7 +30,7 @@ In this demo, I assume leanweb is installed as a global tool by running
 npm i leanweb -g
 ```
 
-### `leanweb` init or `lw init`
+### `leanweb init` or `lw init`
 Create a directory called `demo` for this demo project.
 ```bash
 $ mkdir demo
@@ -309,6 +309,19 @@ for each `item` in the `items` array.
 // );
 ```
 <img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
+
+
+## Import libraries from `node_modules`
+
+Assuming npm module `lodash-es` is installed, you could use any of the 
+following `import` statements for your web component class:
+```javascript
+import { get } from 'lodash-es';
+import get from 'lodash-es/get.js'; // I prefer the explicit way 
+import get from 'lodash-es/get'; // the fancy way
+// import get from './../../../node_modules/lodash-es/get.js'; // this works, but who?
+import * as _ from 'lodash-es';
+```
 
 ## More examples and tutorials
 https://leanweb.app
