@@ -17,8 +17,9 @@ charge of a box, like a div, a rectangle area. But I don't like Angular in that
 my code has to be depending on so many bloated dependencies to run. I created
 leanweb as a set of tools to help create web components based web projects,
 which:
+* are based on native DOM and web components api 
+* are pure Javascript, no fancy framework
 * are assistive, not restrictive
-* are based on native DOM and web components api
 * are built to last
 
 The principle is simply that 3 files (html/js/scss) as a web component will
@@ -76,29 +77,7 @@ customElements.define(component.id,
       constructor() {
          super(component);
       }
-
       name = component.id;
-
-      // connectedCallback() {
-      //    console.log(this.isConnected);
-      //    console.log('Element added to page.');
-      // }
-
-      // disconnectedCallback() {
-      //    console.log('Element removed from page.');
-      // }
-
-      // adoptedCallback() {
-      //    console.log('Element moved to new page.');
-      // }
-
-      // static get observedAttributes() {
-      //    return [];
-      // }
-
-      // attributeChangedCallback(name, oldValue, newValue) {
-      //    console.log(name, oldValue, newValue);
-      // }
    }
 );
 ```
@@ -204,16 +183,9 @@ in the web component js file with the value `Leanweb`.
 Hello <span lw>name</span>!
 ```
 ```javascript
-// const component = { id: 'demo-root', interpolation };
-// customElements.define(component.id,
-//    class extends LWElement {  // LWElement extends HTMLElement
-//       constructor() {
-//          super(component);
-//       }
-         name = 'Leanweb';
-//    }
-// );
-
+   // ...
+   name = 'Leanweb';
+   // ...
 ```
 ```
 Hello Leanweb!
@@ -233,15 +205,9 @@ for each `item` in the `items` array.
 <div lw lw-for="item, $index in items">$index+': '+item</div>
 ```
 ```javascript
-// const component = { id: 'demo-root', interpolation };
-// customElements.define(component.id,
-//    class extends LWElement {  // LWElement extends HTMLElement
-//       constructor() {
-//          super(component);
-//       }
-         items = ['one', 'two', 'three'];
-//    }
-// );
+// ...
+   items = ['one', 'two', 'three'];
+// ...
 ```
 ```
 0: one
@@ -257,18 +223,12 @@ for each `item` in the `items` array.
 <button lw-on:click="resetName()"> Reset Name </button>
 ```
 ```javascript
-// const component = { id: 'demo-root', interpolation };
-// customElements.define(component.id,
-//    class extends LWElement {  // LWElement extends HTMLElement
-//       constructor() {
-//          super(component);
-//       }
-         resetName() {
-            this.name = 'Leanweb';
-            this.update();
-         }
-//    }
-// );
+// ...
+   resetName() {
+      this.name = 'Leanweb';
+      this.update();
+   }
+// ...
 ```
 <img src='https://leanweb.app/lw-model.gif' alt='lw-model' width='640'/>
 
@@ -277,18 +237,12 @@ for each `item` in the `items` array.
 <div lw lw-for='item, $index in items' lw-class:active='isActive($index)'>item</div>
 ```
 ```javascript
-// const component = { id: 'demo-root', interpolation };
-// customElements.define(component.id,
-//    class extends LWElement {  // LWElement extends HTMLElement
-//       constructor() {
-//          super(component);
-//       }
-         items = ['one', 'two', 'three'];
-         isActive(index) {
-            return index === 1;
-         }
-//    }
-// );
+// ...
+   items = ['one', 'two', 'three'];
+   isActive(index) {
+      return index === 1;
+   }
+// ...
 ```
 <img src='https://leanweb.app/lw-active.png' alt='lw-active' width='640'/>
 
@@ -297,16 +251,10 @@ for each `item` in the `items` array.
 <img lw-bind:src='imgSrc' lw-bind:width='imageWidth'>
 ```
 ```javascript
-// const component = { id: 'demo-root', interpolation };
-// customElements.define(component.id,
-//    class extends LWElement {  // LWElement extends HTMLElement
-//       constructor() {
-//          super(component);
-//       }
-         imgSrc = 'https://leanweb.app/az.gif';
-         imageWidth = 480;
-//    }
-// );
+// ...
+   imgSrc = 'https://leanweb.app/az.gif';
+   imageWidth = 480;
+// ...
 ```
 <img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
 
