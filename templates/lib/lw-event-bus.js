@@ -45,7 +45,9 @@ export default class LWEventBus {
    dispatchEvent(event, data = null) {
       if (this.listeners[event]) {
          Object.values(this.listeners[event]).forEach(listener => {
-            listener.callback.call(void 0, new LWEvent(event, data));
+            setTimeout(() => {
+               listener.callback.call(void 0, new LWEvent(event, data));
+            });
          });
       }
    }
