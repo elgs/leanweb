@@ -8,7 +8,7 @@
       return;
    }
 
-   const leanwebJSONPath = `${process.cwd()}/leanweb.json`;
+   const leanwebJSONPath = `${process.cwd()}/src/leanweb.json`;
    const leanwebJSON = require(leanwebJSONPath);
    const cmps = args.slice(2);
 

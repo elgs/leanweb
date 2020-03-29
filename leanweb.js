@@ -27,7 +27,7 @@
 
    target = targetCandidates[0];
 
-   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/leanweb.json`);
+   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/src/leanweb.json`);
 
    if (!leanwebJSONExisted && target !== 'init' && target !== 'help' && target !== 'version') {
       console.error('Error: leanweb.json not found.');

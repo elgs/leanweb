@@ -20,6 +20,7 @@ which:
 * are based on native DOM and web components api 
 * are pure Javascript, no fancy framework
 * are assistive, not restrictive
+* are more standards, less proprietary
 * are built to last
 
 The principle is simply that 3 files (html/js/scss) as a web component will
@@ -41,8 +42,8 @@ demo$ lw init
 demo$
 ```
 
-Now a `leanweb.json` file and a `src/` directory are created at the project
-root. `leanweb.json` looks like:
+Now a `src/` directory are created at the project root. `src/leanweb.json` 
+looks like:
 ```json
 {
   "name": "demo",
@@ -66,10 +67,12 @@ global styles. `demo-root` web component directory is created at
 <div>demo-root works!</div>
 ```
 
+`root.js` defines your new web component `demo-root`, which is a web component
+based on standard DOM api.
 `root.js`
 ```javascript
 import LWElement from './../../lib/lw-element.js';
-import interpolation from './interpolation.js';
+import interpolation from './ast.js';
 
 const component = { id: 'demo-root', interpolation };
 customElements.define(component.id,
@@ -159,9 +162,8 @@ for production.
 `lw clean` will delete `build/` and `dist/` directories.
 
 ### `leanweb destroy` or `lw destroy`
-`lw destrory project-name` will remove the `leanweb.json` file, `src/`, 
-`build/` and `dist/` directory. Please note the `src/` directory will be 
-deleted by this command.
+`lw destrory project-name` will remove the `src/`, `build/` and `dist/` 
+directory. Please note the `src/` directory will be deleted by this command.
 
 ### `leanweb help` or `lw help`
 `lw help command-name` will print help information for the command. For
@@ -183,9 +185,9 @@ in the web component js file with the value `Leanweb`.
 Hello <span lw>name</span>!
 ```
 ```javascript
-   // ...
+// ...
    name = 'Leanweb';
-   // ...
+// ...
 ```
 ```
 Hello Leanweb!

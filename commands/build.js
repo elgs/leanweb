@@ -1,49 +1,54 @@
 (async () => {
    const fs = require('fs');
+   const path = require('path');
    const fse = require('fs-extra');
    const utils = require('./utils.js');
    const parser = require('../lib/lw-html-parser.js');
 
    const buildDir = 'build';
-   const project = require(`${process.cwd()}/leanweb.json`);
+   const project = require(`${process.cwd()}/src/leanweb.json`);
 
-   const replaceNodeModulesImport = (str, cmp) => {
+   const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
-      return str.replace(/^(\s*import\s+.*?from\s+['"])([^\.^\/].+?)(['"].*)$/gm, (m, a, b, c) => {
+      return str.replace(/^(\s*import\s+.*?from\s+['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
          if (b.toLowerCase().endsWith('.js') || b.indexOf('/') > -1) {
             if (!b.endsWith('.js')) {
                b += '.js';
             }
-            return a + `./../../../${utils.getPathLevels(cmp)}node_modules/` + b + c;
+            if (b.startsWith('~/')) {
+               return a + `./${utils.getPathLevels(filePath)}` + b.substring(2) + c;
+            }
+            return a + `./${utils.getPathLevels(filePath)}node_modules/` + b + c;
          } else {
             const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
             const package = require(nodeModulePath);
-            return a + `./../../../${utils.getPathLevels(cmp)}node_modules/` + b + '/' + package.main + c;
+            return a + `./${utils.getPathLevels(filePath)}node_modules/` + b + '/' + package.main + c;
          }
       });
    };
 
-   const copyLib = () => {
-      fse.copySync('./src/lib/', `./${buildDir}/lib/`)
+   const walkDirSync = (dir, callback) => {
+      fs.readdirSync(dir).forEach(f => {
+         let dirPath = path.join(dir, f);
+         let isDirectory = fs.statSync(dirPath).isDirectory();
+         isDirectory ?
+            walkDirSync(dirPath, callback) : callback(path.join(dir, f));
+      });
    };
 
-   const copyElectron = () => {
-      if (fs.existsSync(process.cwd() + '/src/electron.js')) {
-         fse.copySync('./src/electron.js', `./${buildDir}/electron.js`);
+   const preprocessJsImport = filePath => {
+      if (filePath.toLowerCase().endsWith('.js') && !filePath.startsWith('src/lib/')) {
+         let jsFileString = fs.readFileSync(filePath, 'utf8');
+         jsFileString = replaceNodeModulesImport(jsFileString, filePath);
+         fs.writeFileSync(filePath, jsFileString);
       }
    };
 
    const buildJS = () => {
-      project.components.map(cur => {
-         fs.mkdirSync(`./${buildDir}/components/${cur}/`, { recursive: true });
-      });
-
+      walkDirSync(`./${buildDir}/`, preprocessJsImport);
 
       const jsString = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);
-         let jsFileString = fs.readFileSync(`./src/components/${cur}/${cmpName}.js`, 'utf8');
-         jsFileString = replaceNodeModulesImport(jsFileString, cur);
-         fs.writeFileSync(`./${buildDir}/components/${cur}/${cmpName}.js`, jsFileString);
          let importString = `import './components/${cur}/${cmpName}.js';`;
          return acc + importString + '\n';
       }, '');
@@ -68,7 +73,7 @@
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const parsed = parser.parse(htmlString);
             const templateString = `<template id="${project.name}-${cur.replace(/\//g, '-')}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`;
-            fs.writeFileSync(`${buildDir}/components/${cur}/interpolation.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
+            fs.writeFileSync(`${buildDir}/components/${cur}/ast.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
             return `${acc}${templateString}\n\n`
          } else {
             return acc;
@@ -89,11 +94,14 @@
       fs.writeFileSync(`${buildDir}/${project.name}.css`, cssString);
    };
 
+   const copySrc = () => {
+      fse.copySync('./src/', `./${buildDir}/`)
+   };
+
    fs.mkdirSync(buildDir, { recursive: true });
 
-   copyLib();
+   copySrc();
    buildJS();
    buildCSS();
    buildHTML();
-   copyElectron();
 })();

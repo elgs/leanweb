@@ -1,5 +1,5 @@
 import LWElement from './../../${pathLevels}lib/lw-element.js';
-import interpolation from './interpolation.js';
+import interpolation from './ast.js';
 
 const component = { id: '${projectName}-${component}', interpolation };
 customElements.define(component.id,

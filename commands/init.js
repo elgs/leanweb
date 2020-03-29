@@ -5,7 +5,7 @@
    const args = process.argv;
    const utils = require('./utils.js');
 
-   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/leanweb.json`);
+   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/src/leanweb.json`);
 
    if (leanwebJSONExisted) {
       console.error('Error: leanweb.json existed.');
@@ -18,12 +18,12 @@
       projectName = args[2];
    }
 
-
    const leanwebData = {
       name: projectName,
       components: []
    };
-   fs.writeFileSync('leanweb.json', JSON.stringify(leanwebData, null, 2));
+   fs.mkdirSync('src/');
+   fs.writeFileSync('src/leanweb.json', JSON.stringify(leanwebData, null, 2));
 
    utils.exec(`npm i -D @babel/core --loglevel=error`);
    utils.exec(`npm i -D babel-loader --loglevel=error`);

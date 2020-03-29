@@ -6,7 +6,7 @@
       fse.copySync(`${__dirname}/../templates/electron.js`, `${process.cwd()}/src/electron.js`);
    }
 
-   const leanwebJSONPath = `${process.cwd()}/leanweb.json`;
+   const leanwebJSONPath = `${process.cwd()}/src/leanweb.json`;
    const leanwebJSON = require(leanwebJSONPath);
    if (!leanwebJSON.electron) {
       utils.exec(`npm i -D electron --loglevel=error`);

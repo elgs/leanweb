@@ -6,7 +6,7 @@ const fse = require('fs-extra');
 (async () => {
    const buildDir = 'build';
    const distDir = 'dist';
-   const project = require(`${process.cwd()}/leanweb.json`);
+   const project = require(`${process.cwd()}/src/leanweb.json`);
 
    utils.exec(`npx lw clean`);
    utils.exec(`npx lw build`);

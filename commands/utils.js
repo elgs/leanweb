@@ -1,5 +1,6 @@
 const { execSync } = require('child_process');
 const sass = require('node-sass');
+const path = require('path');
 
 module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
@@ -19,10 +20,11 @@ module.exports.getComponentName = cmp => {
    return cmp;
 };
 
-module.exports.getPathLevels = cmp => {
-   const numSlashes = cmp.replace(/[^\/]/g, "").length;
+module.exports.getPathLevels = filePath => {
+   filePath = path.resolve('/' + filePath);
+   const numSlashes = filePath.replace(/[^\/]/g, '').length;
    let ret = '';
-   for (let i = 0; i < numSlashes; ++i) {
+   for (let i = 0; i < numSlashes - 1; ++i) {
       ret += '../';
    }
    return ret;
@@ -46,7 +48,7 @@ leanweb init will initialize a leanweb project with the name of the current
 working directory, otherwise, if a project-name is provided, the provided
 project-name will be used as the leanweb project name.
 
-leanweb init command will create leanweb.json file, which looks like:
+leanweb init command will create src/leanweb.json file, which looks like:
 {
   "name": "demo",
   "components": [
@@ -119,7 +121,7 @@ This will remove the build and dist directory.
 const electronNote = ``;
 
 const destroyNote = `Usage leanweb destroy project-name
-This will remove the leanweb.json file, src, build and dist directory. Please
+This will remove the src/, build/ and dist/ directory. Please
 note the src directory will be deleted by this command.
 `
 
