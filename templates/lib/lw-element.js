@@ -1,4 +1,5 @@
 import * as parser from './lw-expr-parser.js';
+import LWEventBus from './lw-event-bus.js';
 
 const hasMethod = (obj, name) => {
    const desc = Object.getOwnPropertyDescriptor(obj, name);
@@ -27,6 +28,8 @@ export default class LWElement extends HTMLElement {
          this.update();
       });
    }
+
+   static eventBus = new LWEventBus();
 
    _getNodeContext(node) {
       const contextNode = node.closest('[lw-context]');
