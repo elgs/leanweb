@@ -260,7 +260,7 @@ for each `item` in the `items` array.
 ```javascript
 // ...
    imgSrc = 'https://leanweb.app/az.gif';
-   imageWidth = 480;
+   imageWidth = 400;
 // ...
 ```
 <img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
