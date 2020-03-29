@@ -283,5 +283,73 @@ assuming `some-js-file.js` exists in the project `src/` directory.
 
 <img src='https://leanweb.app/leanweb-pub-sub.gif' alt='Leanweb Component Communication'/>
 
+`pub.js`
+```javascript
+// import LWElement from './../../lib/lw-element.js';
+// import interpolation from './ast.js';
+
+// const component = { id: 'demo-pub', interpolation };
+// customElements.define(component.id,
+//   class extends LWElement {  // LWElement extends HTMLElement
+//     constructor() {
+//       super(component);
+      setInterval(() => {
+        this.time = new Date(Date.now()).toLocaleString();
+        LWElement.eventBus.dispatchEvent('time', this.time);
+        this.update();
+      }, 1000);
+//     }
+//   }
+// );
+```
+
+`pub.html`
+```html
+<div class="pub">
+  <span>Time Publisher</span>
+  <span class="time" lw>time</span>
+</div>
+```
+
+`sub.js`
+```javascript
+// import LWElement from './../../lib/lw-element.js';
+// import interpolation from './ast.js';
+
+// const component = { id: 'demo-sub', interpolation };
+// customElements.define(component.id,
+//   class extends LWElement {  // LWElement extends HTMLElement
+//     constructor() {
+//       super(component);
+//     }
+    sub() {
+      this.listener = LWElement.eventBus.addEventListener('time', event => {
+        this.time = event.data;
+        this.subscribed = true;
+        this.update();
+      });
+    }
+
+    unsub() {
+      LWElement.eventBus.removeEventListener(this.listener);
+      this.subscribed = false;
+      this.update();
+    }
+//   }
+// );
+```
+
+`sub.html`
+```html
+<div class='sub'>
+  <span>Time Subscriber</span>
+  <span class="time" lw>time</span>
+  <div class="buttons">
+    <button lw-bind:disabled="subscribed" lw-on:click="sub()">Subscribe Time</button>
+    <button lw-bind:disabled="!subscribed" lw-on:click="unsub()">UnSubscribe Time</button>
+  </div>
+</div>
+```
+
 ## More examples and tutorials
 https://leanweb.app
