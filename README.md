@@ -293,11 +293,11 @@ assuming `some-js-file.js` exists in the project `src/` directory.
 //   class extends LWElement {  // LWElement extends HTMLElement
 //     constructor() {
 //       super(component);
-      setInterval(() => {
-        this.time = new Date(Date.now()).toLocaleString();
-        LWElement.eventBus.dispatchEvent('time', this.time);
-        this.update();
-      }, 1000);
+         setInterval(() => {
+         this.time = new Date(Date.now()).toLocaleString();
+         LWElement.eventBus.dispatchEvent('time', this.time);
+         this.update();
+         }, 1000);
 //     }
 //   }
 // );
@@ -322,19 +322,19 @@ assuming `some-js-file.js` exists in the project `src/` directory.
 //     constructor() {
 //       super(component);
 //     }
-    sub() {
-      this.listener = LWElement.eventBus.addEventListener('time', event => {
-        this.time = event.data;
-        this.subscribed = true;
-        this.update();
-      });
-    }
+      sub() {
+         this.listener = LWElement.eventBus.addEventListener('time', event => {
+         this.time = event.data;
+         this.subscribed = true;
+         this.update();
+         });
+      }
 
-    unsub() {
-      LWElement.eventBus.removeEventListener(this.listener);
-      this.subscribed = false;
-      this.update();
-    }
+      unsub() {
+         LWElement.eventBus.removeEventListener(this.listener);
+         this.subscribed = false;
+         this.update();
+      }
 //   }
 // );
 ```
