@@ -251,7 +251,7 @@ for each `item` in the `items` array.
   color:red;
 }
 ```
-<img src='https://leanweb.app/lw-active.png' alt='lw-active' width='640'/>
+<img src='https://leanweb.app/lw-class.png' alt='lw-class' width='640'/>
 
 ### lw-bind:
 ```html
