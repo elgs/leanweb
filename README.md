@@ -273,5 +273,11 @@ import get from 'lodash-es/get'; // the fancy way
 import * as _ from 'lodash-es';
 ```
 
+As a shortcut, you could import file relative to project root with `~/`:
+```javascript
+import { something } from '~/src/some-js-file.js';
+```
+assuming `some-js-file.js` exists in the project `src/` directory.
+
 ## More examples and tutorials
 https://leanweb.app
