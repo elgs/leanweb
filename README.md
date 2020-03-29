@@ -246,6 +246,11 @@ for each `item` in the `items` array.
    }
 // ...
 ```
+```scss
+.active {
+  color:red;
+}
+```
 <img src='https://leanweb.app/lw-active.png' alt='lw-active' width='640'/>
 
 ### lw-bind:
