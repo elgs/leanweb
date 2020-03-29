@@ -281,6 +281,9 @@ assuming `some-js-file.js` exists in the project `src/` directory.
 
 ## Component Communication
 
+The following project demonstrates how Leanweb helps web components to talk to 
+each other.
+
 <img src='https://leanweb.app/leanweb-pub-sub.gif' alt='Leanweb Component Communication'/>
 
 `pub.js`
@@ -293,11 +296,13 @@ assuming `some-js-file.js` exists in the project `src/` directory.
 //   class extends LWElement {  // LWElement extends HTMLElement
 //     constructor() {
 //       super(component);
+
          setInterval(() => {
          this.time = new Date(Date.now()).toLocaleString();
          LWElement.eventBus.dispatchEvent('time', this.time);
          this.update();
          }, 1000);
+
 //     }
 //   }
 // );
@@ -322,6 +327,7 @@ assuming `some-js-file.js` exists in the project `src/` directory.
 //     constructor() {
 //       super(component);
 //     }
+
       sub() {
          this.listener = LWElement.eventBus.addEventListener('time', event => {
          this.time = event.data;
@@ -335,6 +341,7 @@ assuming `some-js-file.js` exists in the project `src/` directory.
          this.subscribed = false;
          this.update();
       }
+
 //   }
 // );
 ```
@@ -350,6 +357,8 @@ assuming `some-js-file.js` exists in the project `src/` directory.
   </div>
 </div>
 ```
+
+Source code of this demo https://github.com/elgs/leanweb-pub-sub-demo
 
 ## More examples and tutorials
 https://leanweb.app
