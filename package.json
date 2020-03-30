@@ -1,7 +1,7 @@
 {
    "name": "leanweb",
-   "version": "0.1.9",
-   "description": "leanweb",
+   "version": "0.2.0",
+   "description": "A set of tools (as opposed to framework) to generate web components based web project.",
    "bin": {
       "leanweb": "leanweb.js",
       "lw": "leanweb.js"

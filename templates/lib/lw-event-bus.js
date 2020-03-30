@@ -1,14 +1,14 @@
 class LWEvent {
-   constructor(event, data) {
-      this.event = event;
+   constructor(eventName, data) {
+      this.eventName = eventName;
       this.data = data;
    }
 }
 
 class LWEventListener {
    static key = 0;
-   constructor(event, callback) {
-      this.event = event;
+   constructor(eventName, callback) {
+      this.eventName = eventName;
       this.callback = callback;
       this.key = ++LWEventListener.key;
    }
@@ -28,25 +28,25 @@ export default class LWEventBus {
       this.listeners = {};
    }
 
-   addEventListener(event, callback) {
-      const listener = new LWEventListener(event, callback);
-      this.listeners[listener.event] = this.listeners[listener.event] || {};
-      const events = this.listeners[listener.event];
+   addEventListener(eventName, callback) {
+      const listener = new LWEventListener(eventName, callback);
+      this.listeners[listener.eventName] = this.listeners[listener.eventName] || {};
+      const events = this.listeners[listener.eventName];
       events[listener.key] = listener;
       return listener;
    }
 
    removeEventListener(listener) {
-      if (this.listeners[listener.event]) {
-         delete this.listeners[listener.event][listener.key];
+      if (this.listeners[listener.eventName]) {
+         delete this.listeners[listener.eventName][listener.key];
       }
    }
 
-   dispatchEvent(event, data = null) {
-      if (this.listeners[event]) {
-         Object.values(this.listeners[event]).forEach(listener => {
+   dispatchEvent(eventName, data = null) {
+      if (this.listeners[eventName]) {
+         Object.values(this.listeners[eventName]).forEach(listener => {
             setTimeout(() => {
-               listener.callback.call(void 0, new LWEvent(event, data));
+               listener.callback.call(void 0, new LWEvent(eventName, data));
             });
          });
       }

@@ -303,9 +303,9 @@ each other.
 //       super(component);
 
          setInterval(() => {
-         this.time = new Date(Date.now()).toLocaleString();
-         LWElement.eventBus.dispatchEvent('time', this.time);
-         this.update();
+            this.time = new Date(Date.now()).toLocaleString();
+            LWElement.eventBus.dispatchEvent('time', this.time);
+            this.update();
          }, 1000);
 
 //     }
@@ -333,20 +333,20 @@ each other.
 //       super(component);
 //     }
 
-      sub() {
+       sub() {
          this.listener = LWElement.eventBus.addEventListener('time', event => {
          this.time = event.data;
-         this.subscribed = true;
          this.update();
          });
-      }
+         this.subscribed = true;
+         this.update();
+       }
 
-      unsub() {
+       unsub() {
          LWElement.eventBus.removeEventListener(this.listener);
          this.subscribed = false;
          this.update();
-      }
-
+       }
 //   }
 // );
 ```
@@ -364,6 +364,55 @@ each other.
 ```
 
 Source code of this demo https://github.com/elgs/leanweb-pub-sub-demo
+
+## API
+
+### LWElement
+`LWElement` extends `HTMLElement`, and Leanweb components extend `LWElement`.
+So Leanweb components are just more specific versions of the stand 
+`HTMLElement`. `LWElement` helps to wire up the `lw` directives in the HTML and
+provides some convenient methods to update the DOM.
+
+#### LWElement.update(selector = '', rootNode = this.shadowRoot)
+The `update` method provides a convenient way to update the DOM when the model
+changes. You should feel free to use old way to update DOM. The `update` just
+makes life a little easier. `update` takes two parameters. `selector` allows
+you to update precisely the DOM element you want to update. `rootNode` allows
+you to specifiy which DOM element to start with, which defaults to the current
+`shadowRoot`.
+
+### LWEventBus
+`LWElement` comes with an instance of `LWEventBus` that helps web components to
+talk to each other by sending and receiving events and data. You could use your
+own way for component communication. `LWEventBus` is however a choice for you.
+
+#### LWEventBus.addEventListener(eventName, callback)
+You can use `LWElement.eventBus` to get the instance of event bus, and use
+`LWElement.eventBus.addEventListener(eventName, callback)` to subscribe to a 
+type of event from the event bus. `addEventListener` takes two parameters. The 
+first `eventName` is the name of the event, and the second `callback` is a 
+function that will get called when a event is sent to the event bus. The 
+`callback` function takes a parameter `event`, which constains `eventName`
+and `data` fields. `addEventListener` returns the eventListener instance
+being added, which could be passed in `removeEventListener` as parameter.
+
+#### LWEventBus.removeEventListener(listener)
+`removeEventListener` removes the listener from the event bus, so it stops
+being notified when a next event is fired.
+
+#### LWEventBus.dispatchEvent(eventName, data = null)
+`dispatchEvent` is used to send an event to the event bus. It takes two 
+parameter. `eventName` is the name of the event, and `data` is the payload data
+of the event.
+
+## FAQ
+
+### Why `lw serve` does work with Safari, while the `dist` works?
+`lw s` runs the build process and uses the `build/` directory to serve the
+dev webserver. It doesn't do any transformation so if Safari doesn't work, as
+of today (March/9/2020), Safari still doesn't support class fields. I make sure
+the lastest Chrome will work with the dev build. The `dist` should work most,
+if not all, browsers.
 
 ## More examples and tutorials
 https://leanweb.app
