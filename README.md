@@ -363,7 +363,7 @@ each other.
 </div>
 ```
 
-Source code of this demo https://github.com/elgs/leanweb-pub-sub-demo
+Source code of this demo https://github.com/elgs/leanweb-pub-sub-demo.
 
 ## API
 
