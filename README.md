@@ -46,10 +46,10 @@ Now a `src/` directory are created at the project root. `src/leanweb.json`
 looks like:
 ```json
 {
-  "name": "demo",
-  "components": [
-    "root"
-  ]
+   "name": "demo",
+   "components": [
+      "root"
+   ]
 }
 ```
 which suggests a root web component `demo-root` is created. In `src/` directory, 
@@ -112,11 +112,11 @@ demo$
 Now the `leanweb.json` has one more entry in the component list:
 ```json
 {
-  "name": "demo",
-  "components": [
-    "root",
-    "login"
-  ]
+   "name": "demo",
+   "components": [
+      "root",
+      "login"
+   ]
 }
 ```
 `demo-login` is the newly generated web component. The web component name is
@@ -140,7 +140,7 @@ like the following after the change:
 Then open up `src/components/login/login.scss`, and add the following style:
 ```scss
 div {
-  color: red;
+   color: red;
 }
 ```
 
@@ -248,7 +248,7 @@ for each `item` in the `items` array.
 ```
 ```scss
 .active {
-  color:red;
+   color: red;
 }
 ```
 <img src='https://leanweb.app/lw-class.png' alt='lw-class' width='640'/>
@@ -265,6 +265,118 @@ for each `item` in the `items` array.
 ```
 <img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
 
+
+## Form Binding
+Here is a few examples how Leanweb helps web components work with form binding.
+
+### Checkbox
+```javascript
+// ...
+   items = ['one', 'two', 'three'];
+   toggleCheckboxes() {
+      if (this.checkedValues.length) {
+         this.checkedValues.length = 0;
+      } else {
+         this.checkedValues = [...this.items];
+      }
+      this.update();
+   }
+   checkedValues = [];
+// ...
+```
+```html
+<button lw-on:click='toggleCheckboxes()'>Toggle Checkboxes</button>
+<div lw-for="item, $index in items">
+   <input type="checkbox" lw-bind:value='item' lw-model="checkedValues"> <span lw>item</span>
+</div>
+<span lw>checkedValues</span>
+```
+<img src='https://leanweb.app/leanweb-form-binding-checkbox.gif' alt='Leanweb Form Binding Checkbox' width='640'/>
+
+### Select
+```javascript
+// ...
+   items = ['one', 'two', 'three'];
+   selectTwo() {
+      this.selectedOption = 'two';
+      this.update();
+   }
+   selectedOption;
+// ...
+```
+```html
+<button lw-on:click='selectTwo()'>Select Two</button>
+<div>
+   <select lw-model="selectedOption">
+      <option lw lw-for="item, $index in items">item</option>
+   </select>
+</div>
+<span lw> selectedOption </span>
+```
+<img src='https://leanweb.app/leanweb-form-binding-select.gif' alt='Leanweb Form Binding Select' width='640'/>
+
+### Multiple Select
+```javascript
+// ...
+   items = ['one', 'two', 'three'];
+   toggleAllOptions() {
+      if (this.selectedOptions.length) {
+         this.selectedOptions.length = 0;
+      } else {
+         this.selectedOptions = [...this.items];
+      }
+      this.update();
+   }
+   selectedOptions = [];
+// ...
+```
+```html
+<button lw-on:click='toggleAllOptions()'>Toggle All</button>
+<div>
+   <select lw-model="selectedOptions" multiple>
+      <option lw lw-for="item, $index in items">item</option>
+   </select>
+</div>
+<span lw> selectedOptions </span>
+```
+<img src='https://leanweb.app/leanweb-form-binding-multiple-select.gif' alt='Leanweb Form Binding Multiple Select' width='640'/>
+
+### Radio Button
+```javascript
+// ...
+   items = ['one', 'two', 'three'];
+   chooseTwo() {
+      this.picked = 'two';
+      this.update();
+   }
+   picked;
+// ...
+```
+```html
+<button lw-on:click='chooseTwo()'>Choose Two</button>
+<div lw-for="item, $index in items">
+   <input type="radio" name="pickOne" lw-bind:value="item" lw-model="picked"><span lw>item</span>
+</div>
+<span lw>picked</span>
+```
+<img src='https://leanweb.app/leanweb-form-binding-radio-button.gif' alt='Leanweb Form Binding Radio Button' width='640'/>
+
+### Range
+```javascript
+// ...
+   selectRange50() {
+      this.selectedRange = 50;
+      this.update();
+   }
+   selectedRange = 10;
+// ...
+```
+```html
+<button lw-on:click="selectRange50()">Select Range 50</button> <br>
+<input type="range" lw-model="selectedRange">
+<span lw>selectedRange</span>
+```
+<img src='https://leanweb.app/leanweb-form-binding-range.gif' alt='Leanweb Form Binding Range' width='640'/>
 
 ## Import libraries from `node_modules`
 
@@ -297,26 +409,26 @@ each other.
 
 // const component = { id: 'demo-pub', interpolation };
 // customElements.define(component.id,
-//   class extends LWElement {  // LWElement extends HTMLElement
-//     constructor() {
-//       super(component);
+//    class extends LWElement {  // LWElement extends HTMLElement
+//       constructor() {
+//          super(component);
 
-         setInterval(() => {
-            this.time = new Date(Date.now()).toLocaleString();
-            LWElement.eventBus.dispatchEvent('time', this.time);
-            this.update();
-         }, 1000);
+            setInterval(() => {
+               this.time = new Date(Date.now()).toLocaleString();
+               LWElement.eventBus.dispatchEvent('time', this.time);
+               this.update();
+            }, 1000);
 
-//     }
-//   }
+//       }
+//    }
 // );
 ```
 
 `pub.html`
 ```html
 <div class="pub">
-  <span>Time Publisher</span>
-  <span class="time" lw>time</span>
+   <span>Time Publisher</span>
+   <span class="time" lw>time</span>
 </div>
 ```
 
@@ -327,38 +439,38 @@ each other.
 
 // const component = { id: 'demo-sub', interpolation };
 // customElements.define(component.id,
-//   class extends LWElement {  // LWElement extends HTMLElement
-//     constructor() {
-//       super(component);
-//     }
+//    class extends LWElement {  // LWElement extends HTMLElement
+//       constructor() {
+//          super(component);
+//       }
 
-       sub() {
-         this.listener = LWElement.eventBus.addEventListener('time', event => {
-           this.time = event.data;
-           this.update();
-         });
-         this.subscribed = true;
-         this.update();
-       }
+         sub() {
+            this.listener = LWElement.eventBus.addEventListener('time', event => {
+               this.time = event.data;
+               this.update();
+            });
+            this.subscribed = true;
+            this.update();
+         }
 
-       unsub() {
-         LWElement.eventBus.removeEventListener(this.listener);
-         this.subscribed = false;
-         this.update();
-       }
-//   }
+         unsub() {
+            LWElement.eventBus.removeEventListener(this.listener);
+            this.subscribed = false;
+            this.update();
+         }
+//    }
 // );
 ```
 
 `sub.html`
 ```html
 <div class='sub'>
-  <span>Time Subscriber</span>
-  <span class="time" lw>time</span>
-  <div class="buttons">
-    <button lw-bind:disabled="subscribed" lw-on:click="sub()">Subscribe Time</button>
-    <button lw-bind:disabled="!subscribed" lw-on:click="unsub()">UnSubscribe Time</button>
-  </div>
+   <span>Time Subscriber</span>
+   <span class="time" lw>time</span>
+   <div class="buttons">
+      <button lw-bind:disabled="subscribed" lw-on:click="sub()">Subscribe Time</button>
+      <button lw-bind:disabled="!subscribed" lw-on:click="unsub()">UnSubscribe Time</button>
+   </div>
 </div>
 ```
 

@@ -35,7 +35,6 @@
 
    const preprocessJsImport = filePath => {
       if (filePath.toLowerCase().endsWith('.js') && !filePath.toLowerCase().endsWith('/ast.js') && !filePath.startsWith(`${buildDir}/lib/`)) {
-         console.log(filePath);
          let jsFileString = fs.readFileSync(filePath, 'utf8');
          jsFileString = replaceNodeModulesImport(jsFileString, filePath);
          fs.writeFileSync(filePath, jsFileString);
