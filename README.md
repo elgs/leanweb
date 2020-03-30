@@ -335,8 +335,8 @@ each other.
 
        sub() {
          this.listener = LWElement.eventBus.addEventListener('time', event => {
-         this.time = event.data;
-         this.update();
+           this.time = event.data;
+           this.update();
          });
          this.subscribed = true;
          this.update();
