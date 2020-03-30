@@ -11,18 +11,15 @@
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
       return str.replace(/^(\s*import\s+.*?from\s+['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
-         if (b.toLowerCase().endsWith('.js') || b.indexOf('/') > -1) {
-            if (!b.endsWith('.js')) {
-               b += '.js';
-            }
+         if (b.indexOf('/') > -1) {
             if (b.startsWith('~/')) {
-               return a + `./${utils.getPathLevels(filePath)}` + b.substring(2) + c;
+               return a + path.normalize(`./${utils.getPathLevels(filePath)}` + b.substring(2)) + c;
             }
-            return a + `./${utils.getPathLevels(filePath)}node_modules/` + b + c;
+            return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b) + c;
          } else {
             const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
             const package = require(nodeModulePath);
-            return a + `./${utils.getPathLevels(filePath)}node_modules/` + b + '/' + package.main + c;
+            return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b + '/' + package.main) + c;
          }
       });
    };
@@ -37,7 +34,8 @@
    };
 
    const preprocessJsImport = filePath => {
-      if (filePath.toLowerCase().endsWith('.js') && !filePath.startsWith('src/lib/')) {
+      if (filePath.toLowerCase().endsWith('.js') && !filePath.toLowerCase().endsWith('/ast.js') && !filePath.startsWith(`${buildDir}/lib/`)) {
+         console.log(filePath);
          let jsFileString = fs.readFileSync(filePath, 'utf8');
          jsFileString = replaceNodeModulesImport(jsFileString, filePath);
          fs.writeFileSync(filePath, jsFileString);

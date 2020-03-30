@@ -272,9 +272,8 @@ Assuming npm module `lodash-es` is installed, you could use any of the
 following `import` statements for your web component class:
 ```javascript
 import { get } from 'lodash-es';
-import get from 'lodash-es/get.js'; // I prefer the explicit way 
-import get from 'lodash-es/get'; // the fancy way
-// import get from './../../../node_modules/lodash-es/get.js'; // this works, but who?
+import get from 'lodash-es/get.js'; // The tailing explicit .js is important.
+import get from './../../../node_modules/lodash-es/get.js';
 import * as _ from 'lodash-es';
 ```
 
