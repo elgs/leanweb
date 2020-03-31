@@ -39,4 +39,5 @@
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
    fs.writeFileSync(`./src/index.html`, htmlString);
    fs.writeFileSync(`./src/${projectName}.scss`, '');
+   fse.copySync(`${__dirname}/../templates/favicon.svg`, `./src/favicon.svg`);
 })();
