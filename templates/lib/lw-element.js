@@ -26,6 +26,9 @@ export default class LWElement extends HTMLElement {
       this._bindMethods().then(() => {
          this._bind();
          this.update();
+         if (this.domReady && typeof this.domReady === 'function') {
+            this.domReady.call(this);
+         }
       });
    }
 

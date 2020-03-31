@@ -492,6 +492,11 @@ you to update precisely the DOM element you want to update. `rootNode` allows
 you to specifiy which DOM element to start with, which defaults to the current
 `shadowRoot`.
 
+#### LWElement.domReady()
+`domReady()` will be called after all initial DOM events are bound, and all 
+DOM interpolations are evaluated. This method is meant to be overriden and is a
+graet place to send events to the event bus.
+
 ### LWEventBus
 `LWElement` comes with an instance of `LWEventBus` that helps web components to
 talk to each other by sending and receiving events and data. You could use your
