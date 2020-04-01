@@ -8,6 +8,10 @@
    const buildDir = 'build';
    const project = require(`${process.cwd()}/src/leanweb.json`);
 
+   // const args = process.argv;
+   // const changedFiles = args.slice(2);
+   // console.log(changedFiles);
+
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
       return str.replace(/^(\s*import\s+.*?from\s+['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
@@ -24,12 +28,11 @@
       });
    };
 
-   const walkDirSync = (dir, callback) => {
+   const walkDirSync = (dir, accept = null, callback) => {
       fs.readdirSync(dir).forEach(f => {
          let dirPath = path.join(dir, f);
-         let isDirectory = fs.statSync(dirPath).isDirectory();
-         isDirectory ?
-            walkDirSync(dirPath, callback) : callback(path.join(dir, f));
+         const isDirectory = fs.statSync(dirPath).isDirectory() && (!accept || (typeof accept === 'function' && accept(dirPath, f)));
+         isDirectory ? walkDirSync(dirPath, accept, callback) : callback(path.join(dir));
       });
    };
 
@@ -41,8 +44,15 @@
       }
    };
 
+   const buildDirFilter = dirPath => {
+      if (dirPath.startsWith(`${buildDir}/lib/`)) {
+         return false;
+      }
+      return true;
+   };
+
    const buildJS = () => {
-      walkDirSync(`./${buildDir}/`, preprocessJsImport);
+      walkDirSync(`./${buildDir}/`, buildDirFilter, preprocessJsImport);
 
       const jsString = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);

@@ -19,7 +19,7 @@ const watch = require('node-watch');
 
    const build = (eventType, filename) => {
       // console.log(eventType + ': ', filename);
-      utils.exec(`npx lw build`);
+      utils.exec(`npx lw build ` + filename);
    };
 
    const throttledBuild = utils.throttle(build);
