@@ -6,10 +6,15 @@
    const utils = require('./utils.js');
 
    const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/src/leanweb.json`);
+   const packageJSONExisted = fs.existsSync(`${process.cwd()}/package.json`);
 
    if (leanwebJSONExisted) {
       console.error('Error: leanweb.json existed.');
       return;
+   }
+
+   if (!packageJSONExisted) {
+      utils.exec(`npm init -y`);
    }
 
    let projectName = path.basename(path.resolve());

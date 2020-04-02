@@ -37,7 +37,6 @@ Create a directory called `demo` for this demo project.
 ```bash
 $ mkdir demo
 $ cd demo
-demo$ npm init -y # create package.json, skip this step if it's done before
 demo$ lw init
 demo$
 ```
@@ -63,7 +62,6 @@ global styles. `demo-root` web component directory is created at
 
 `root.html`
 ```html
-<slot></slot>
 <div>demo-root works!</div>
 ```
 
@@ -132,7 +130,6 @@ add a new line `<demo-login></demo-login>`. The new `root.html` should look
 like the following after the change:
 
 ```html
-<slot></slot>
 <div>demo-root works!</div>
 <demo-login></demo-login>
 ```
