@@ -131,6 +131,9 @@ const nodeHandlers = {
    'CallExpression': (node, context) => callFunction(node, context),
    'OptionalCallExpression': (node, context) => callFunction(node, context),
    'NewExpression': (node, context) => callFunction(node, context),
+
+   'Directive': (node, context) => evalNode(node.value, context),
+   'DirectiveLiteral': (node, context) => node.value,
 };
 
 const evalNode = (node, context) => nodeHandlers[node.type](node, context);
