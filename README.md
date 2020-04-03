@@ -557,8 +557,8 @@ dev webserver. It doesn't do any transformation so if Safari doesn't work, as
 of today (March/9/2020), Safari still doesn't support class fields. I make sure
 the lastest Chrome will work with the dev build. The `dist` should work for 
 most, if not all, browsers. The design decision this is done this way is 
-because I want to the `build/` directory to be ES6 compatible and be 
-independent from any build tools.
+because I want the `build/` directory to be ES6 compatible and be independent 
+from any build tools.
 
 ## More examples and tutorials
 https://leanweb.app
