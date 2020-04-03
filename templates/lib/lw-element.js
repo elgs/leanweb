@@ -84,6 +84,7 @@ export default class LWElement extends HTMLElement {
    _bind(selector = '', rootNode = this.shadowRoot) {
       this._bindEvents(selector, rootNode);
       this._bindModels(selector, rootNode);
+      this._bindInputs(selector, rootNode);
    }
 
    async _bindMethods() {
@@ -93,6 +94,25 @@ export default class LWElement extends HTMLElement {
       methodNames.push(...Object.getOwnPropertyNames(this).filter(name => hasMethod(this, name)));
       methodNames.filter(name => name !== 'constructor').forEach(name => {
          this[name] = this[name].bind(this);
+      });
+   }
+
+   _bindInputs(selector = '', rootNode = this.shadowRoot) {
+      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-input]', rootNode);
+      nodes.forEach(inputNode => {
+         for (const attr of inputNode.attributes) {
+            const attrName = attr.name;
+            const attrValue = attr.value;
+            if (attrName.startsWith('lw-input:')) {
+               const interpolation = this._component.interpolation[attrValue];
+               const context = this._getNodeContext(inputNode);
+               const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
+               inputNode[interpolation.lwValue] = parsed[0];
+            }
+         }
+         if (inputNode.inputReady && typeof inputNode.inputReady === 'function') {
+            inputNode.inputReady.call(this);
+         }
       });
    }
 
@@ -181,7 +201,7 @@ export default class LWElement extends HTMLElement {
    }
 
    update(selector = '', rootNode = this.shadowRoot) {
-      this.updateFors(selector, rootNode);
+      this.updateFor(selector, rootNode);
       this.updateIf(selector, rootNode);
       this.updateEval(selector, rootNode);
       this.updateClass(selector, rootNode);
@@ -282,7 +302,7 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateFors(selector = '', rootNode = this.shadowRoot) {
+   updateFor(selector = '', rootNode = this.shadowRoot) {
       const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-for]', rootNode, true, false);
       for (const forNode of nodes) {
          const context = this._getNodeContext(forNode);

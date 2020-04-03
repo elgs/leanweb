@@ -32,7 +32,7 @@
       fs.readdirSync(dir).forEach(f => {
          let dirPath = path.join(dir, f);
          const isDirectory = fs.statSync(dirPath).isDirectory() && (!accept || (typeof accept === 'function' && accept(dirPath, f)));
-         isDirectory ? walkDirSync(dirPath, accept, callback) : callback(path.join(dir));
+         isDirectory ? walkDirSync(dirPath, accept, callback) : callback(path.join(dirPath));
       });
    };
 

@@ -262,6 +262,32 @@ for each `item` in the `items` array.
 ```
 <img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
 
+### lw-input:
+`lw-input` is used to pass and share data from parent to children.
+
+`demo-parent.html`
+```html
+<demo-child lw-input:user='user'></demo-child>
+```
+
+`demo-parent.js`
+```javascript
+// ...
+   user = {firstname: 'Qian', lastname: 'Chen'};
+// ...
+```
+
+The child is able to access the `user` object passed in with `lw-input:` 
+directive from `inputReady()` method.
+`demo-child.js`
+```javascript
+// ...
+   inputReady() {
+      console.log(this.user);
+   }
+// ...
+```
+
 
 ## Form Binding
 Here is a few examples how Leanweb helps web components work with form binding.
@@ -493,6 +519,11 @@ you to specifiy which DOM element to start with, which defaults to the current
 `domReady()` will be called after all initial DOM events are bound, and all 
 DOM interpolations are evaluated. This method is meant to be overriden and is a
 graet place to send events to the event bus.
+
+#### LWElement.inputReady()
+`inputReady()` will be called after all input data from parent's `lw-input:` is
+ready. In this method, children are able to access the passed in data shared
+by parents.
 
 ### LWEventBus
 `LWElement` comes with an instance of `LWEventBus` that helps web components to
