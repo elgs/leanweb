@@ -15,6 +15,10 @@ customElements.define(component.id,
       //    console.log('Dom is ready');
       // }
 
+      // inputReady() {
+      //    console.log('input is ready');
+      // }
+
       // derived from HTMLElement
       // connectedCallback() {
       //    console.log(this.isConnected);
