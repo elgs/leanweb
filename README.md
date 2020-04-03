@@ -267,7 +267,7 @@ for each `item` in the `items` array.
 
 `demo-parent.html`
 ```html
-<demo-child lw-input:user='user'></demo-child>
+<demo-child lw-input:userData='user'></demo-child>
 ```
 
 `demo-parent.js`
@@ -283,7 +283,7 @@ directive from `inputReady()` method.
 ```javascript
 // ...
    inputReady() {
-      console.log(this.user);
+      console.log(this.userData);
    }
 // ...
 ```

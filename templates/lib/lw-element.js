@@ -113,6 +113,7 @@ export default class LWElement extends HTMLElement {
          if (inputNode.inputReady && typeof inputNode.inputReady === 'function') {
             inputNode.inputReady.call(this);
          }
+         inputNode.update();
       });
    }
 
