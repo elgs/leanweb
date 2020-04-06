@@ -27,7 +27,7 @@
       name: projectName,
       components: []
    };
-   fs.mkdirSync('src/');
+   fs.mkdirSync('src/resources/', { recursive: true });
    fs.writeFileSync('src/leanweb.json', JSON.stringify(leanwebData, null, 2));
 
    utils.exec(`npm i -D @babel/core --loglevel=error`);

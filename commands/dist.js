@@ -54,5 +54,6 @@ const fse = require('fs-extra');
       fse.copySync(`./${buildDir}/index.html`, `./${distDir}/index.html`);
       fse.copySync(`./${buildDir}/${project.name}.css`, `./${distDir}/${project.name}.css`);
       fse.copySync(`./${buildDir}/favicon.svg`, `./${distDir}/favicon.svg`);
+      fse.copySync(`./${buildDir}/resources/`, `./${distDir}/resources/`)
    });
 })();
