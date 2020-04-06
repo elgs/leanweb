@@ -90,14 +90,14 @@ customElements.define(component.id,
 Run `lw serve` and you should see a browser window open. Try make some 
 changes in the code, and save, the browser should refresh automatically to 
 reflect your changes.
-<img src='https://leanweb.app/leanweb-serve.png' alt='lw serve' width='640'/>
+<img src='https://leanweb.app/images/leanweb-serve.png' alt='lw serve' width='640'/>
 
 
 ### `leanweb electron` or `lw electron`
 Run `lw electron` or even `lw elec` and you should see an electron app window
 open as follows:
 
-<img src='https://leanweb.app/leanweb-electron.png' alt='lw electron' width='640'/>
+<img src='https://leanweb.app/images/leanweb-electron.png' alt='lw electron' width='640'/>
 
 
 ### `leanweb generate` or `lw generate`
@@ -144,12 +144,12 @@ div {
 And you should see the changes in the browser. Please note the styles added to
 the `login` component does not affect other components.
 
-<img src='https://leanweb.app/leanweb-serve-1.png' alt='lw serve' width='640'/>
+<img src='https://leanweb.app/images/leanweb-serve-1.png' alt='lw serve' width='640'/>
 
 Run `lw electron` again, and you will see the same changes reflected in 
 the electron app.
 
-<img src='https://leanweb.app/leanweb-electron-1.png' alt='lw electron' width='640'/>
+<img src='https://leanweb.app/images/leanweb-electron-1.png' alt='lw electron' width='640'/>
 
 ### `leanweb dist` or `lw dist`
 Run `lw dist`, and a `dist` directory will be created with minified files
@@ -229,7 +229,7 @@ for each `item` in the `items` array.
    }
 // ...
 ```
-<img src='https://leanweb.app/lw-model.gif' alt='lw-model' width='640'/>
+<img src='https://leanweb.app/images/lw-model.gif' alt='lw-model' width='640'/>
 
 ### lw-class:
 ```html
@@ -248,7 +248,7 @@ for each `item` in the `items` array.
    color: red;
 }
 ```
-<img src='https://leanweb.app/lw-class.png' alt='lw-class' width='640'/>
+<img src='https://leanweb.app/images/lw-class.png' alt='lw-class' width='640'/>
 
 ### lw-bind:
 ```html
@@ -256,11 +256,11 @@ for each `item` in the `items` array.
 ```
 ```javascript
 // ...
-   imgSrc = 'https://leanweb.app/az.gif';
+   imgSrc = 'https://leanweb.app/images/az.gif';
    imageWidth = 400;
 // ...
 ```
-<img src='https://leanweb.app/lw-bind.png' alt='lw-bind' width='640'/>
+<img src='https://leanweb.app/images/lw-bind.png' alt='lw-bind' width='640'/>
 
 ### lw-input:
 `lw-input` is used to pass and share data from parent to children.
@@ -314,7 +314,7 @@ Here is a few examples how Leanweb helps web components work with form binding.
 </div>
 <span lw>checkedValues</span>
 ```
-<img src='https://leanweb.app/leanweb-form-binding-checkbox.gif' alt='Leanweb Form Binding Checkbox' width='640'/>
+<img src='https://leanweb.app/images/leanweb-form-binding-checkbox.gif' alt='Leanweb Form Binding Checkbox' width='640'/>
 
 ### Select
 ```javascript
@@ -336,7 +336,7 @@ Here is a few examples how Leanweb helps web components work with form binding.
 </div>
 <span lw> selectedOption </span>
 ```
-<img src='https://leanweb.app/leanweb-form-binding-select.gif' alt='Leanweb Form Binding Select' width='640'/>
+<img src='https://leanweb.app/images/leanweb-form-binding-select.gif' alt='Leanweb Form Binding Select' width='640'/>
 
 ### Multiple Select
 ```javascript
@@ -362,7 +362,7 @@ Here is a few examples how Leanweb helps web components work with form binding.
 </div>
 <span lw> selectedOptions </span>
 ```
-<img src='https://leanweb.app/leanweb-form-binding-multiple-select.gif' alt='Leanweb Form Binding Multiple Select' width='640'/>
+<img src='https://leanweb.app/images/leanweb-form-binding-multiple-select.gif' alt='Leanweb Form Binding Multiple Select' width='640'/>
 
 ### Radio Button
 ```javascript
@@ -382,7 +382,7 @@ Here is a few examples how Leanweb helps web components work with form binding.
 </div>
 <span lw>picked</span>
 ```
-<img src='https://leanweb.app/leanweb-form-binding-radio-button.gif' alt='Leanweb Form Binding Radio Button' width='640'/>
+<img src='https://leanweb.app/images/leanweb-form-binding-radio-button.gif' alt='Leanweb Form Binding Radio Button' width='640'/>
 
 ### Range
 ```javascript
@@ -399,7 +399,7 @@ Here is a few examples how Leanweb helps web components work with form binding.
 <input type="range" lw-model="selectedRange">
 <span lw>selectedRange</span>
 ```
-<img src='https://leanweb.app/leanweb-form-binding-range.gif' alt='Leanweb Form Binding Range' width='640'/>
+<img src='https://leanweb.app/images/leanweb-form-binding-range.gif' alt='Leanweb Form Binding Range' width='640'/>
 
 ## Import libraries from `node_modules`
 
@@ -423,7 +423,7 @@ assuming `some-js-file.js` exists in the project `src/` directory.
 The following project demonstrates how Leanweb helps web components to talk to 
 each other.
 
-<img src='https://leanweb.app/leanweb-pub-sub.gif' alt='Leanweb Component Communication'/>
+<img src='https://leanweb.app/images/leanweb-pub-sub.gif' alt='Leanweb Component Communication'/>
 
 `pub.js`
 ```javascript
