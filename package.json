@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.2.6",
+   "version": "0.2.7",
    "description": "A set of tools (as opposed to framework) to generate web components based web project.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -11,7 +11,8 @@
       "url": "git+https://github.com/elgs/leanweb.git"
    },
    "keywords": [
-      "leanweb lw"
+      "leanweb",
+      "lw"
    ],
    "author": "Qian Chen",
    "license": "MIT",
