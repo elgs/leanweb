@@ -1,7 +1,9 @@
 const path = require('path');
 const webpack = require('webpack');
 const utils = require('./utils.js');
+const fs = require('fs');
 const fse = require('fs-extra');
+const minify = require('html-minifier').minify;
 
 (async () => {
    const buildDir = 'build';
@@ -51,7 +53,15 @@ const fse = require('fs-extra');
          console.log(stats.compilation.warnings);
       }
 
-      fse.copySync(`./${buildDir}/index.html`, `./${distDir}/index.html`);
+      const indexHTML = fs.readFileSync(`./${buildDir}/index.html`, 'utf8');
+      const minifiedIndexHtml = minify(indexHTML, {
+         caseSensitive: true,
+         collapseWhitespace: true,
+         conservativeCollapse: true,
+         minifyCSS: true,
+         minifyJS: true,
+      });
+      fs.writeFileSync(`./${distDir}/index.html`, minifiedIndexHtml);
       fse.copySync(`./${buildDir}/${project.name}.css`, `./${distDir}/${project.name}.css`);
       fse.copySync(`./${buildDir}/favicon.svg`, `./${distDir}/favicon.svg`);
       project.resources.forEach(resource => {
