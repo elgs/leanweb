@@ -4,6 +4,7 @@ const utils = require('./utils.js');
 const fs = require('fs');
 const fse = require('fs-extra');
 const minify = require('html-minifier').minify;
+const CleanCSS = require('clean-css');
 
 (async () => {
    const buildDir = 'build';
@@ -57,12 +58,17 @@ const minify = require('html-minifier').minify;
       const minifiedIndexHtml = minify(indexHTML, {
          caseSensitive: true,
          collapseWhitespace: true,
-         conservativeCollapse: true,
          minifyCSS: true,
          minifyJS: true,
       });
       fs.writeFileSync(`./${distDir}/index.html`, minifiedIndexHtml);
-      fse.copySync(`./${buildDir}/${project.name}.css`, `./${distDir}/${project.name}.css`);
+
+      const appCSS = fs.readFileSync(`./${buildDir}/${project.name}.css`, 'utf8');
+      const minifiedAppCss = new CleanCSS({}).minify(appCSS);
+      fs.writeFileSync(`./${distDir}/${project.name}.css`, minifiedAppCss.styles);
+
+      // fse.copySync(`./${buildDir}/index.html`, `./${distDir}/index.html`);
+      // fse.copySync(`./${buildDir}/${project.name}.css`, `./${distDir}/${project.name}.css`);
       fse.copySync(`./${buildDir}/favicon.svg`, `./${distDir}/favicon.svg`);
       project.resources.forEach(resource => {
          fse.copySync(`./${buildDir}/${resource}`, `./${distDir}/${resource}`);
