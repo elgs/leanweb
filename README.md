@@ -48,6 +48,9 @@ looks like:
    "name": "demo",
    "components": [
       "root"
+   ],
+   "resources": [
+      "resources/"
    ]
 }
 ```

@@ -25,7 +25,10 @@
 
    const leanwebData = {
       name: projectName,
-      components: []
+      components: [],
+      resources: [
+         'resources/'
+      ],
    };
    fs.mkdirSync('src/resources/', { recursive: true });
    fs.writeFileSync('src/leanweb.json', JSON.stringify(leanwebData, null, 2));
