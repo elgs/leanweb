@@ -51,21 +51,24 @@ project-name will be used as the leanweb project name.
 leanweb init command will create src/leanweb.json file, which looks like:
 {
   "name": "demo",
+  "version": "0.0.29",
   "components": [
     "demo-root",
+  ],
+  "resources": [
+   "resources/"
   ]
 }
 where demo is the project name.
 
-A src directory will be created, and the top level web component demo-root
+A src/ directory will be created, and the top level web component demo-root
 will be created. demo-root web component contains 3 files:
 
-demo-root.html
-demo-root.js
-demo-root.scss
+root.html
+root.js
+root.scss
 
-Under src directory, demo.scss is created for global styling. global styling
-will note affect web components styling if they are attached to shadow DOMs.
+Under src/ directory, demo.scss is created for global styling.
 `;
 
 const generateNote = `Usage: leanweb generate component-name
@@ -74,51 +77,55 @@ src/components directory. The leanweb.json will be updated to look like:
 
 {
   "name": "demo",
-  "title": "demo",
+  "version": "0.0.29",
   "components": [
-    "demo-root",
-    "demo-login"
+    "root",
+    "login"
+  ],
+  "resources": [
+   "resources/"
   ]
 }
 
 demo-login web component will contain 3 files:
 
-demo-login.html
-demo-login.js
-demo-login.scss
+login.html
+login.js
+login.scss
 
-Now, the demo-login component can be added in demo-root.html as follows:
+Now, the demo-login component can be added in root.html as follows:
 <demo-login></demo-login>
 `;
 
-const serveNote = ``;
+const serveNote = `Usage: leabweb serve or lw s
+Running this command will start the dev server and open the app in a new 
+browser window. Any chances to the source code will cause the dev server to
+reload the app and the browser will be automatically refreshed.
+`;
 
 const buildNote = `Usage: leanweb build
-This will create a build directory in which js files for all components will be
-copied over to, plus index.html, $project-name.js and $project-name.css.
-
-index.html
-demo.js
-demo.css
-demo-root.js
-demo-login.js
+This will build the app and the output files will be stored in the build/
+directory. In this phase, the build doesn't transpile the app code. So likely
+the build file will only work with latest Chrome. However, the dist will 
+produce output for most desktop and mobile browsers.
 `;
 
 const distNote = `Usage: leanweb dist
-This will create a dist directory in which 3 files will be created:
-
-index.html
-demo.js
-demo.css
-
-These 3 files could be deployed to a web server.
+This will transpile the source code and produce output compatible with most
+desktop and mobile browsers. The output will be stored in dist/ directory.
 `;
 
 const cleanNote = `Usage: leanweb clean
 This will remove the build and dist directory.
 `;
 
-const electronNote = ``;
+const upgradeNote = `Usage: leanweb upgrade
+This will upgrade leanweb runtime in the src/lib directory.
+`;
+
+const electronNote = `Usage: leanweb electron
+This will run the app as native desktop app using Electron.
+`;
 
 const destroyNote = `Usage leanweb destroy project-name
 This will remove the src/, build/ and dist/ directory. Please
@@ -141,6 +148,7 @@ module.exports.targets = {
    'serve': { file: 'serve.js', note: serveNote },
    'build': { file: 'build.js', note: buildNote },
    'dist': { file: 'dist.js', note: distNote },
+   'upgrade': { file: 'upgrade.js', note: upgradeNote },
    'clean': { file: 'clean.js', note: cleanNote },
    'electron': { file: 'electron.js', note: electronNote },
    'destroy': { file: 'destroy.js', note: destroyNote },

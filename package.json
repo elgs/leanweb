@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.2.8",
+   "version": "0.2.9",
    "description": "A set of tools (as opposed to framework) to generate web components based web project.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -17,14 +17,15 @@
    "author": "Qian Chen",
    "license": "MIT",
    "dependencies": {
-      "@babel/parser": "*",
-      "clean-css": "*",
-      "fs-extra": "*",
-      "html-minifier": "*",
-      "live-server": "*",
-      "node-sass": "*",
-      "node-watch": "*",
-      "parse5": "*",
-      "webpack": "*"
+      "@babel/parser": "^7.9.4",
+      "clean-css": "^4.2.3",
+      "fs-extra": "^9.0.0",
+      "html-minifier": "^4.0.0",
+      "live-server": "^1.2.1",
+      "node-sass": "^4.13.1",
+      "node-watch": "^0.6.3",
+      "parse5": "^5.1.1",
+      "semver": "^7.2.1",
+      "webpack": "^4.42.1"
    }
 }

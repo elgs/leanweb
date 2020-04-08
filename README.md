@@ -46,6 +46,7 @@ looks like:
 ```json
 {
    "name": "demo",
+   "version": "0.2.9",
    "components": [
       "root"
    ],
@@ -160,6 +161,10 @@ for production.
 
 ### `leanweb clean` or `lw clean`
 `lw clean` will delete `build/` and `dist/` directories.
+
+### `leanweb upgrade` or `lw u`
+`lw upgrade` will upgrade `src/lib/` directory if there is a new version 
+available.
 
 ### `leanweb destroy` or `lw destroy`
 `lw destrory project-name` will remove the `src/`, `build/` and `dist/` 

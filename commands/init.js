@@ -8,6 +8,8 @@
    const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/src/leanweb.json`);
    const packageJSONExisted = fs.existsSync(`${process.cwd()}/package.json`);
 
+   const lwPackage = require(`${__dirname}/../package.json`);
+
    if (leanwebJSONExisted) {
       console.error('Error: leanweb.json existed.');
       return;
@@ -25,6 +27,7 @@
 
    const leanwebData = {
       name: projectName,
+      version: lwPackage.version,
       components: [],
       resources: [
          'resources/'
