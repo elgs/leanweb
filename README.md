@@ -454,7 +454,7 @@ each other.
 ```html
 <div class="pub">
    <span>Time Publisher</span>
-   <span class="time" lw>time</span>
+   <span lw>time</span>
 </div>
 ```
 
@@ -492,7 +492,7 @@ each other.
 ```html
 <div class='sub'>
    <span>Time Subscriber</span>
-   <span class="time" lw>time</span>
+   <span lw>time</span>
    <div class="buttons">
       <button lw-bind:disabled="subscribed" lw-on:click="sub()">Subscribe Time</button>
       <button lw-bind:disabled="!subscribed" lw-on:click="unsub()">UnSubscribe Time</button>
