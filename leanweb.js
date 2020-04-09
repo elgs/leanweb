@@ -35,12 +35,14 @@
       return;
    }
 
-   const leanwebPackageJSON = require(`${__dirname}/package.json`);
-   const projectLeanwebJSON = require(`${process.cwd()}/src/leanweb.json`);
-   const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);
-   if (upgradeAvailable && target !== 'help' && target !== 'upgrade') {
-      console.log(`New version of leanweb lib (${projectLeanwebJSON.version} => ${leanwebPackageJSON.version}) is available. Please consider 
+   if (target === 'version' || target === 'serve' || target === 'dist' || target === 'electron') {
+      const leanwebPackageJSON = require(`${__dirname}/package.json`);
+      const projectLeanwebJSON = require(`${process.cwd()}/src/leanweb.json`);
+      const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);
+      if (upgradeAvailable) {
+         console.log(`New version of leanweb lib (${projectLeanwebJSON.version} => ${leanwebPackageJSON.version}) is available. Please consider 
 running 'lw upgrade' to upgrade your project leanweb lib.`);
+      }
    }
    const targetData = utils.targets[target];
    const command = `node ${__dirname}/commands/${targetData.file} ${args.slice(3).join(' ')}`;
