@@ -1,4 +1,5 @@
-# Leanweb
+# <img src='https://leanweb.app/favicon.svg' alt='Leanweb' width='32'/> Leanweb
+
 A set of tools (as opposed to framework) to generate web components based web 
 project.
 
