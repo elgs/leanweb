@@ -2,6 +2,8 @@
    const fs = require('fs');
    const fse = require('fs-extra');
    const path = require('path');
+   const git = require('isomorphic-git');
+   const globby = require('globby');
    const args = process.argv;
    const utils = require('./utils.js');
 
@@ -51,4 +53,22 @@
    fs.writeFileSync(`./src/index.html`, htmlString);
    fs.writeFileSync(`./src/${projectName}.scss`, '');
    fse.copySync(`${__dirname}/../templates/favicon.svg`, `./src/favicon.svg`);
+
+   if (!(fs.existsSync(`${process.cwd()}/.git/`) && fs.statSync(`${process.cwd()}/.git/`).isDirectory())) {
+      await git.init({ fs, dir: process.cwd() });
+      fs.appendFileSync(`${process.cwd()}/.gitignore`, '\nnode_modules/', 'utf8');
+      const paths = await globby(['./**', './**/.*'], { gitignore: true });
+      for (const filepath of paths) {
+         await git.add({ fs, dir: process.cwd(), filepath });
+      }
+      await git.commit({
+         fs,
+         dir: process.cwd(),
+         author: {
+            name: 'Leanweb',
+            email: 'leanweb@leanweb.app',
+         },
+         message: 'Init commit.'
+      })
+   }
 })();
