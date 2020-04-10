@@ -127,7 +127,9 @@ Now the `leanweb.json` has one more entry in the component list:
 ```json
 {
   "name": "demo",
-  "components": ["root", "login"]
+  "version": "0.2.9",
+  "components": ["root", "login"],
+  "resources": ["resources/"]
 }
 ```
 
