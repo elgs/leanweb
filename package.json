@@ -1,7 +1,7 @@
 {
    "name": "leanweb",
-   "version": "0.3.3",
-   "description": "A set of tools (as opposed to framework) to generate web components based web project.",
+   "version": "0.3.4",
+   "description": "A set of tools (as opposed to a framework) to generate web components based web project.",
    "bin": {
       "leanweb": "leanweb.js",
       "lw": "leanweb.js"
@@ -12,7 +12,8 @@
    },
    "keywords": [
       "leanweb",
-      "lw"
+      "lw",
+      "web components"
    ],
    "author": "Qian Chen",
    "license": "MIT",
