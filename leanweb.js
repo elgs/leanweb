@@ -35,7 +35,7 @@
       return;
    }
 
-   if (target === 'version' || target === 'serve' || target === 'dist' || target === 'electron') {
+   if (leanwebJSONExisted && target === 'version' || target === 'serve' || target === 'dist' || target === 'electron') {
       const leanwebPackageJSON = require(`${__dirname}/package.json`);
       const projectLeanwebJSON = require(`${process.cwd()}/src/leanweb.json`);
       const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);
