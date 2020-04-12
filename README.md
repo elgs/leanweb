@@ -592,7 +592,7 @@ So Leanweb components are just more specific versions of the stand
 `HTMLElement`. `LWElement` helps to wire up the `lw` directives in the HTML and
 provides some convenient methods to update the DOM.
 
-#### LWElement.update(selector = '', rootNode = this.shadowRoot)
+#### LWElement.update(rootNode = this.shadowRoot)
 
 The `update` method provides a convenient way to update the DOM when the model
 changes. You should feel free to use old way to update DOM. The `update` just

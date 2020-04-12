@@ -63,7 +63,6 @@ export default class LWElement extends HTMLElement {
             nodes.push(rootNode);
          }
       }
-      // console.log('walk');
       const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
          acceptNode: node => {
             if (node.matches('[lw-for-parent]')) {
