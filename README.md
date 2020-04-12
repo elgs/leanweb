@@ -596,10 +596,9 @@ provides some convenient methods to update the DOM.
 
 The `update` method provides a convenient way to update the DOM when the model
 changes. You should feel free to use old way to update DOM. The `update` just
-makes life a little easier. `update` takes two parameters. `selector` allows
-you to update precisely the DOM element you want to update. `rootNode` allows
-you to specifiy which DOM element to start with, which defaults to the current
-`shadowRoot`.
+makes life a little easier. `update` takes `rootNode` as parameter, which 
+allows you to specifiy which DOM element to start with. The default value is 
+the current`shadowRoot`.
 
 #### LWElement.domReady()
 

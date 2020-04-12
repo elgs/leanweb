@@ -47,7 +47,10 @@ export default class LWElement extends HTMLElement {
    // lw-for:  reject lw-false
    // others:  reject both lw-for and lw-false 
    // all:     reject lw-for-parent
-   _queryNodesExcudingLwFor(selector = '', rootNode = this.shadowRoot, excludeLwFalse = true, excludeLwFor = true) {
+   _queryNodes(selector = '', rootNode = this.shadowRoot, excludeLwFalse = true, excludeLwFor = true) {
+      if (rootNode[selector]) {
+         return rootNode[selector];
+      }
       const nodes = [];
       if (rootNode !== this.shadowRoot) {
          if (excludeLwFalse && rootNode.matches('[lw-false]')) {
@@ -60,6 +63,7 @@ export default class LWElement extends HTMLElement {
             nodes.push(rootNode);
          }
       }
+      // console.log('walk');
       const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
          acceptNode: node => {
             if (node.matches('[lw-for-parent]')) {
@@ -78,13 +82,14 @@ export default class LWElement extends HTMLElement {
          }
       });
       while (treeWalker.nextNode()) { }
+      rootNode[selector] = nodes;
       return nodes;
    }
 
-   _bind(selector = '', rootNode = this.shadowRoot) {
-      this._bindEvents(selector, rootNode);
-      this._bindModels(selector, rootNode);
-      this._bindInputs(selector, rootNode);
+   _bind(rootNode = this.shadowRoot) {
+      this._bindEvents(rootNode);
+      this._bindModels(rootNode);
+      this._bindInputs(rootNode);
    }
 
    async _bindMethods() {
@@ -97,8 +102,9 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   _bindInputs(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-input]', rootNode);
+   // attribute: lw-input (marker)
+   _bindInputs(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-input]', rootNode);
       nodes.forEach(inputNode => {
          for (const attr of inputNode.attributes) {
             const attrName = attr.name;
@@ -117,17 +123,20 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   _bindEvents(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-on]', rootNode);
+   // attribute: lw-on (marker)
+   // properties:
+   // lw-on:click: true
+   _bindEvents(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-on]', rootNode);
       nodes.forEach(eventNode => {
          for (const attr of eventNode.attributes) {
             const attrName = attr.name;
             const attrValue = attr.value;
             if (attrName.startsWith('lw-on:')) {
-               if (eventNode[attr.name]) {
+               if (eventNode[attrName]) {
                   continue;
                }
-               eventNode[attr.name] = true;
+               eventNode[attrName] = true;
                const interpolation = this._component.interpolation[attrValue];
 
                const context = this._getNodeContext(eventNode);
@@ -142,8 +151,11 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   _bindModels(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-model]', rootNode);
+   // attribute: lw-model (marker)
+   // properties:
+   // model_event_bound: boolean
+   _bindModels(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-model]', rootNode);
       for (const modelNode of nodes) {
          if (modelNode['model_event_bound']) {
             continue;
@@ -201,17 +213,18 @@ export default class LWElement extends HTMLElement {
       }
    }
 
-   update(selector = '', rootNode = this.shadowRoot) {
-      this.updateFor(selector, rootNode);
-      this.updateIf(selector, rootNode);
-      this.updateEval(selector, rootNode);
-      this.updateClass(selector, rootNode);
-      this.updateBind(selector, rootNode);
-      this.updateModel(selector, rootNode);
+   update(rootNode = this.shadowRoot) {
+      this.updateFor(rootNode);
+      this.updateIf(rootNode);
+      this.updateEval(rootNode);
+      this.updateClass(rootNode);
+      this.updateBind(rootNode);
+      this.updateModel(rootNode);
    }
 
-   updateModel(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-model]', rootNode);
+   // attribute: lw-model (marker)
+   updateModel(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-model]', rootNode);
       nodes.forEach(modelNode => {
          const context = this._getNodeContext(modelNode);
          const key = modelNode.getAttribute('lw-model');
@@ -234,8 +247,9 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateEval(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw]', rootNode);
+   // attribute: lw: astKey
+   updateEval(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw]', rootNode);
       nodes.forEach(evalNode => {
          const context = this._getNodeContext(evalNode);
          const key = evalNode.getAttribute('lw');
@@ -245,8 +259,10 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateIf(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-if]', rootNode, false, true);
+   // attribute: lw-if: astKey
+   // lw-false: '' (if false)
+   updateIf(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-if]', rootNode, false, true);
       nodes.forEach(ifNode => {
          const context = this._getNodeContext(ifNode);
          const key = ifNode.getAttribute('lw-if');
@@ -261,8 +277,9 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateClass(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-class]', rootNode);
+   // attribute: lw-class: astKey
+   updateClass(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-class]', rootNode);
       nodes.forEach(classNode => {
          const context = this._getNodeContext(classNode);
          for (const attr of classNode.attributes) {
@@ -282,8 +299,9 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateBind(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-bind]', rootNode);
+   // attribute: lw-bind (marker)
+   updateBind(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-bind]', rootNode);
       nodes.forEach(bindNode => {
          const context = this._getNodeContext(bindNode);
          for (const attr of bindNode.attributes) {
@@ -303,8 +321,17 @@ export default class LWElement extends HTMLElement {
       });
    }
 
-   updateFor(selector = '', rootNode = this.shadowRoot) {
-      const nodes = this._queryNodesExcudingLwFor(selector.trim() + '[lw-for]', rootNode, true, false);
+   // parent attribytes:
+   // lw-for: $astKey
+
+   // child attributes:
+   // lw-context: ''
+   // lw-for-parent: $astKey
+
+   // child propery:
+   // lw-context: localContext
+   updateFor(rootNode = this.shadowRoot) {
+      const nodes = this._queryNodes('[lw-for]', rootNode, true, false);
       for (const forNode of nodes) {
          const context = this._getNodeContext(forNode);
          const key = forNode.getAttribute('lw-for');
@@ -332,9 +359,9 @@ export default class LWElement extends HTMLElement {
             const localContext = [itemContext, context].flat(Infinity);
             node['lw-context'] = localContext;
             if (rendered.length <= index) {
-               this._bind(selector, node);
+               this._bind(node);
             }
-            this.update(selector, node);
+            this.update(node);
          });
       }
    }
