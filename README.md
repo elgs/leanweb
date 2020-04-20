@@ -261,10 +261,9 @@ items = ["one", "two", "three"];
 
 ```javascript
 // ...
-   resetName() {
-      this.name = 'Leanweb';
-      this.update();
-   }
+resetName() {
+  this.name = 'Leanweb';
+}
 // ...
 ```
 
@@ -280,10 +279,10 @@ items = ["one", "two", "three"];
 
 ```javascript
 // ...
-   items = ['one', 'two', 'three'];
-   isActive(index) {
-      return index === 1;
-   }
+items = ['one', 'two', 'three'];
+isActive(index) {
+  return index === 1;
+}
 // ...
 ```
 
@@ -334,9 +333,9 @@ directive from `inputReady()` method.
 
 ```javascript
 // ...
-   inputReady() {
-      console.log(this.userData);
-   }
+inputReady() {
+  console.log(this.userData);
+}
 // ...
 ```
 
@@ -348,16 +347,15 @@ Here is a few examples how Leanweb helps web components work with form binding.
 
 ```javascript
 // ...
-   items = ['one', 'two', 'three'];
-   toggleCheckboxes() {
-      if (this.checkedValues.length) {
-         this.checkedValues.length = 0;
-      } else {
-         this.checkedValues = [...this.items];
-      }
-      this.update();
-   }
-   checkedValues = [];
+items = ['one', 'two', 'three'];
+toggleCheckboxes() {
+  if (this.checkedValues.length) {
+    this.checkedValues.length = 0;
+  } else {
+    this.checkedValues = [...this.items];
+  }
+}
+checkedValues = [];
 // ...
 ```
 
@@ -376,12 +374,11 @@ Here is a few examples how Leanweb helps web components work with form binding.
 
 ```javascript
 // ...
-   items = ['one', 'two', 'three'];
-   selectTwo() {
-      this.selectedOption = 'two';
-      this.update();
-   }
-   selectedOption;
+items = ['one', 'two', 'three'];
+selectTwo() {
+   this.selectedOption = 'two';
+}
+selectedOption;
 // ...
 ```
 
@@ -401,16 +398,15 @@ Here is a few examples how Leanweb helps web components work with form binding.
 
 ```javascript
 // ...
-   items = ['one', 'two', 'three'];
-   toggleAllOptions() {
-      if (this.selectedOptions.length) {
-         this.selectedOptions.length = 0;
-      } else {
-         this.selectedOptions = [...this.items];
-      }
-      this.update();
-   }
-   selectedOptions = [];
+items = ['one', 'two', 'three'];
+toggleAllOptions() {
+  if (this.selectedOptions.length) {
+    this.selectedOptions.length = 0;
+  } else {
+    this.selectedOptions = [...this.items];
+  }
+}
+selectedOptions = [];
 // ...
 ```
 
@@ -430,12 +426,11 @@ Here is a few examples how Leanweb helps web components work with form binding.
 
 ```javascript
 // ...
-   items = ['one', 'two', 'three'];
-   chooseTwo() {
-      this.picked = 'two';
-      this.update();
-   }
-   picked;
+items = ['one', 'two', 'three'];
+chooseTwo() {
+  this.picked = 'two';
+}
+picked;
 // ...
 ```
 
@@ -458,11 +453,10 @@ Here is a few examples how Leanweb helps web components work with form binding.
 
 ```javascript
 // ...
-   selectRange50() {
-      this.selectedRange = 50;
-      this.update();
-   }
-   selectedRange = 10;
+selectRange50() {
+  this.selectedRange = 50;
+}
+selectedRange = 10;
 // ...
 ```
 
@@ -509,18 +503,18 @@ each other.
 
 // const component = { id: 'demo-pub', interpolation };
 // customElements.define(component.id,
-//    class extends LWElement {  // LWElement extends HTMLElement
-//       constructor() {
-//          super(component);
+//   class extends LWElement {  // LWElement extends HTMLElement
+//     constructor() {
+//       super(component);
 
-setInterval(() => {
-  this.time = new Date(Date.now()).toLocaleString();
-  LWElement.eventBus.dispatchEvent("time", this.time);
-  this.update();
-}, 1000);
+         setInterval(() => {
+           this.time = new Date(Date.now()).toLocaleString();
+           LWElement.eventBus.dispatchEvent("time", this.time);
+           this.update();
+         }, 1000);
 
-//       }
-//    }
+//     }
+//   }
 // );
 ```
 
@@ -541,26 +535,26 @@ setInterval(() => {
 
 // const component = { id: 'demo-sub', interpolation };
 // customElements.define(component.id,
-//    class extends LWElement {  // LWElement extends HTMLElement
-//       constructor() {
-//          super(component);
-//       }
+//   class extends LWElement {  // LWElement extends HTMLElement
+//     constructor() {
+//       super(component);
+//     }
 
-         sub() {
-            this.listener = LWElement.eventBus.addEventListener('time', event => {
-               this.time = event.data;
-               this.update();
-            });
-            this.subscribed = true;
-            this.update();
-         }
+       sub() {
+         this.listener = LWElement.eventBus.addEventListener('time', event => {
+           this.time = event.data;
+           this.update();
+         });
+         this.subscribed = true;
+         this.update();
+       }
 
-         unsub() {
-            LWElement.eventBus.removeEventListener(this.listener);
-            this.subscribed = false;
-            this.update();
-         }
-//    }
+       unsub() {
+         LWElement.eventBus.removeEventListener(this.listener);
+         this.subscribed = false;
+         this.update();
+       }
+//   }
 // );
 ```
 
@@ -596,9 +590,20 @@ provides some convenient methods to update the DOM.
 
 The `update` method provides a convenient way to update the DOM when the model
 changes. You should feel free to use old way to update DOM. The `update` just
-makes life a little easier. `update` takes `rootNode` as parameter, which 
-allows you to specifiy which DOM element to start with. The default value is 
+makes life a little easier. `update` takes `rootNode` as parameter, which
+allows you to specifiy which DOM element to start with. The default value is
 the current`shadowRoot`.
+
+LWElement will call update in the following scenarios:
+1. after all `lw` directively are initially bound to DOM;
+2. after `lw-on:` event is fired;
+3. after `lw-model` change is fired;
+
+You may need to call the `update()` method manually in other events. For 
+example:
+1. in your setTimeout/setInterval callbacks;
+2. in `LWEventBus` callbacks;
+3. in any network api callbacks;
 
 #### LWElement.domReady()
 

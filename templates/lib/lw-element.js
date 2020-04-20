@@ -143,6 +143,7 @@ export default class LWElement extends HTMLElement {
                   const eventContext = { '$event': event };
                   const localContext = [eventContext, context].flat(Infinity);
                   const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
+                  this.update();
                   return parsed;
                }).bind(this));
             }
