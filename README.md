@@ -546,13 +546,11 @@ each other.
            this.update();
          });
          this.subscribed = true;
-         this.update();
        }
 
        unsub() {
          LWElement.eventBus.removeEventListener(this.listener);
          this.subscribed = false;
-         this.update();
        }
 //   }
 // );
