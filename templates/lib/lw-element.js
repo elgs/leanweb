@@ -255,7 +255,7 @@ export default class LWElement extends HTMLElement {
          const key = evalNode.getAttribute('lw');
          const interpolation = this._component.interpolation[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
-         if (evalNode['lw-eval-value-' + key] !== parsed[0]) {
+         if (evalNode['lw-eval-value-' + key] !== parsed[0] || typeof parsed[0] === 'object') {
             evalNode['lw-eval-value-' + key] = parsed[0];
             evalNode.innerText = parsed[0] ?? '';
          }
