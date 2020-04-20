@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.3.7",
+   "version": "0.3.8",
    "description": "A set of tools (as opposed to a framework) to generate web components based web project.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -27,8 +27,8 @@
       "live-server": "^1.2.1",
       "node-sass": "^4.13.1",
       "node-watch": "^0.6.3",
-      "parse5": "^5.1.1",
-      "semver": "^7.2.1",
+      "parse5": "^6.0.0",
+      "semver": "^7.3.2",
       "webpack": "^4.42.1"
    }
 }

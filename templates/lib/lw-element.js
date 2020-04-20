@@ -247,6 +247,7 @@ export default class LWElement extends HTMLElement {
    }
 
    // attribute: lw: astKey
+   // property: lw-eval-value-$key
    updateEval(rootNode = this.shadowRoot) {
       const nodes = this._queryNodes('[lw]', rootNode);
       nodes.forEach(evalNode => {
@@ -254,7 +255,10 @@ export default class LWElement extends HTMLElement {
          const key = evalNode.getAttribute('lw');
          const interpolation = this._component.interpolation[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
-         evalNode.innerText = parsed[0] ?? '';
+         if (evalNode['lw-eval-value-' + key] !== parsed[0]) {
+            evalNode['lw-eval-value-' + key] = parsed[0];
+            evalNode.innerText = parsed[0] ?? '';
+         }
       });
    }
 
@@ -335,7 +339,7 @@ export default class LWElement extends HTMLElement {
          const context = this._getNodeContext(forNode);
          const key = forNode.getAttribute('lw-for');
          const interpolation = this._component.interpolation[key];
-         const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0] || [];
+         const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0] ?? [];
          const rendered = nextAllSiblings(forNode, `[lw-for-parent="${key}"]`);
          for (let i = items.length; i < rendered.length; ++i) {
             rendered[i].remove();
