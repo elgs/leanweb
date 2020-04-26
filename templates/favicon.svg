@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="400px" height="400px" viewBox="0 0 400 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="400px" height="247px" viewBox="0 0 400 247" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect id="Rectangle" fill="#FF6347" x="0" y="0" width="400" height="400"></rect>
-        <text id="LW" font-family="HelveticaNeue, Helvetica Neue" font-size="192" font-weight="normal" fill="#FFFFFF">
-            <tspan x="63.508" y="272">LW</tspan>
-        </text>
+        <rect id="Rectangle" fill="#FF6347" x="0" y="0" width="400" height="247"></rect>
+        <path d="M164.382947,200 L164.382947,182.969188 L94.5504862,182.969188 L94.5504862,48 L77,48 L77,200 L164.382947,200 Z M209.459985,200 L239.942408,72.2689076 L240.311892,72.2689076 L270.424832,200 L288.714286,200 L324,48 L306.449514,48 L279.66193,174.453782 L279.292446,174.453782 L250.103216,48 L231.074794,48 L201.516081,174.453782 L201.146597,174.453782 L175.282723,48 L157.362752,48 L191.170531,200 L209.459985,200 Z" id="LW" fill="#FFFFFF" fill-rule="nonzero"></path>
     </g>
 </svg>
