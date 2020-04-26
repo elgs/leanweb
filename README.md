@@ -1,4 +1,4 @@
-# <img src='https://leanweb.app/favicon.svg' alt='Leanweb' width='32'/> Leanweb
+# <a href="https://leanweb.app"><img src='https://leanweb.app/favicon.svg' alt='Leanweb' width='32'/></a> Leanweb
 
 A set of tools (as opposed to framework) to generate web components based web
 project.
