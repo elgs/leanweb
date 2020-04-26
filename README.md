@@ -184,7 +184,7 @@ available.
 
 ### `leanweb destroy` or `lw destroy`
 
-`lw destrory project-name` will remove the `src/`, `build/` and `dist/`
+`lw destroy project-name` will remove the `src/`, `build/` and `dist/`
 directory. Please note the `src/` directory will be deleted by this command.
 
 ### `leanweb help` or `lw help`
@@ -589,11 +589,11 @@ provides some convenient methods to update the DOM.
 The `update` method provides a convenient way to update the DOM when the model
 changes. You should feel free to use old way to update DOM. The `update` just
 makes life a little easier. `update` takes `rootNode` as parameter, which
-allows you to specifiy which DOM element to start with. The default value is
+allows you to specify which DOM element to start with. The default value is
 the current`shadowRoot`.
 
 LWElement will call update in the following scenarios:
-1. after all `lw` directively are initially bound to DOM;
+1. after all `lw` directives are initially bound to DOM;
 2. after `lw-on:` event is fired;
 3. after `lw-model` change is fired;
 
@@ -606,8 +606,8 @@ example:
 #### LWElement.domReady()
 
 `domReady()` will be called after all initial DOM events are bound, and all
-DOM interpolations are evaluated. This method is meant to be overriden and is a
-graet place to send events to the event bus.
+DOM interpolations are evaluated. This method is meant to be overridden and is a
+great place to send events to the event bus.
 
 #### LWElement.inputReady()
 
@@ -628,7 +628,7 @@ You can use `LWElement.eventBus` to get the instance of event bus, and use
 type of event from the event bus. `addEventListener` takes two parameters. The
 first `eventName` is the name of the event, and the second `callback` is a
 function that will get called when a event is sent to the event bus. The
-`callback` function takes a parameter `event`, which constains `eventName`
+`callback` function takes a parameter `event`, which contains `eventName`
 and `data` fields. `addEventListener` returns the eventListener instance
 being added, which could be passed in `removeEventListener` as parameter.
 
@@ -648,9 +648,9 @@ of the event.
 ### Why `lw serve` does work with Safari, while the `dist` works?
 
 `lw s` runs the build process and uses the `build/` directory to serve the
-dev webserver. It doesn't do any transformation so if Safari doesn't work, as
+dev web server. It doesn't do any transformation so if Safari doesn't work, as
 of today (March/9/2020), Safari still doesn't support class fields. I make sure
-the lastest Chrome will work with the dev build. The `dist` should work for
+the latest Chrome will work with the dev build. The `dist` should work for
 most, if not all, browsers. The design decision this is done this way is
 because I want the `build/` directory to be ES6 compatible and be independent
 from any build tools.
