@@ -56,7 +56,13 @@
 
    if (!(fs.existsSync(`${process.cwd()}/.git/`) && fs.statSync(`${process.cwd()}/.git/`).isDirectory())) {
       await git.init({ fs, dir: process.cwd() });
-      fs.appendFileSync(`${process.cwd()}/.gitignore`, '\nnode_modules/', 'utf8');
+
+      if (fs.existsSync(`${process.cwd()}/.gitignore`) && fs.statSync(`${process.cwd()}/.gitignore`).isFile()) {
+         fs.appendFileSync(`${process.cwd()}/.gitignore`, '\nnode_modules/\nbuild/\ndist/\n', 'utf8');
+      } else {
+         fs.writeFileSync(`${process.cwd()}/.gitignore`, 'node_modules/\nbuild/\ndist/\n', 'utf8');
+      }
+
       const paths = await globby(['./**', './**/.*'], { gitignore: true });
       for (const filepath of paths) {
          await git.add({ fs, dir: process.cwd(), filepath });
