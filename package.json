@@ -24,7 +24,6 @@
       "globby": "^11.0.0",
       "html-minifier": "^4.0.0",
       "isomorphic-git": "^1.4.0",
-      "live-server": "^1.2.1",
       "node-sass": "^4.14.0",
       "node-watch": "^0.6.3",
       "parse5": "^6.0.0",
