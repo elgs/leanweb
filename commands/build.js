@@ -12,47 +12,47 @@
    // const changedFiles = args.slice(2);
    // console.log(changedFiles);
 
-   const replaceNodeModulesImport = (str, filePath) => {
-      // match import not starting with dot or slash
-      return str.replace(/^(\s*import\s+.*?from\s+['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
-         if (b.indexOf('/') > -1) {
-            if (b.startsWith('~/')) {
-               return a + path.normalize(`./${utils.getPathLevels(filePath)}` + b.substring(2)) + c;
-            }
-            return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b) + c;
-         } else {
-            const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
-            const package = require(nodeModulePath);
-            return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b + '/' + package.main) + c;
-         }
-      });
-   };
+   // const replaceNodeModulesImport = (str, filePath) => {
+   //    // match import not starting with dot or slash
+   //    return str.replace(/^(\s*import\s+.*?from\s+['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
+   //       if (b.indexOf('/') > -1) {
+   //          if (b.startsWith('~/')) {
+   //             return a + path.normalize(`./${utils.getPathLevels(filePath)}` + b.substring(2)) + c;
+   //          }
+   //          return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b) + c;
+   //       } else {
+   //          const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
+   //          const package = require(nodeModulePath);
+   //          return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b + '/' + package.main) + c;
+   //       }
+   //    });
+   // };
 
-   const walkDirSync = (dir, accept = null, callback) => {
-      fs.readdirSync(dir).forEach(f => {
-         let dirPath = path.join(dir, f);
-         const isDirectory = fs.statSync(dirPath).isDirectory() && (!accept || (typeof accept === 'function' && accept(dirPath, f)));
-         isDirectory ? walkDirSync(dirPath, accept, callback) : callback(path.join(dirPath));
-      });
-   };
+   // const walkDirSync = (dir, accept = null, callback) => {
+   //    fs.readdirSync(dir).forEach(f => {
+   //       let dirPath = path.join(dir, f);
+   //       const isDirectory = fs.statSync(dirPath).isDirectory() && (!accept || (typeof accept === 'function' && accept(dirPath, f)));
+   //       isDirectory ? walkDirSync(dirPath, accept, callback) : callback(path.join(dirPath));
+   //    });
+   // };
 
-   const preprocessJsImport = filePath => {
-      if (filePath.toLowerCase().endsWith('.js') && !filePath.toLowerCase().endsWith('/ast.js') && !filePath.startsWith(`${buildDir}/lib/`)) {
-         let jsFileString = fs.readFileSync(filePath, 'utf8');
-         jsFileString = replaceNodeModulesImport(jsFileString, filePath);
-         fs.writeFileSync(filePath, jsFileString);
-      }
-   };
+   // const preprocessJsImport = filePath => {
+   //    if (filePath.toLowerCase().endsWith('.js') && !filePath.toLowerCase().endsWith('/ast.js') && !filePath.startsWith(`${buildDir}/lib/`)) {
+   //       let jsFileString = fs.readFileSync(filePath, 'utf8');
+   //       jsFileString = replaceNodeModulesImport(jsFileString, filePath);
+   //       fs.writeFileSync(filePath, jsFileString);
+   //    }
+   // };
 
-   const buildDirFilter = dirPath => {
-      if (dirPath.startsWith(`${buildDir}/lib/`)) {
-         return false;
-      }
-      return true;
-   };
+   // const buildDirFilter = dirPath => {
+   //    if (dirPath.startsWith(`${buildDir}/lib/`)) {
+   //       return false;
+   //    }
+   //    return true;
+   // };
 
    const buildJS = () => {
-      walkDirSync(`./${buildDir}/`, buildDirFilter, preprocessJsImport);
+      // walkDirSync(`./${buildDir}/`, buildDirFilter, preprocessJsImport);
 
       const jsString = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);

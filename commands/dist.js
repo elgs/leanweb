@@ -22,6 +22,9 @@ const CleanCSS = require('clean-css');
          path: process.cwd() + `/${distDir}/`,
          filename: `${project.name}.js`
       },
+      performance: {
+         hints: 'warning'
+      },
       module: {
          rules: [
             {
