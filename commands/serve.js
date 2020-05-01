@@ -14,9 +14,12 @@ const WebpackDevServer = require('webpack-dev-server');
 
    utils.exec(`npx lw build`);
 
-   const build = (eventType, filename) => {
+   const build = async (eventType, filename) => {
       // console.log(eventType + ': ', filename);
-      utils.exec(`npx lw build ` + filename);
+      await utils.exec(`npx lw build ` + filename);
+
+      fse.copySync(`./${buildDir}/index.html`, `./${serveDir}/index.html`);
+      fse.copySync(`./${buildDir}/${project.name}.css`, `./${serveDir}/${project.name}.css`);
    };
 
    const throttledBuild = utils.throttle(build);
@@ -27,14 +30,14 @@ const WebpackDevServer = require('webpack-dev-server');
    const webpackConfig = {
       mode: 'development',
       watch: true,
-      devtool: 'cheap-module-source-map',
-      entry: [process.cwd() + `/${buildDir}/${project.name}.js`],
+      devtool: 'eval-cheap-module-source-map',
+      entry: process.cwd() + `/${buildDir}/${project.name}.js`,
       output: {
          path: process.cwd() + `/${serveDir}/`,
-         filename: `${project.name}.js`
+         filename: `${project.name}.js`,
       },
       performance: {
-         hints: 'warning'
+         hints: false,
       },
       module: {
          rules: [{
@@ -58,9 +61,10 @@ const WebpackDevServer = require('webpack-dev-server');
    const devServerOptions = {
       ...webpackConfig.devServer,
       contentBase: process.cwd() + `/${serveDir}/`,
+      publicPath: '/',
       hot: true,
-      open: true,
-      stats: 'errors-only',
+      // open: true,
+      stats: 'errors-warnings',
    };
    const server = new WebpackDevServer(compiler, devServerOptions);
 
