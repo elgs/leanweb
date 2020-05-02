@@ -474,16 +474,16 @@ Assuming npm module `lodash-es` is installed, you could use any of the
 following `import` statements for your web component class:
 
 ```javascript
-import { get } from "lodash-es";
-import get from "lodash-es/get.js"; // The tailing explicit .js is important.
-import get from "./../../../node_modules/lodash-es/get.js";
-import * as _ from "lodash-es";
+import { get } from "lodash-es"; // find from node_modules
+import get from "lodash-es/get.js"; // find from node_modules
+import get from "./../../../node_modules/lodash-es/get.js"; // find from path as is
+import * as _ from "lodash-es"; // find from node_modules
 ```
 
 As a shortcut, you could import files relative to project root with `~/`:
 
 ```javascript
-import { something } from "~/src/some-js-file.js";
+import { something } from "~/src/some-js-file.js"; // relative to project root
 ```
 
 assuming `some-js-file.js` exists in the project `src/` directory.

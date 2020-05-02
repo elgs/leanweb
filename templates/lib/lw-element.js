@@ -17,11 +17,12 @@ const nextAllSiblings = (el, selector) => {
 };
 
 export default class LWElement extends HTMLElement {
-   constructor(component) {
+   constructor(ast) {
       super();
-      this._component = component;
-      const node = document.getElementById(component.id).content.cloneNode(true);
-      this.attachShadow({ mode: 'open' }).appendChild(node);
+      this.ast = ast;
+      const node = document.createElement('template');
+      node.innerHTML = `<link rel="stylesheet" href="./global-styles.css">`+'<style>' + ast.css + '</style>' + ast.html;
+      this.attachShadow({ mode: 'open' }).appendChild(node.content);
 
       this._bindMethods().then(() => {
          this._bind();
@@ -109,7 +110,7 @@ export default class LWElement extends HTMLElement {
             const attrName = attr.name;
             const attrValue = attr.value;
             if (attrName.startsWith('lw-input:')) {
-               const interpolation = this._component.interpolation[attrValue];
+               const interpolation = this.ast[attrValue];
                const context = this._getNodeContext(inputNode);
                const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
                inputNode[interpolation.lwValue] = parsed[0];
@@ -136,7 +137,7 @@ export default class LWElement extends HTMLElement {
                   continue;
                }
                eventNode[attrName] = true;
-               const interpolation = this._component.interpolation[attrValue];
+               const interpolation = this.ast[attrValue];
 
                const context = this._getNodeContext(eventNode);
                eventNode.addEventListener(interpolation.lwValue, (event => {
@@ -162,7 +163,7 @@ export default class LWElement extends HTMLElement {
          }
          modelNode['model_event_bound'] = true;
          const key = modelNode.getAttribute('lw-model');
-         const interpolation = this._component.interpolation[key];
+         const interpolation = this.ast[key];
          const context = this._getNodeContext(modelNode);
          modelNode.addEventListener('input', (event => {
             const astModel = interpolation.ast[0].expression;
@@ -228,7 +229,7 @@ export default class LWElement extends HTMLElement {
       nodes.forEach(modelNode => {
          const context = this._getNodeContext(modelNode);
          const key = modelNode.getAttribute('lw-model');
-         const interpolation = this._component.interpolation[key];
+         const interpolation = this.ast[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
          if (modelNode.type === 'checkbox') {
             modelNode.checked = parsed[0].includes(modelNode.value);
@@ -254,7 +255,7 @@ export default class LWElement extends HTMLElement {
       nodes.forEach(evalNode => {
          const context = this._getNodeContext(evalNode);
          const key = evalNode.getAttribute('lw');
-         const interpolation = this._component.interpolation[key];
+         const interpolation = this.ast[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
          if (evalNode['lw-eval-value-' + key] !== parsed[0] || typeof parsed[0] === 'object') {
             evalNode['lw-eval-value-' + key] = parsed[0];
@@ -270,7 +271,7 @@ export default class LWElement extends HTMLElement {
       nodes.forEach(ifNode => {
          const context = this._getNodeContext(ifNode);
          const key = ifNode.getAttribute('lw-if');
-         const interpolation = this._component.interpolation[key];
+         const interpolation = this.ast[key];
          const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
          if (!parsed[0]) {
@@ -290,7 +291,7 @@ export default class LWElement extends HTMLElement {
             const attrName = attr.name;
             const attrValue = attr.value;
             if (attrName.startsWith('lw-class:')) {
-               const interpolation = this._component.interpolation[attrValue];
+               const interpolation = this.ast[attrValue];
                const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
                if (!parsed[0]) {
@@ -312,7 +313,7 @@ export default class LWElement extends HTMLElement {
             const attrName = attr.name;
             const attrValue = attr.value;
             if (attrName.startsWith('lw-bind:')) {
-               const interpolation = this._component.interpolation[attrValue];
+               const interpolation = this.ast[attrValue];
                const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
                if (!parsed[0]) {
@@ -339,7 +340,7 @@ export default class LWElement extends HTMLElement {
       for (const forNode of nodes) {
          const context = this._getNodeContext(forNode);
          const key = forNode.getAttribute('lw-for');
-         const interpolation = this._component.interpolation[key];
+         const interpolation = this.ast[key];
          const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0] ?? [];
          const rendered = nextAllSiblings(forNode, `[lw-for-parent="${key}"]`);
          for (let i = items.length; i < rendered.length; ++i) {

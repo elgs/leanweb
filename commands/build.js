@@ -13,7 +13,7 @@
 
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
-      return str.replace(/^(\s*import.+?['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
+      return str.replace(/^(\s*import.+?['"])([^\.|\/].+?)(['"].*)$/gm, (m, a, b, c) => {
          if (b.indexOf('/') > -1) {
             if (b.startsWith('~/')) {
                return a + path.normalize(`./${utils.getPathLevels(filePath)}` + b.substring(2)) + c;
@@ -62,42 +62,39 @@
    };
 
    const buildHTML = () => {
-      const templates = project.components.reduce((acc, cur) => {
-         const cmpName = utils.getComponentName(cur);
-         const htmlFilename = `./${utils.dirs.src}/components/${cur}/${cmpName}.html`;
+      project.components.forEach(cmp => {
+         const cmpName = utils.getComponentName(cmp);
+         const htmlFilename = `./${utils.dirs.src}/components/${cmp}/${cmpName}.html`;
          const htmlFileExists = fs.existsSync(htmlFilename);
          if (htmlFileExists) {
 
-            const scssFilename = `./${utils.dirs.src}/components/${cur}/${cmpName}.scss`;
+            const scssFilename = `./${utils.dirs.src}/components/${cmp}/${cmpName}.scss`;
             const scssFileExists = fs.existsSync(scssFilename);
             let cssString = '';
             if (scssFileExists) {
                const scssString = fs.readFileSync(scssFilename, 'utf8');
                cssString = utils.buildCSS(scssString);
             }
-            const styleString = !!cssString ? `<style>${cssString}</style>\n` : '';
+            const styleString = !!cssString ? cssString : '';
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
-            const parsed = parser.parse(htmlString);
-            const templateString = `<template id="${project.name}-${cur.replace(/\//g, '-')}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`;
-            fs.writeFileSync(`${utils.dirs.build}/components/${cur}/ast.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
-            return `${acc}${templateString}\n\n`
-         } else {
-            return acc;
+            const ast = parser.parse(htmlString);
+            ast.css = styleString;
+            fs.writeFileSync(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
          }
-      }, '\n');
-      const htmlString = fs.readFileSync(`./${utils.dirs.src}/index.html`, 'utf8') + templates;
+      });
+      const htmlString = fs.readFileSync(`./${utils.dirs.src}/index.html`, 'utf8');
       fs.writeFileSync(`${utils.dirs.build}/index.html`, htmlString);
    };
 
    const buildCSS = () => {
-      const scssFilename = `./${utils.dirs.src}/${project.name}.scss`;
+      const scssFilename = `./${utils.dirs.src}/global-styles.scss`;
       const scssFileExists = fs.existsSync(scssFilename);
       let cssString = '[lw-false],[lw-for]{display:none;}\n';
       if (scssFileExists) {
          const scssString = fs.readFileSync(scssFilename, 'utf8');
          cssString += utils.buildCSS(scssString);
       }
-      fs.writeFileSync(`${utils.dirs.build}/${project.name}.css`, cssString);
+      fs.writeFileSync(`${utils.dirs.build}/global-styles.css`, cssString);
    };
 
    const copySrc = () => {

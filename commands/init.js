@@ -51,7 +51,7 @@
    let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
    fs.writeFileSync(`./${utils.dirs.src}/index.html`, htmlString);
-   fs.writeFileSync(`./${utils.dirs.src}/${projectName}.scss`, '');
+   fs.writeFileSync(`./${utils.dirs.src}/global-styles.scss`, '');
    fse.copySync(`${__dirname}/../templates/favicon.svg`, `./${utils.dirs.src}/favicon.svg`);
 
    if (!(fs.existsSync(`${process.cwd()}/.git/`) && fs.statSync(`${process.cwd()}/.git/`).isDirectory())) {

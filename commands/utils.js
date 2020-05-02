@@ -60,12 +60,20 @@ module.exports.getWebPackConfig = (outputDir, project) => {
       },
       module: {
          rules: [{
-            test: path.resolve(process.cwd() + `/${dirs.build}/`),
+            test: /\.css$/i,
+            use: ['style-loader', {
+               loader: 'css-loader',
+               // options: {
+               //    esModule: true,
+               // }
+            }],
+         }, {
+            test: path.resolve(process.cwd() ),
             exclude: /node_modules/,
             loader: 'babel-loader',
             options: {
                presets: ['@babel/preset-env', {
-                  'plugins': [
+                  plugins: [
                      '@babel/plugin-proposal-class-properties',
                      '@babel/plugin-transform-runtime'
                   ]

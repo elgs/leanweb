@@ -1,6 +1,7 @@
 const semver = require('semver');
 const fs = require('fs');
 const fse = require('fs-extra');
+const utils = require('./utils.js');
 
 const leanwebPackageJSON = require(`${__dirname}/../package.json`);
 const projectLeanwebJSON = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
