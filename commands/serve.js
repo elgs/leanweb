@@ -16,8 +16,8 @@ const WebpackDevServer = require('webpack-dev-server');
       // console.log(eventType + ': ', filename);
       await utils.exec(`npx lw build ` + filename);
 
-      fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);
-      fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
+      fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
+      fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
    };
 
    const throttledBuild = utils.throttle(build);
@@ -42,9 +42,11 @@ const WebpackDevServer = require('webpack-dev-server');
    const devServerOptions = {
       ...webpackDevConfig.devServer,
       contentBase: process.cwd() + `/${utils.dirs.serve}/`,
+      watchContentBase: true,
       publicPath: '/',
       hot: true,
       open: true,
+      // quiet: true,
       stats: 'errors-warnings',
    };
    const server = new WebpackDevServer(compiler, devServerOptions);

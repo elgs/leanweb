@@ -18,6 +18,14 @@
    await utils.exec(`npx lw clean`);
    await utils.exec(`npx lw build`);
 
+   fse.copySync(`./${utils.dirs.build}/electron.js`, `./${utils.dirs.electron}/electron.js`);
+   fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);
+   fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
+   fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.electron}/favicon.svg`);
+   project.resources.forEach(resource => {
+      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.electron}/${resource}`);
+   });
+
    const webpackConfig = utils.getWebPackConfig(utils.dirs.electron, project);
 
    const webpackDevConfig = {
@@ -42,14 +50,6 @@
       if (stats.compilation.warnings.length) {
          console.log(stats.compilation.warnings);
       }
-
-      fse.copySync(`./${utils.dirs.build}/electron.js`, `./${utils.dirs.electron}/electron.js`);
-      fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);
-      fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
-      fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.electron}/favicon.svg`);
-      project.resources.forEach(resource => {
-         fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.electron}/${resource}`);
-      });
    });
 
    await utils.exec(`npx electron ${process.cwd()}/${utils.dirs.electron}/electron.js`);
