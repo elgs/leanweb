@@ -28,7 +28,7 @@
 
    target = targetCandidates[0];
 
-   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/src/leanweb.json`);
+   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
    if (!leanwebJSONExisted && target !== 'init' && target !== 'help' && target !== 'version') {
       console.error('Error: leanweb.json not found.');
@@ -37,7 +37,7 @@
 
    if (leanwebJSONExisted && target === 'version' || target === 'serve' || target === 'dist' || target === 'electron') {
       const leanwebPackageJSON = require(`${__dirname}/package.json`);
-      const projectLeanwebJSON = require(`${process.cwd()}/src/leanweb.json`);
+      const projectLeanwebJSON = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
       const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);
       if (upgradeAvailable) {
          console.log(`New version of leanweb lib (${projectLeanwebJSON.version} => ${leanwebPackageJSON.version}) is available. Please consider 

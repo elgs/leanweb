@@ -7,7 +7,7 @@
    const args = process.argv;
    const utils = require('./utils.js');
 
-   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/src/leanweb.json`);
+   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
    const packageJSONExisted = fs.existsSync(`${process.cwd()}/package.json`);
 
    const lwPackage = require(`${__dirname}/../package.json`);
@@ -35,8 +35,8 @@
          'resources/'
       ],
    };
-   fs.mkdirSync('src/resources/', { recursive: true });
-   fs.writeFileSync('src/leanweb.json', JSON.stringify(leanwebData, null, 2));
+   fs.mkdirSync(`${utils.dirs.src}/resources/`, { recursive: true });
+   fs.writeFileSync(`${utils.dirs.src}/leanweb.json`, JSON.stringify(leanwebData, null, 2));
 
    utils.exec(`npm i -D @babel/core --loglevel=error`);
    utils.exec(`npm i -D babel-loader --loglevel=error`);
@@ -46,21 +46,21 @@
 
    utils.exec(`npx lw generate root`);
 
-   fse.copySync(`${__dirname}/../templates/lib`, `./src/lib/`);
+   fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);
 
    let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
-   fs.writeFileSync(`./src/index.html`, htmlString);
-   fs.writeFileSync(`./src/${projectName}.scss`, '');
-   fse.copySync(`${__dirname}/../templates/favicon.svg`, `./src/favicon.svg`);
+   fs.writeFileSync(`./${utils.dirs.src}/index.html`, htmlString);
+   fs.writeFileSync(`./${utils.dirs.src}/${projectName}.scss`, '');
+   fse.copySync(`${__dirname}/../templates/favicon.svg`, `./${utils.dirs.src}/favicon.svg`);
 
    if (!(fs.existsSync(`${process.cwd()}/.git/`) && fs.statSync(`${process.cwd()}/.git/`).isDirectory())) {
       await git.init({ fs, dir: process.cwd() });
 
       if (fs.existsSync(`${process.cwd()}/.gitignore`) && fs.statSync(`${process.cwd()}/.gitignore`).isFile()) {
-         fs.appendFileSync(`${process.cwd()}/.gitignore`, '\nnode_modules/\nbuild/\ndist/\n', 'utf8');
+         fs.appendFileSync(`${process.cwd()}/.gitignore`, `\nnode_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n${utils.dirs.electron}/\n`, 'utf8');
       } else {
-         fs.writeFileSync(`${process.cwd()}/.gitignore`, 'node_modules/\nbuild/\ndist/\n', 'utf8');
+         fs.writeFileSync(`${process.cwd()}/.gitignore`, `node_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n${utils.dirs.electron}/\n`, 'utf8');
       }
 
       const paths = await globby(['./**', './**/.*'], { gitignore: true });

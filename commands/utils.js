@@ -2,6 +2,14 @@ const { execSync } = require('child_process');
 const sass = require('node-sass');
 const path = require('path');
 
+const dirs = {
+   src: 'src',
+   build: 'build',
+   serve: 'serve',
+   dist: 'dist',
+   electron: 'electron',
+};
+
 module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
 module.exports.buildCSS = scssString => {
@@ -42,6 +50,35 @@ module.exports.throttle = (callback, limit = 100) => {
       }
    };
 };
+
+module.exports.getWebPackConfig = (outputDir, project) => {
+   return {
+      entry: process.cwd() + `/${dirs.build}/${project.name}.js`,
+      output: {
+         path: process.cwd() + `/${outputDir}/`,
+         filename: `${project.name}.js`,
+      },
+      module: {
+         rules: [{
+            test: path.resolve(process.cwd() + `/${dirs.build}/`),
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+            options: {
+               presets: ['@babel/preset-env', {
+                  'plugins': [
+                     '@babel/plugin-proposal-class-properties',
+                     '@babel/plugin-transform-runtime'
+                  ]
+               }]
+            },
+         }]
+      },
+   }
+};
+
+
+
+module.exports.dirs = dirs;
 
 const initNote = `Usage: leanweb init or leanweb init project-name
 leanweb init will initialize a leanweb project with the name of the current

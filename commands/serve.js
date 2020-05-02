@@ -8,71 +8,52 @@ const WebpackDevServer = require('webpack-dev-server');
 
 (async () => {
 
-   const buildDir = 'build';
-   const serveDir = 'serve';
-   const project = require(`${process.cwd()}/src/leanweb.json`);
+   const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
-   utils.exec(`npx lw build`);
+   await utils.exec(`npx lw build`);
 
    const build = async (eventType, filename) => {
       // console.log(eventType + ': ', filename);
       await utils.exec(`npx lw build ` + filename);
 
-      fse.copySync(`./${buildDir}/index.html`, `./${serveDir}/index.html`);
-      fse.copySync(`./${buildDir}/${project.name}.css`, `./${serveDir}/${project.name}.css`);
+      fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);
+      fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
    };
 
    const throttledBuild = utils.throttle(build);
-   watch(process.cwd() + '/src/', { recursive: true }, (eventType, filename) => {
+   watch(process.cwd() + `/${utils.dirs.src}/`, { recursive: true }, (eventType, filename) => {
       throttledBuild(eventType, filename);
    });
 
-   const webpackConfig = {
+   const webpackConfig = utils.getWebPackConfig(utils.dirs.serve, project);
+
+   const webpackDevConfig = {
+      ...webpackConfig,
       mode: 'development',
       watch: true,
       devtool: 'eval-cheap-module-source-map',
-      entry: process.cwd() + `/${buildDir}/${project.name}.js`,
-      output: {
-         path: process.cwd() + `/${serveDir}/`,
-         filename: `${project.name}.js`,
-      },
       performance: {
          hints: false,
       },
-      module: {
-         rules: [{
-            test: path.resolve(process.cwd() + `/${buildDir}/`),
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-            options: {
-               presets: ['@babel/preset-env', {
-                  'plugins': [
-                     '@babel/plugin-proposal-class-properties',
-                     '@babel/plugin-transform-runtime'
-                  ]
-               }]
-            },
-         }]
-      },
    };
 
-   const compiler = webpack(webpackConfig);
+   const compiler = webpack(webpackDevConfig);
 
    const devServerOptions = {
-      ...webpackConfig.devServer,
-      contentBase: process.cwd() + `/${serveDir}/`,
+      ...webpackDevConfig.devServer,
+      contentBase: process.cwd() + `/${utils.dirs.serve}/`,
       publicPath: '/',
       hot: true,
-      // open: true,
+      open: true,
       stats: 'errors-warnings',
    };
    const server = new WebpackDevServer(compiler, devServerOptions);
 
-   fse.copySync(`./${buildDir}/index.html`, `./${serveDir}/index.html`);
-   fse.copySync(`./${buildDir}/${project.name}.css`, `./${serveDir}/${project.name}.css`);
-   fse.copySync(`./${buildDir}/favicon.svg`, `./${serveDir}/favicon.svg`);
+   fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
+   fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
+   fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
    project.resources.forEach(resource => {
-      fse.copySync(`./${buildDir}/${resource}`, `./${serveDir}/${resource}`);
+      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
    });
 
    server.listen(2020, '127.0.0.1');

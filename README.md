@@ -643,18 +643,6 @@ being notified when a next event is fired.
 parameter. `eventName` is the name of the event, and `data` is the payload data
 of the event.
 
-## FAQ
-
-### Why `lw serve` does work with Safari, while the `dist` works?
-
-`lw s` runs the build process and uses the `build/` directory to serve the
-dev web server. It doesn't do any transformation so if Safari doesn't work, as
-of today (March/9/2020), Safari still doesn't support class fields. I make sure
-the latest Chrome will work with the dev build. The `dist` should work for
-most, if not all, browsers. The design decision this is done this way is
-because I want the `build/` directory to be ES6 compatible and be independent
-from any build tools.
-
 ## More examples and tutorials
 
 https://leanweb.app

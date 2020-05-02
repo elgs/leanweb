@@ -5,8 +5,7 @@
    const utils = require('./utils.js');
    const parser = require('../lib/lw-html-parser.js');
 
-   const buildDir = 'build';
-   const project = require(`${process.cwd()}/src/leanweb.json`);
+   const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
    // const args = process.argv;
    // const changedFiles = args.slice(2);
@@ -37,7 +36,7 @@
    };
 
    const preprocessJsImport = filePath => {
-      if (filePath.toLowerCase().endsWith('.js') && !filePath.toLowerCase().endsWith('/ast.js') && !filePath.startsWith(`${buildDir}/lib/`)) {
+      if (filePath.toLowerCase().endsWith('.js') && !filePath.toLowerCase().endsWith('/ast.js') && !filePath.startsWith(`${utils.dirs.build}/lib/`)) {
          let jsFileString = fs.readFileSync(filePath, 'utf8');
          jsFileString = replaceNodeModulesImport(jsFileString, filePath);
          fs.writeFileSync(filePath, jsFileString);
@@ -45,31 +44,31 @@
    };
 
    const buildDirFilter = dirPath => {
-      if (dirPath.startsWith(`${buildDir}/lib/`)) {
+      if (dirPath.startsWith(`${utils.dirs.build}/lib/`)) {
          return false;
       }
       return true;
    };
 
    const buildJS = () => {
-      walkDirSync(`./${buildDir}/`, buildDirFilter, preprocessJsImport);
+      walkDirSync(`./${utils.dirs.build}/`, buildDirFilter, preprocessJsImport);
 
       const jsString = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);
          let importString = `import './components/${cur}/${cmpName}.js';`;
          return acc + importString + '\n';
       }, '');
-      fs.writeFileSync(`${buildDir}/${project.name}.js`, jsString);
+      fs.writeFileSync(`${utils.dirs.build}/${project.name}.js`, jsString);
    };
 
    const buildHTML = () => {
       const templates = project.components.reduce((acc, cur) => {
          const cmpName = utils.getComponentName(cur);
-         const htmlFilename = `./src/components/${cur}/${cmpName}.html`;
+         const htmlFilename = `./${utils.dirs.src}/components/${cur}/${cmpName}.html`;
          const htmlFileExists = fs.existsSync(htmlFilename);
          if (htmlFileExists) {
 
-            const scssFilename = `./src/components/${cur}/${cmpName}.scss`;
+            const scssFilename = `./${utils.dirs.src}/components/${cur}/${cmpName}.scss`;
             const scssFileExists = fs.existsSync(scssFilename);
             let cssString = '';
             if (scssFileExists) {
@@ -80,32 +79,32 @@
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const parsed = parser.parse(htmlString);
             const templateString = `<template id="${project.name}-${cur.replace(/\//g, '-')}">\n<link rel="stylesheet" href="./${project.name}.css">\n${styleString}${parsed.html}\n</template>`;
-            fs.writeFileSync(`${buildDir}/components/${cur}/ast.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
+            fs.writeFileSync(`${utils.dirs.build}/components/${cur}/ast.js`, `export default ${JSON.stringify(parsed.interpolation, null, 0)};`);
             return `${acc}${templateString}\n\n`
          } else {
             return acc;
          }
       }, '\n');
-      const htmlString = fs.readFileSync(`./src/index.html`, 'utf8') + templates;
-      fs.writeFileSync(`${buildDir}/index.html`, htmlString);
+      const htmlString = fs.readFileSync(`./${utils.dirs.src}/index.html`, 'utf8') + templates;
+      fs.writeFileSync(`${utils.dirs.build}/index.html`, htmlString);
    };
 
    const buildCSS = () => {
-      const scssFilename = `./src/${project.name}.scss`;
+      const scssFilename = `./${utils.dirs.src}/${project.name}.scss`;
       const scssFileExists = fs.existsSync(scssFilename);
       let cssString = '[lw-false],[lw-for]{display:none;}\n';
       if (scssFileExists) {
          const scssString = fs.readFileSync(scssFilename, 'utf8');
          cssString += utils.buildCSS(scssString);
       }
-      fs.writeFileSync(`${buildDir}/${project.name}.css`, cssString);
+      fs.writeFileSync(`${utils.dirs.build}/${project.name}.css`, cssString);
    };
 
    const copySrc = () => {
-      fse.copySync('./src/', `./${buildDir}/`)
+      fse.copySync(`./${utils.dirs.src}/`, `./${utils.dirs.build}/`)
    };
 
-   fs.mkdirSync(buildDir, { recursive: true });
+   fs.mkdirSync(utils.dirs.build, { recursive: true });
 
    copySrc();
    buildJS();
