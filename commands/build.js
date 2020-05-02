@@ -13,7 +13,7 @@
 
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
-      return str.replace(/^(\s*import\s+.*?from\s+['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
+      return str.replace(/^(\s*import.+?['"])([^\.].+?)(['"].*)$/gm, (m, a, b, c) => {
          if (b.indexOf('/') > -1) {
             if (b.startsWith('~/')) {
                return a + path.normalize(`./${utils.getPathLevels(filePath)}` + b.substring(2)) + c;
