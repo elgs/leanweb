@@ -98,7 +98,7 @@ project-name will be used as the leanweb project name.
 leanweb init command will create src/leanweb.json file, which looks like:
 {
   "name": "demo",
-  "version": "0.0.45",
+  "version": "0.4.5",
   "components": [
     "demo-root",
   ],
@@ -124,7 +124,7 @@ src/components directory. The leanweb.json will be updated to look like:
 
 {
   "name": "demo",
-  "version": "0.0.45",
+  "version": "0.4.5",
   "components": [
     "root",
     "login"
