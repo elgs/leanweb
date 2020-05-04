@@ -93,7 +93,7 @@
          const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
          projectCssString += utils.buildCSS(projectScssString);
       }
-      fs.writeFileSync(`${buildDir}/${project.name}.css`, projectCssString);
+      fs.writeFileSync(`${utils.dirs.build}/${project.name}.css`, projectCssString);
 
       const globalScssFilename = `./${utils.dirs.src}/global-styles.scss`;
       let globalCssString = '';
