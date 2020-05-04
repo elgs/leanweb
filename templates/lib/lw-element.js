@@ -21,7 +21,9 @@ export default class LWElement extends HTMLElement {
       super();
       this.ast = ast;
       const node = document.createElement('template');
-      node.innerHTML = `<link rel="stylesheet" href="./global-styles.css">`+'<style>' + ast.css + '</style>' + ast.html;
+      node.innerHTML = `<link rel="stylesheet" href="./global-styles.css">` +
+         '<style>' + ast.css + '</style>' +
+         ast.html;
       this.attachShadow({ mode: 'open' }).appendChild(node.content);
 
       this._bindMethods().then(() => {
@@ -369,5 +371,17 @@ export default class LWElement extends HTMLElement {
             this.update(node);
          });
       }
+   }
+
+   applyStyles(styles) {
+      if (!styles) {
+         return;
+      }
+      if (typeof styles !== 'string') {
+         styles = styles.toString();
+      }
+      const styleNode = document.createElement('style');
+      styleNode.innerHTML = styles;
+      this.shadowRoot.appendChild(styleNode);
    }
 }

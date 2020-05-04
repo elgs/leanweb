@@ -60,15 +60,7 @@ module.exports.getWebPackConfig = (outputDir, project) => {
       },
       module: {
          rules: [{
-            test: /\.css$/i,
-            use: ['style-loader', {
-               loader: 'css-loader',
-               // options: {
-               //    esModule: true,
-               // }
-            }],
-         }, {
-            test: path.resolve(process.cwd() ),
+            test: path.resolve(process.cwd()),
             exclude: /node_modules/,
             loader: 'babel-loader',
             options: {
@@ -79,7 +71,17 @@ module.exports.getWebPackConfig = (outputDir, project) => {
                   ]
                }]
             },
-         }]
+         }, {
+            test: /\.scss$/,
+            use: ["css-loader", "sass-loader"]
+         }, {
+            test: /\.json$/i,
+            loader: 'json5-loader',
+            options: {
+               esModule: true,
+            },
+            type: 'javascript/auto',
+         },]
       },
    }
 };

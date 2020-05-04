@@ -20,6 +20,7 @@
 
    fse.copySync(`./${utils.dirs.build}/electron.js`, `./${utils.dirs.electron}/electron.js`);
    fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);
+   fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
    fse.copySync(`./${utils.dirs.build}/global-styles.css`, `./${utils.dirs.electron}/global-styles.css`);
    fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.electron}/favicon.svg`);
    project.resources.forEach(resource => {

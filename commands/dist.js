@@ -42,9 +42,13 @@ const CleanCSS = require('clean-css');
       });
       fs.writeFileSync(`./${utils.dirs.dist}/index.html`, minifiedIndexHtml);
 
-      const appCSS = fs.readFileSync(`./${utils.dirs.build}/global-styles.css`, 'utf8');
+      const appCSS = fs.readFileSync(`./${buildDir}/${project.name}.css`, 'utf8');
       const minifiedAppCss = new CleanCSS({}).minify(appCSS);
-      fs.writeFileSync(`./${utils.dirs.dist}/global-styles.css`, minifiedAppCss.styles);
+      fs.writeFileSync(`./${distDir}/${project.name}.css`, minifiedAppCss.styles);
+
+      const globalCSS = fs.readFileSync(`./${utils.dirs.build}/global-styles.css`, 'utf8');
+      const minifiedGlobalCss = new CleanCSS({}).minify(globalCSS);
+      fs.writeFileSync(`./${utils.dirs.dist}/global-styles.css`, minifiedGlobalCss.styles);
 
       fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.dist}/favicon.svg`);
       project.resources.forEach(resource => {

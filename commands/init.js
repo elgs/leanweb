@@ -44,6 +44,12 @@
    utils.exec(`npm i -D @babel/plugin-proposal-class-properties --loglevel=error`);
    utils.exec(`npm i -D @babel/plugin-transform-runtime --loglevel=error`);
 
+   utils.exec(`npm i -D css-loader --loglevel=error`);
+   utils.exec(`npm i -D style-loader --loglevel=error`);
+   utils.exec(`npm i -D sass-loader --loglevel=error`);
+   utils.exec(`npm i -D node-sass --loglevel=error`);
+   utils.exec(`npm i -D json5-loader --loglevel=error`);
+
    utils.exec(`npx lw generate root`);
 
    fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);
@@ -51,6 +57,7 @@
    let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
    fs.writeFileSync(`./${utils.dirs.src}/index.html`, htmlString);
+   fs.writeFileSync(`./src/${projectName}.scss`, '');
    fs.writeFileSync(`./${utils.dirs.src}/global-styles.scss`, '');
    fse.copySync(`${__dirname}/../templates/favicon.svg`, `./${utils.dirs.src}/favicon.svg`);
 

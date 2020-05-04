@@ -87,14 +87,22 @@
    };
 
    const buildCSS = () => {
-      const scssFilename = `./${utils.dirs.src}/global-styles.scss`;
-      const scssFileExists = fs.existsSync(scssFilename);
-      let cssString = '[lw-false],[lw-for]{display:none;}\n';
-      if (scssFileExists) {
-         const scssString = fs.readFileSync(scssFilename, 'utf8');
-         cssString += utils.buildCSS(scssString);
+      const projectScssFilename = `./src/${project.name}.scss`;
+      let projectCssString = '';
+      if (fs.existsSync(projectScssFilename)) {
+         const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
+         projectCssString += utils.buildCSS(projectScssString);
       }
-      fs.writeFileSync(`${utils.dirs.build}/global-styles.css`, cssString);
+      fs.writeFileSync(`${buildDir}/${project.name}.css`, projectCssString);
+
+      const globalScssFilename = `./${utils.dirs.src}/global-styles.scss`;
+      let globalCssString = '';
+      if (fs.existsSync(globalScssFilename)) {
+         const globalScssString = fs.readFileSync(globalScssFilename, 'utf8');
+         globalCssString += utils.buildCSS(globalScssString);
+      }
+      globalCssString += '[lw-false],[lw-for]{display:none;}\n';
+      fs.writeFileSync(`${utils.dirs.build}/global-styles.css`, globalCssString);
    };
 
    const copySrc = () => {
