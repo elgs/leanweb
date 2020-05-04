@@ -98,7 +98,7 @@ project-name will be used as the leanweb project name.
 leanweb init command will create src/leanweb.json file, which looks like:
 {
   "name": "demo",
-  "version": "0.0.29",
+  "version": "0.0.45",
   "components": [
     "demo-root",
   ],
@@ -115,7 +115,7 @@ root.html
 root.js
 root.scss
 
-Under src/ directory, demo.scss is created for global styling.
+Under src/ directory, global-styles.scss is created for global styling.
 `;
 
 const generateNote = `Usage: leanweb generate component-name
@@ -124,7 +124,7 @@ src/components directory. The leanweb.json will be updated to look like:
 
 {
   "name": "demo",
-  "version": "0.0.29",
+  "version": "0.0.45",
   "components": [
     "root",
     "login"
