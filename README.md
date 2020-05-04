@@ -55,16 +55,17 @@ looks like:
 ```json
 {
   "name": "demo",
-  "version": "0.2.9",
+  "version": "0.4.5",
   "components": ["root"],
   "resources": ["resources/"]
 }
 ```
 
 which suggests a root web component `demo-root` is created. In `src/` directory,
-an `index.html` an empty `demo.scss` files are created, in `demo.scss` we can add
-global styles. `demo-root` web component directory is created at
-`src/components/root/`. There are 3 files in this directory:
+an `index.html`, an empty `demo.scss` and an empty `global-styles.scss` files
+are created, in `global-styles.scss` we can add global styles. `demo-root` web
+component directory is created at `src/components/root/`. There are 3 files in
+this directory:
 
 - root.html
 - root.js
@@ -81,18 +82,14 @@ based on standard DOM api.
 `root.js`
 
 ```javascript
-import LWElement from "./../../lib/lw-element.js";
-import interpolation from "./ast.js";
+import LWElement from "~/src/lib/lw-element.js";
+import ast from "./ast.js";
 
-const component = { id: "demo-root", interpolation };
-customElements.define(
-  component.id,
-  class extends LWElement {
-    // LWElement extends HTMLElement
+customElements.define('f-root',
+  class extends LWElement { // LWElement extends HTMLElement
     constructor() {
-      super(component);
+      super(ast);
     }
-    name = component.id;
   }
 );
 ```
@@ -127,7 +124,7 @@ Now the `leanweb.json` has one more entry in the component list:
 ```json
 {
   "name": "demo",
-  "version": "0.2.9",
+  "version": "0.4.5",
   "components": ["root", "login"],
   "resources": ["resources/"]
 }
@@ -474,16 +471,36 @@ Assuming npm module `lodash-es` is installed, you could use any of the
 following `import` statements for your web component class:
 
 ```javascript
-import { get } from "lodash-es";
-import get from "lodash-es/get.js"; // The tailing explicit .js is important.
-import get from "./../../../node_modules/lodash-es/get.js";
-import * as _ from "lodash-es";
+import { get } from "lodash-es"; // find from node_modules
+import get from "lodash-es/get.js"; // find from node_modules
+import get from "./../../../node_modules/lodash-es/get.js"; // find from path as is
+import * as _ from "lodash-es"; // find from node_modules
 ```
 
 As a shortcut, you could import files relative to project root with `~/`:
 
 ```javascript
-import { something } from "~/src/some-js-file.js";
+import { something } from "~/src/some-js-file.js"; // relative to project root
+```
+
+Importing a JSON file:
+```javascript
+import someJSON from "./some.json";
+```
+
+Importing CSS/SCSS:
+```javascript
+import agate from 'highlight.js/scss/agate.scss';
+
+// customElements.define('demo-root',
+//  class extends LWElement {  // LWElement extends HTMLElement
+//    constructor() {
+//      super(ast);
+        super.applyStyles(agate);
+//    }
+//  }
+//);
+
 ```
 
 assuming `some-js-file.js` exists in the project `src/` directory.
@@ -498,14 +515,13 @@ each other.
 `pub.js`
 
 ```javascript
-// import LWElement from './../../lib/lw-element.js';
-// import interpolation from './ast.js';
+// import LWElement from './../../../lib/lw-element.js';
+// import ast from './ast.js';
 
-// const component = { id: 'demo-pub', interpolation };
 // customElements.define(component.id,
 //   class extends LWElement {  // LWElement extends HTMLElement
 //     constructor() {
-//       super(component);
+//       super(ast);
 
          setInterval(() => {
            this.time = new Date(Date.now()).toLocaleString();
@@ -530,14 +546,13 @@ each other.
 `sub.js`
 
 ```javascript
-// import LWElement from './../../lib/lw-element.js';
-// import interpolation from './ast.js';
+// import LWElement from './../../../lib/lw-element.js';
+// import ast from './ast.js';
 
-// const component = { id: 'demo-sub', interpolation };
 // customElements.define(component.id,
 //   class extends LWElement {  // LWElement extends HTMLElement
 //     constructor() {
-//       super(component);
+//       super(ast);
 //     }
 
        sub() {
@@ -593,12 +608,14 @@ allows you to specify which DOM element to start with. The default value is
 the current`shadowRoot`.
 
 LWElement will call update in the following scenarios:
+
 1. after all `lw` directives are initially bound to DOM;
 2. after `lw-on:` event is fired;
 3. after `lw-model` change is fired;
 
-You may need to call the `update()` method manually in other events. For 
+You may need to call the `update()` method manually in other events. For
 example:
+
 1. in your setTimeout/setInterval callbacks;
 2. in `LWEventBus` callbacks;
 3. in any network api callbacks;
@@ -614,6 +631,10 @@ great place to send events to the event bus.
 `inputReady()` will be called after all input data from parent's `lw-input:` is
 ready. In this method, children are able to access the passed in data shared
 by parents.
+
+#### LWElement.applyStyles(styles)
+`applyStyles` will apply the styles that is imported from a css or scss into
+the web component DOM.
 
 ### LWEventBus
 
@@ -642,18 +663,6 @@ being notified when a next event is fired.
 `dispatchEvent` is used to send an event to the event bus. It takes two
 parameter. `eventName` is the name of the event, and `data` is the payload data
 of the event.
-
-## FAQ
-
-### Why `lw serve` does work with Safari, while the `dist` works?
-
-`lw s` runs the build process and uses the `build/` directory to serve the
-dev web server. It doesn't do any transformation so if Safari doesn't work, as
-of today (March/9/2020), Safari still doesn't support class fields. I make sure
-the latest Chrome will work with the dev build. The `dist` should work for
-most, if not all, browsers. The design decision this is done this way is
-because I want the `build/` directory to be ES6 compatible and be independent
-from any build tools.
 
 ## More examples and tutorials
 

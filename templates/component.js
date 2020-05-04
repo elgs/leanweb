@@ -1,14 +1,11 @@
-import LWElement from './../../${pathLevels}lib/lw-element.js';
-import interpolation from './ast.js';
+import LWElement from '~/src/lib/lw-element.js';
+import ast from './ast.js';
 
-const component = { id: '${projectName}-${component}', interpolation };
-customElements.define(component.id,
+customElements.define('${projectName}-${component}',
    class extends LWElement {  // LWElement extends HTMLElement
       constructor() {
-         super(component);
+         super(ast);
       }
-
-      name = component.id;
 
       // derived from LWElement
       // domReady() {

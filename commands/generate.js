@@ -8,7 +8,7 @@
       return;
    }
 
-   const leanwebJSONPath = `${process.cwd()}/src/leanweb.json`;
+   const leanwebJSONPath = `${process.cwd()}/${utils.dirs.src}/leanweb.json`;
    const leanwebJSON = require(leanwebJSONPath);
    const cmps = args.slice(2);
 
@@ -26,7 +26,7 @@
 
    for (const cmp of cmps) {
       const cmpName = utils.getComponentName(cmp);
-      const cmpPath = `src/components/${cmp}`;
+      const cmpPath = `${utils.dirs.src}/components/${cmp}`;
 
       fs.mkdirSync(cmpPath, { recursive: true });
 

@@ -1,38 +1,66 @@
-const fs = require('fs');
+const fse = require('fs-extra');
 const utils = require('./utils.js');
-const liveServer = require("live-server");
+const webpack = require('webpack');
 const watch = require('node-watch');
+const WebpackDevServer = require('webpack-dev-server');
 
 (async () => {
 
-   let port = 2020;
-   let host = '127.0.0.1';
+   const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
-   if (process.argv.length > 2) {
-      port = process.argv[2] * 1;
-   }
-   if (process.argv.length > 3) {
-      host = process.argv[3];
-   }
+   await utils.exec(`npx lw build`);
 
-   utils.exec(`npx lw build`);
-
-   const build = (eventType, filename) => {
+   const build = async (eventType, filename) => {
       // console.log(eventType + ': ', filename);
-      utils.exec(`npx lw build ` + filename);
+      await utils.exec(`npx lw build ` + filename);
+
+      fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
+      fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
+      fse.copySync(`./${utils.dirs.build}/global-styles.css`, `./${utils.dirs.serve}/global-styles.css`);
+      fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
+      project.resources.forEach(resource => {
+         fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
+      });
    };
 
    const throttledBuild = utils.throttle(build);
-   watch(process.cwd() + '/src/', { recursive: true }, (eventType, filename) => {
+   watch(process.cwd() + `/${utils.dirs.src}/`, { recursive: true }, (eventType, filename) => {
       throttledBuild(eventType, filename);
    });
 
-   const params = {
-      port,
-      host,
-      open: '/build/',
-      wait: 1000,
-      logLevel: 0, // 0 = errors only, 1 = some, 2 = lots
+   const webpackConfig = utils.getWebPackConfig(utils.dirs.serve, project);
+
+   const webpackDevConfig = {
+      ...webpackConfig,
+      mode: 'development',
+      watch: true,
+      devtool: 'eval-cheap-module-source-map',
+      performance: {
+         hints: false,
+      },
    };
-   liveServer.start(params);
+
+   const compiler = webpack(webpackDevConfig);
+
+   const devServerOptions = {
+      ...webpackDevConfig.devServer,
+      contentBase: process.cwd() + `/${utils.dirs.serve}/`,
+      watchContentBase: true,
+      publicPath: '/',
+      hot: true,
+      open: true,
+      // quiet: true,
+      stats: 'errors-warnings',
+   };
+   const server = new WebpackDevServer(compiler, devServerOptions);
+
+   fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
+   fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
+   fse.copySync(`./${utils.dirs.build}/global-styles.css`, `./${utils.dirs.serve}/global-styles.css`);
+   fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
+   project.resources.forEach(resource => {
+      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
+   });
+
+   server.listen(2020, '127.0.0.1');
 })();

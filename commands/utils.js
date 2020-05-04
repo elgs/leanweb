@@ -2,6 +2,14 @@ const { execSync } = require('child_process');
 const sass = require('node-sass');
 const path = require('path');
 
+const dirs = {
+   src: 'src',
+   build: 'build',
+   serve: 'serve',
+   dist: 'dist',
+   electron: 'electron',
+};
+
 module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
 module.exports.buildCSS = scssString => {
@@ -43,6 +51,45 @@ module.exports.throttle = (callback, limit = 100) => {
    };
 };
 
+module.exports.getWebPackConfig = (outputDir, project) => {
+   return {
+      entry: process.cwd() + `/${dirs.build}/${project.name}.js`,
+      output: {
+         path: process.cwd() + `/${outputDir}/`,
+         filename: `${project.name}.js`,
+      },
+      module: {
+         rules: [{
+            test: path.resolve(process.cwd()),
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+            options: {
+               presets: ['@babel/preset-env', {
+                  plugins: [
+                     '@babel/plugin-proposal-class-properties',
+                     '@babel/plugin-transform-runtime'
+                  ]
+               }]
+            },
+         }, {
+            test: /\.scss$/,
+            use: ["css-loader", "sass-loader"]
+         }, {
+            test: /\.json$/i,
+            loader: 'json5-loader',
+            options: {
+               esModule: true,
+            },
+            type: 'javascript/auto',
+         },]
+      },
+   }
+};
+
+
+
+module.exports.dirs = dirs;
+
 const initNote = `Usage: leanweb init or leanweb init project-name
 leanweb init will initialize a leanweb project with the name of the current
 working directory, otherwise, if a project-name is provided, the provided
@@ -51,7 +98,7 @@ project-name will be used as the leanweb project name.
 leanweb init command will create src/leanweb.json file, which looks like:
 {
   "name": "demo",
-  "version": "0.0.29",
+  "version": "0.0.45",
   "components": [
     "demo-root",
   ],
@@ -68,7 +115,7 @@ root.html
 root.js
 root.scss
 
-Under src/ directory, demo.scss is created for global styling.
+Under src/ directory, global-styles.scss is created for global styling.
 `;
 
 const generateNote = `Usage: leanweb generate component-name
@@ -77,7 +124,7 @@ src/components directory. The leanweb.json will be updated to look like:
 
 {
   "name": "demo",
-  "version": "0.0.29",
+  "version": "0.0.45",
   "components": [
     "root",
     "login"

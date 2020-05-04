@@ -1,4 +1,3 @@
-const path = require('path');
 const webpack = require('webpack');
 const utils = require('./utils.js');
 const fs = require('fs');
@@ -7,40 +6,20 @@ const minify = require('html-minifier').minify;
 const CleanCSS = require('clean-css');
 
 (async () => {
-   const buildDir = 'build';
-   const distDir = 'dist';
-   const project = require(`${process.cwd()}/src/leanweb.json`);
+   const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
-   utils.exec(`npx lw clean`);
-   utils.exec(`npx lw build`);
+   await utils.exec(`npx lw clean`);
+   await utils.exec(`npx lw build`);
+
+   const webpackConfig = utils.getWebPackConfig(utils.dirs.dist, project);
 
    const compiler = webpack({
+      ...webpackConfig,
       mode: 'production',
       devtool: 'source-map',
-      entry: [process.cwd() + `/${buildDir}/${project.name}.js`],
-      output: {
-         path: process.cwd() + `/${distDir}/`,
-         filename: `${project.name}.js`
+      performance: {
+         hints: 'warning'
       },
-      module: {
-         rules: [
-            {
-               test: path.resolve(process.cwd() + `/${buildDir}/`),
-               exclude: /node_modules/,
-               loader: 'babel-loader',
-               options: {
-                  presets: ['@babel/preset-env',
-                     {
-                        'plugins': [
-                           '@babel/plugin-proposal-class-properties',
-                           '@babel/plugin-transform-runtime'
-                        ]
-                     }
-                  ]
-               }
-            }
-         ]
-      }
    });
 
    compiler.run(async (err, stats) => {
@@ -54,24 +33,26 @@ const CleanCSS = require('clean-css');
          console.log(stats.compilation.warnings);
       }
 
-      const indexHTML = fs.readFileSync(`./${buildDir}/index.html`, 'utf8');
+      const indexHTML = fs.readFileSync(`./${utils.dirs.build}/index.html`, 'utf8');
       const minifiedIndexHtml = minify(indexHTML, {
          caseSensitive: true,
          collapseWhitespace: true,
          minifyCSS: true,
          minifyJS: true,
       });
-      fs.writeFileSync(`./${distDir}/index.html`, minifiedIndexHtml);
+      fs.writeFileSync(`./${utils.dirs.dist}/index.html`, minifiedIndexHtml);
 
-      const appCSS = fs.readFileSync(`./${buildDir}/${project.name}.css`, 'utf8');
+      const appCSS = fs.readFileSync(`./${utils.dirs.build}/${project.name}.css`, 'utf8');
       const minifiedAppCss = new CleanCSS({}).minify(appCSS);
-      fs.writeFileSync(`./${distDir}/${project.name}.css`, minifiedAppCss.styles);
+      fs.writeFileSync(`./${utils.dirs.dist}/${project.name}.css`, minifiedAppCss.styles);
 
-      // fse.copySync(`./${buildDir}/index.html`, `./${distDir}/index.html`);
-      // fse.copySync(`./${buildDir}/${project.name}.css`, `./${distDir}/${project.name}.css`);
-      fse.copySync(`./${buildDir}/favicon.svg`, `./${distDir}/favicon.svg`);
+      const globalCSS = fs.readFileSync(`./${utils.dirs.build}/global-styles.css`, 'utf8');
+      const minifiedGlobalCss = new CleanCSS({}).minify(globalCSS);
+      fs.writeFileSync(`./${utils.dirs.dist}/global-styles.css`, minifiedGlobalCss.styles);
+
+      fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.dist}/favicon.svg`);
       project.resources.forEach(resource => {
-         fse.copySync(`./${buildDir}/${resource}`, `./${distDir}/${resource}`);
+         fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.dist}/${resource}`);
       });
    });
 })();
