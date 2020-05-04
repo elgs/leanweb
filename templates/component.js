@@ -1,4 +1,4 @@
-import LWElement from '~/src/lib/lw-element.js';
+import LWElement from './../../${pathLevels}lib/lw-element.js';
 import ast from './ast.js';
 
 customElements.define('${projectName}-${component}',
