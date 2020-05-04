@@ -72,16 +72,30 @@ module.exports.getWebPackConfig = (outputDir, project) => {
                }]
             },
          }, {
-            test: /\.scss$/,
-            use: ["css-loader", "sass-loader"]
+            test: /\.scss$/i,
+            use: [
+               {
+                  loader: require.resolve('css-loader'),
+               },
+               {
+                  loader: require.resolve('sass-loader'),
+               },
+            ]
          }, {
             test: /\.json$/i,
-            loader: 'json5-loader',
+            loader: require.resolve('json5-loader'),
             options: {
                esModule: true,
             },
             type: 'javascript/auto',
-         },]
+         }, {
+            loader: require.resolve('raw-loader'),
+            exclude: [
+               /\.(js|mjs|jsx|ts|tsx)$/i,
+               /\.(json|json5)$/i,
+               /\.(css|scss)$/i
+            ],
+         }]
       },
    }
 };

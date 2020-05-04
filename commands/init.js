@@ -44,12 +44,6 @@
    utils.exec(`npm i -D @babel/plugin-proposal-class-properties --loglevel=error`);
    utils.exec(`npm i -D @babel/plugin-transform-runtime --loglevel=error`);
 
-   utils.exec(`npm i -D css-loader --loglevel=error`);
-   utils.exec(`npm i -D style-loader --loglevel=error`);
-   utils.exec(`npm i -D sass-loader --loglevel=error`);
-   utils.exec(`npm i -D node-sass --loglevel=error`);
-   utils.exec(`npm i -D json5-loader --loglevel=error`);
-
    utils.exec(`npx lw generate root`);
 
    fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);

@@ -373,15 +373,17 @@ export default class LWElement extends HTMLElement {
       }
    }
 
-   applyStyles(styles) {
+   applyStyles(...styles) {
       if (!styles) {
          return;
       }
-      if (typeof styles !== 'string') {
-         styles = styles.toString();
-      }
-      const styleNode = document.createElement('style');
-      styleNode.innerHTML = styles;
-      this.shadowRoot.appendChild(styleNode);
+      styles.forEach(style => {
+         if (typeof style !== 'string') {
+            style = style.toString();
+         }
+         const styleNode = document.createElement('style');
+         styleNode.innerHTML = style;
+         this.shadowRoot.appendChild(styleNode);
+      });
    }
 }
