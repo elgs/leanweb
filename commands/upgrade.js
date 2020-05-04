@@ -19,6 +19,12 @@ const upgradeTo045 = () => {
          .replace(/super\(component\);/, 'super(ast);');
       fs.writeFileSync(filePath, newSrc);
    });
+
+   utils.exec(`npm i -D css-loader --loglevel=error`);
+   utils.exec(`npm i -D style-loader --loglevel=error`);
+   utils.exec(`npm i -D sass-loader --loglevel=error`);
+   utils.exec(`npm i -D node-sass --loglevel=error`);
+   utils.exec(`npm i -D json5-loader --loglevel=error`);
 };
 
 const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);
