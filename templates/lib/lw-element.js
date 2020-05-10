@@ -51,6 +51,7 @@ export default class LWElement extends HTMLElement {
    // others:  reject both lw-for and lw-false 
    // all:     reject lw-for-parent
    _queryNodes(selector = '', rootNode = this.shadowRoot, excludeLwFalse = true, excludeLwFor = true) {
+      selector = selector.trim();
       if (rootNode[selector]) {
          return rootNode[selector];
       }
@@ -62,7 +63,7 @@ export default class LWElement extends HTMLElement {
          if (excludeLwFor && rootNode.matches('[lw-for]')) {
             return nodes;
          }
-         if (rootNode.matches(selector.trim())) {
+         if (rootNode.matches(selector)) {
             nodes.push(rootNode);
          }
       }
@@ -77,7 +78,7 @@ export default class LWElement extends HTMLElement {
             if (excludeLwFor && node.matches('[lw-for]')) {
                return NodeFilter.FILTER_REJECT;
             }
-            if (node.matches(selector.trim())) {
+            if (node.matches(selector)) {
                nodes.push(node);
             }
             return NodeFilter.FILTER_ACCEPT;
@@ -144,7 +145,14 @@ export default class LWElement extends HTMLElement {
                const context = this._getNodeContext(eventNode);
                eventNode.addEventListener(interpolation.lwValue, (event => {
                   const eventContext = { '$event': event };
-                  const localContext = [eventContext, context].flat(Infinity);
+
+                  let localContext;
+                  if (Array.isArray(context)) {
+                     localContext = [eventContext, ...context];
+                  } else {
+                     localContext = [eventContext, context];
+                  }
+                  // const localContext = [eventContext, context].flat(Infinity);
                   const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
                   this.update();
                   return parsed;
@@ -217,8 +225,8 @@ export default class LWElement extends HTMLElement {
    }
 
    update(rootNode = this.shadowRoot) {
-      this.updateFor(rootNode);
       this.updateIf(rootNode);
+      this.updateFor(rootNode);
       this.updateEval(rootNode);
       this.updateClass(rootNode);
       this.updateBind(rootNode);
@@ -363,7 +371,14 @@ export default class LWElement extends HTMLElement {
             }
             currentNode = node;
             const itemContext = { [interpolation.itemExpr]: item, [interpolation.indexExpr]: index };
-            const localContext = [itemContext, context].flat(Infinity);
+
+            let localContext;
+            if (Array.isArray(context)) {
+               localContext = [itemContext, ...context];
+            } else {
+               localContext = [itemContext, context];
+            }
+            // const localContext = [itemContext, context].flat(Infinity);
             node['lw-context'] = localContext;
             if (rendered.length <= index) {
                this._bind(node);
