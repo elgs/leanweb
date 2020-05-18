@@ -142,7 +142,7 @@ export const evaluate = (ast, context = {}, loc = {}) => {
    try {
       return ast.map(astNode => evalNode(astNode, context));
    } catch (e) {
-      throw { error: e.message, location: loc };
+      throw { error: e.message, location: loc, ast, context };
    }
 };
 
