@@ -32,6 +32,14 @@ export default class LWElement extends HTMLElement {
       });
    }
 
+   set urlHash(hash) {
+      location.hash = hash;
+   }
+
+   get urlHash() {
+      return location.hash;
+   }
+
    static eventBus = new LWEventBus();
 
    _getNodeContext(node) {
