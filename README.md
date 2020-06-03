@@ -599,7 +599,7 @@ So Leanweb components are just more specific versions of the stand
 `HTMLElement`. `LWElement` helps to wire up the `lw` directives in the HTML and
 provides some convenient methods to update the DOM.
 
-#### LWElement.update(rootNode = this.shadowRoot)
+#### update(rootNode = this.shadowRoot)
 
 The `update` method provides a convenient way to update the DOM when the model
 changes. You should feel free to use old way to update DOM. The `update` just
@@ -620,21 +620,25 @@ example:
 2. in `LWEventBus` callbacks;
 3. in any network api callbacks;
 
-#### LWElement.domReady()
+#### domReady()
 
 `domReady()` will be called after all initial DOM events are bound, and all
 DOM interpolations are evaluated. This method is meant to be overridden and is a
 great place to send events to the event bus.
 
-#### LWElement.inputReady()
+#### inputReady()
 
 `inputReady()` will be called after all input data from parent's `lw-input:` is
 ready. In this method, children are able to access the passed in data shared
 by parents.
 
-#### LWElement.applyStyles(styles)
+#### applyStyles(styles)
 `applyStyles` will apply the styles that is imported from a css or scss into
 the web component DOM.
+
+#### urlHash
+`urlHash` is a reference to `window.location.hash` which can be used for 
+routing.
 
 ### LWEventBus
 
@@ -642,7 +646,7 @@ the web component DOM.
 talk to each other by sending and receiving events and data. You could use your
 own way for component communication. `LWEventBus` is however a choice for you.
 
-#### LWEventBus.addEventListener(eventName, callback)
+#### addEventListener(eventName, callback)
 
 You can use `LWElement.eventBus` to get the instance of event bus, and use
 `LWElement.eventBus.addEventListener(eventName, callback)` to subscribe to a
@@ -653,12 +657,12 @@ function that will get called when a event is sent to the event bus. The
 and `data` fields. `addEventListener` returns the eventListener instance
 being added, which could be passed in `removeEventListener` as parameter.
 
-#### LWEventBus.removeEventListener(listener)
+#### removeEventListener(listener)
 
 `removeEventListener` removes the listener from the event bus, so it stops
 being notified when a next event is fired.
 
-#### LWEventBus.dispatchEvent(eventName, data = null)
+#### dispatchEvent(eventName, data = null)
 
 `dispatchEvent` is used to send an event to the event bus. It takes two
 parameter. `eventName` is the name of the event, and `data` is the payload data
