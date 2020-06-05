@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.5.1",
+   "version": "0.5.2",
    "description": "A set of tools (as opposed to a framework) to generate web components based web project.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -21,7 +21,7 @@
       "@babel/parser": "^7.10.2",
       "clean-css": "^4.2.3",
       "css-loader": "^3.5.3",
-      "fs-extra": "^9.0.0",
+      "fs-extra": "^9.0.1",
       "globby": "^11.0.1",
       "html-minifier": "^4.0.0",
       "isomorphic-git": "^1.4.0",

@@ -18,7 +18,7 @@ const CleanCSS = require('clean-css');
       mode: 'production',
       devtool: 'source-map',
       performance: {
-         hints: 'warning'
+         hints: false,
       },
    });
 
