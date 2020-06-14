@@ -632,9 +632,9 @@ great place to send events to the event bus.
 ready. In this method, children are able to access the passed in data shared
 by parents.
 
-#### urlHashchanged()
-If `urlHashchanged()` is defined, it will be called whenever the urlHash
-changes. This could be useful to update the DOM on component routing.
+#### urlHashChanged()
+If `urlHashChanged()` is defined as a function, it will be called whenever the
+urlHash changes. This could be useful to update the DOM on component routing.
 
 #### applyStyles(styles)
 `applyStyles` will apply the styles that is imported from a css or scss into

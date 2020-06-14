@@ -31,9 +31,9 @@ export default class LWElement extends HTMLElement {
          this.domReady?.call(this);
       });
 
-      if (this.urlHashchanged && typeof this.urlHashchanged === 'function') {
+      if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
          window.addEventListener('hashchange', () => {
-            this.urlHashchanged?.call(this);
+            this.urlHashChanged?.call(this);
          }, false);
       }
    }
