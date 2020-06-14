@@ -30,6 +30,12 @@ export default class LWElement extends HTMLElement {
          this.update(this.shadowRoot);
          this.domReady?.call(this);
       });
+
+      if (this.urlHashchanged && typeof this.urlHashchanged === 'function') {
+         window.addEventListener('hashchange', () => {
+            this.urlHashchanged?.call(this);
+         }, false);
+      }
    }
 
    set urlHash(hash) {
