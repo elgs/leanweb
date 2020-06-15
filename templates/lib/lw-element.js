@@ -16,6 +16,14 @@ const nextAllSiblings = (el, selector) => {
    return siblings;
 };
 
+window.addEventListener('hashchange', () => {
+   LWElement._componentsUrlHashChanges?.forEach(component => {
+      setTimeout(() => {
+         component?.urlHashChanged?.call(component);
+      });
+   });
+}, false);
+
 export default class LWElement extends HTMLElement {
    constructor(ast) {
       super();
@@ -32,9 +40,7 @@ export default class LWElement extends HTMLElement {
       });
 
       if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
-         window.addEventListener('hashchange', () => {
-            this.urlHashChanged?.call(this);
-         }, false);
+         LWElement._componentsUrlHashChanges.push(this);
       }
    }
 
@@ -47,6 +53,8 @@ export default class LWElement extends HTMLElement {
    }
 
    static eventBus = new LWEventBus();
+
+   static _componentsUrlHashChanges = [];
 
    _getNodeContext(node) {
       const contextNode = node.closest('[lw-context]');
