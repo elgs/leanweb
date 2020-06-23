@@ -75,7 +75,7 @@
                const scssString = fs.readFileSync(scssFilename, 'utf8');
                cssString = utils.buildCSS(scssString);
             }
-            const styleString = !!cssString ? cssString : '';
+            const styleString = cssString || '';
             const htmlString = fs.readFileSync(htmlFilename, 'utf8');
             const ast = parser.parse(htmlString);
             ast.css = styleString;
