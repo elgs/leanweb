@@ -16,6 +16,13 @@ customElements.define('${projectName}-${component}',
       //    console.log('input is ready');
       // }
 
+      // Called when the urlHash changes. This could be useful to update the 
+      // DOM on component routing.
+      // urlHashChanged() {
+      //    // update component DOM
+      //    this.update();
+      // }
+
       // derived from HTMLElement
       // connectedCallback() {
       //    console.log(this.isConnected);
