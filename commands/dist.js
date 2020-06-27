@@ -39,6 +39,7 @@ const CleanCSS = require('clean-css');
          collapseWhitespace: true,
          minifyCSS: true,
          minifyJS: true,
+         caseSensitive: true,
       });
       fs.writeFileSync(`./${utils.dirs.dist}/index.html`, minifiedIndexHtml);
 
