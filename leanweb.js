@@ -43,6 +43,12 @@
          console.log(`New version of leanweb lib (${projectLeanwebJSON.version} => ${leanwebPackageJSON.version}) is available. Please consider 
 running 'lw upgrade' to upgrade your project leanweb lib.`);
       }
+
+      const projectTooNew = semver.gt(projectLeanwebJSON.version, leanwebPackageJSON.version);
+      if (projectTooNew) {
+         console.log(`Poject version of leanweb (${projectLeanwebJSON.version} > ${leanwebPackageJSON.version}) is newer than local leanweb tools version.
+Please consider running 'npm i leanweb -g' to upgrade your local leanweb tools.`);
+      }
    }
    const targetData = utils.targets[target];
    const command = `node ${__dirname}/commands/${targetData.file} ${args.slice(3).join(' ')}`;

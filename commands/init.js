@@ -35,6 +35,23 @@
          'resources/'
       ],
    };
+
+   const projectScss = `html,
+body {
+   height: 100%;
+   width: 100%;
+   margin: 0 auto;
+   padding: 0;
+
+   // font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+}
+`
+
+   const globalScss = `// div {
+//    color: tomato;
+// }
+`;
+
    fs.mkdirSync(`${utils.dirs.src}/resources/`, { recursive: true });
    fs.writeFileSync(`${utils.dirs.src}/leanweb.json`, JSON.stringify(leanwebData, null, 2));
 
@@ -51,8 +68,8 @@
    let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
    fs.writeFileSync(`./${utils.dirs.src}/index.html`, htmlString);
-   fs.writeFileSync(`./src/${projectName}.scss`, '');
-   fs.writeFileSync(`./${utils.dirs.src}/global-styles.scss`, '');
+   fs.writeFileSync(`./src/${projectName}.scss`, projectScss);
+   fs.writeFileSync(`./${utils.dirs.src}/global-styles.scss`, globalScss);
    fse.copySync(`${__dirname}/../templates/favicon.svg`, `./${utils.dirs.src}/favicon.svg`);
 
    if (!(fs.existsSync(`${process.cwd()}/.git/`) && fs.statSync(`${process.cwd()}/.git/`).isDirectory())) {
