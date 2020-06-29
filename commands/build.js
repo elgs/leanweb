@@ -53,9 +53,17 @@
 
       let depImports = '';
       project.imports?.forEach(im => {
-         let depPath = im;
+         let depPath;
          if (im.indexOf('/') < 0) {
             depPath = `${process.cwd()}/node_modules/${im}`;
+         } else {
+            if (im.startsWith('.')) {
+               depPath = `${process.cwd()}/${im}`;
+            } else if (im.startsWith('/')) {
+               depPath = im;
+            } else {
+               depPath = `${process.cwd()}/node_modules/${im}`;
+            }
          }
          const depName = buildModule(depPath);
          if (isMain) {
