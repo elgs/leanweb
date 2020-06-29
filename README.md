@@ -57,7 +57,7 @@ looks like:
   "name": "demo",
   "version": "0.4.5",
   "components": ["root"],
-  "import": [],
+  "imports": [],
   "resources": ["resources/"]
 }
 ```
@@ -127,7 +127,7 @@ Now the `leanweb.json` has one more entry in the component list:
   "name": "demo",
   "version": "0.4.5",
   "components": ["root", "login"],
-  "import": [],
+  "imports": [],
   "resources": ["resources/"]
 }
 ```
