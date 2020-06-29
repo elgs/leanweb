@@ -31,20 +31,21 @@
       name: projectName,
       version: lwPackage.version,
       components: [],
+      imports: [],
       resources: [
          'resources/'
       ],
    };
 
-   const projectScss = `html,
-body {
-   height: 100%;
-   width: 100%;
-   margin: 0 auto;
-   padding: 0;
+   const projectScss = `// html,
+// body {
+   // height: 100%;
+   // width: 100%;
+   // margin: 0 auto;
+   // padding: 0;
 
    // font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-}
+// }
 `
 
    const globalScss = `// div {

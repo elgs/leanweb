@@ -29,7 +29,7 @@ export default class LWElement extends HTMLElement {
       super();
       this.ast = ast;
       const node = document.createElement('template');
-      node.innerHTML = `<link rel="stylesheet" href="./global-styles.css">` +
+      node.innerHTML = '<style>' + ast.globalCss + '</style>' +
          '<style>' + ast.css + '</style>' +
          ast.html;
       this.attachShadow({ mode: 'open' }).appendChild(node.content);

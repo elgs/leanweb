@@ -5,24 +5,17 @@
    const utils = require('./utils.js');
    const parser = require('../lib/lw-html-parser.js');
 
-   const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
-
-   // const args = process.argv;
-   // const changedFiles = args.slice(2);
-   // console.log(changedFiles);
-
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
       return str.replace(/^(\s*import.+?['"])([^\.|\/].+?)(['"].*)$/gm, (m, a, b, c) => {
          if (b.indexOf('/') > -1) {
-            if (b.startsWith('~/')) {
-               return a + path.normalize(`./${utils.getPathLevels(filePath)}` + b.substring(2)) + c;
-            }
-            return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b) + c;
+            // lodash-es/get.js
+            return a + path.normalize(`${process.cwd()}/node_modules/` + b) + c;
          } else {
             const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
             const package = require(nodeModulePath);
-            return a + path.normalize(`./${utils.getPathLevels(filePath)}node_modules/` + b + '/' + package.main) + c;
+            // lodash-es
+            return a + path.normalize(`${process.cwd()}/node_modules/` + b + '/' + package.main) + c;
          }
       });
    };
@@ -50,69 +43,99 @@
       return true;
    };
 
-   const buildJS = () => {
-      walkDirSync(`./${utils.dirs.build}/`, buildDirFilter, preprocessJsImport);
+   const buildModule = (projectPath) => {
 
-      const jsString = project.components.reduce((acc, cur) => {
-         const cmpName = utils.getComponentName(cur);
-         let importString = `import './components/${cur}/${cmpName}.js';`;
-         return acc + importString + '\n';
-      }, '');
-      fs.writeFileSync(`${utils.dirs.build}/${project.name}.js`, jsString);
-   };
+      const project = require(`${projectPath}/${utils.dirs.src}/leanweb.json`);
+      const isMain = process.cwd() === projectPath;
 
-   const buildHTML = () => {
-      project.components.forEach(cmp => {
-         const cmpName = utils.getComponentName(cmp);
-         const htmlFilename = `./${utils.dirs.src}/components/${cmp}/${cmpName}.html`;
-         const htmlFileExists = fs.existsSync(htmlFilename);
-         if (htmlFileExists) {
+      const buildDir = isMain ? utils.dirs.build : `${utils.dirs.build}/_dependencies/${project.name}`;
+      fs.mkdirSync(buildDir, { recursive: true });
 
-            const scssFilename = `./${utils.dirs.src}/components/${cmp}/${cmpName}.scss`;
-            const scssFileExists = fs.existsSync(scssFilename);
-            let cssString = '';
-            if (scssFileExists) {
-               const scssString = fs.readFileSync(scssFilename, 'utf8');
-               cssString = utils.buildCSS(scssString);
-            }
-            const styleString = cssString || '';
-            const htmlString = fs.readFileSync(htmlFilename, 'utf8');
-            const ast = parser.parse(htmlString);
-            ast.css = styleString;
-            fs.writeFileSync(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
+      let depImports = '';
+      project.imports?.forEach(im => {
+         let depPath = im;
+         if (im.indexOf('/') < 0) {
+            depPath = `${process.cwd()}/node_modules/${im}`;
          }
+         const depName = buildModule(depPath);
+         if (isMain) {
+            depImports += `import './_dependencies/${depName}/${depName}.js';\n`;
+         } else {
+            depImports += `import '../${depName}/${depName}.js';\n`;
+         }
+
       });
-      const htmlString = fs.readFileSync(`./${utils.dirs.src}/index.html`, 'utf8');
-      fs.writeFileSync(`${utils.dirs.build}/index.html`, htmlString);
+
+      const copySrc = () => {
+         fse.copySync(`${projectPath}/${utils.dirs.src}/`, buildDir);
+      };
+
+      const buildJS = () => {
+         walkDirSync(buildDir, buildDirFilter, preprocessJsImport);
+
+         const jsString = project.components.reduce((acc, cur) => {
+            const cmpName = utils.getComponentName(cur);
+            let importString = `import './components/${cur}/${cmpName}.js';`;
+            return acc + importString + '\n';
+         }, depImports + '\n');
+         fs.writeFileSync(`${buildDir}/${project.name}.js`, jsString);
+      };
+
+      const buildHTML = (globalStyleString) => {
+         project.components.forEach(cmp => {
+            const cmpName = utils.getComponentName(cmp);
+            const htmlFilename = `${projectPath}/${utils.dirs.src}/components/${cmp}/${cmpName}.html`;
+            const htmlFileExists = fs.existsSync(htmlFilename);
+            if (htmlFileExists) {
+
+               const scssFilename = `${projectPath}/${utils.dirs.src}/components/${cmp}/${cmpName}.scss`;
+               const scssFileExists = fs.existsSync(scssFilename);
+               let cssString = '';
+               if (scssFileExists) {
+                  const scssString = fs.readFileSync(scssFilename, 'utf8');
+                  cssString = utils.buildCSS(scssString);
+               }
+               const styleString = cssString || '';
+               const htmlString = fs.readFileSync(htmlFilename, 'utf8');
+               const ast = parser.parse(htmlString);
+               ast.css = styleString;
+               ast.globalCss = globalStyleString;
+               ast.name = project.name;
+               fs.writeFileSync(`${buildDir}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
+            }
+         });
+         const htmlString = fs.readFileSync(`${projectPath}/${utils.dirs.src}/index.html`, 'utf8');
+         fs.writeFileSync(`${buildDir}/index.html`, htmlString);
+      };
+
+      const buildCSS = () => {
+         const projectScssFilename = `${projectPath}/src/${project.name}.scss`;
+         let projectCssString = '';
+         if (fs.existsSync(projectScssFilename)) {
+            const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
+            projectCssString += utils.buildCSS(projectScssString);
+         }
+         fs.writeFileSync(`${buildDir}/${project.name}.css`, projectCssString);
+
+         const globalScssFilename = `${projectPath}/${utils.dirs.src}/global-styles.scss`;
+         let globalCssString = '';
+         if (fs.existsSync(globalScssFilename)) {
+            const globalScssString = fs.readFileSync(globalScssFilename, 'utf8');
+            globalCssString += utils.buildCSS(globalScssString);
+         }
+         globalCssString += '[lw-false],[lw-for]{display:none;}\n';
+         return globalCssString;
+      };
+
+      copySrc();
+      buildJS();
+      const globalStyleString = buildCSS();
+      buildHTML(globalStyleString);
+
+      // return `import '${isMain ? '.' : '..'}/_dependencies/${project.name}/${project.name}.js';\n`;
+      return project.name;
    };
 
-   const buildCSS = () => {
-      const projectScssFilename = `./src/${project.name}.scss`;
-      let projectCssString = '';
-      if (fs.existsSync(projectScssFilename)) {
-         const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
-         projectCssString += utils.buildCSS(projectScssString);
-      }
-      fs.writeFileSync(`${utils.dirs.build}/${project.name}.css`, projectCssString);
+   buildModule(process.cwd());
 
-      const globalScssFilename = `./${utils.dirs.src}/global-styles.scss`;
-      let globalCssString = '';
-      if (fs.existsSync(globalScssFilename)) {
-         const globalScssString = fs.readFileSync(globalScssFilename, 'utf8');
-         globalCssString += utils.buildCSS(globalScssString);
-      }
-      globalCssString += '[lw-false],[lw-for]{display:none;}\n';
-      fs.writeFileSync(`${utils.dirs.build}/global-styles.css`, globalCssString);
-   };
-
-   const copySrc = () => {
-      fse.copySync(`./${utils.dirs.src}/`, `./${utils.dirs.build}/`)
-   };
-
-   fs.mkdirSync(utils.dirs.build, { recursive: true });
-
-   copySrc();
-   buildJS();
-   buildCSS();
-   buildHTML();
 })();

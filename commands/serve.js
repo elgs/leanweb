@@ -16,7 +16,6 @@ const WebpackDevServer = require('webpack-dev-server');
 
       fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
       fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
-      fse.copySync(`./${utils.dirs.build}/global-styles.css`, `./${utils.dirs.serve}/global-styles.css`);
       fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
       project.resources.forEach(resource => {
          fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
@@ -55,7 +54,6 @@ const WebpackDevServer = require('webpack-dev-server');
 
    fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
    fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
-   fse.copySync(`./${utils.dirs.build}/global-styles.css`, `./${utils.dirs.serve}/global-styles.css`);
    fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
    project.resources && project.resources.forEach(resource => {
       fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);

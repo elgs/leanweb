@@ -29,10 +29,10 @@ module.exports.getComponentName = cmp => {
 };
 
 module.exports.getPathLevels = filePath => {
-   filePath = path.resolve('/' + filePath);
+   filePath = path.normalize(filePath);
    const numSlashes = filePath.replace(/[^\/]/g, '').length;
    let ret = '';
-   for (let i = 0; i < numSlashes - 1; ++i) {
+   for (let i = 0; i < numSlashes; ++i) {
       ret += '../';
    }
    return ret;
