@@ -16,18 +16,27 @@ const nextAllSiblings = (el, selector) => {
    return siblings;
 };
 
-window.addEventListener('hashchange', () => {
-   LWElement._componentsUrlHashChanges?.forEach(component => {
-      setTimeout(() => {
-         component?.urlHashChanged?.call(component);
-      });
-   });
-}, false);
-
 export default class LWElement extends HTMLElement {
    constructor(ast) {
       super();
       this.ast = ast;
+
+      globalThis['leanweb'] = globalThis['leanweb'] ?? {
+         version: ast.version,
+      };
+
+      this.glw = globalThis['leanweb'];
+      if (!this.glw.componentsListeningOnUrlChanges) {
+         this.glw.componentsListeningOnUrlChanges = [];
+         globalThis.addEventListener('hashchange', () => {
+            this.glw.componentsListeningOnUrlChanges.forEach(component => {
+               setTimeout(() => {
+                  component?.urlHashChanged?.call(component);
+               });
+            });
+         }, false);
+      }
+
       const node = document.createElement('template');
       node.innerHTML = '<style>' + ast.globalCss + '</style>' +
          '<style>' + ast.css + '</style>' +
@@ -40,7 +49,7 @@ export default class LWElement extends HTMLElement {
       });
 
       if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
-         LWElement._componentsUrlHashChanges.push(this);
+         this.glw.componentsListeningOnUrlChanges.push(this);
       }
    }
 
@@ -52,9 +61,11 @@ export default class LWElement extends HTMLElement {
       return location.hash;
    }
 
-   static eventBus = new LWEventBus();
-
-   static _componentsUrlHashChanges = [];
+   static get eventBus() {
+      const glw = globalThis['leanweb']
+      glw['event-bus'] = glw['event-bus'] ?? new LWEventBus();
+      return glw['event-bus'];
+   };
 
    _getNodeContext(node) {
       const contextNode = node.closest('[lw-context]');
