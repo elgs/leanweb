@@ -43,6 +43,8 @@
       return true;
    };
 
+   const leanwebPackageJSON = require(`${__dirname}/../package.json`);
+
    const buildModule = (projectPath) => {
 
       const project = require(`${projectPath}/${utils.dirs.src}/leanweb.json`);
@@ -109,7 +111,8 @@
                ast.css = styleString;
                ast.globalCss = globalStyleString;
                ast.name = project.name;
-               ast.version = project.version;
+               ast.projectVersion = project.version;
+               ast.leanwebVersion = leanwebPackageJSON.version;
                fs.writeFileSync(`${buildDir}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
             }
          });

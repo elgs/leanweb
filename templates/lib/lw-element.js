@@ -22,7 +22,8 @@ export default class LWElement extends HTMLElement {
       this.ast = ast;
 
       globalThis['leanweb'] = globalThis['leanweb'] ?? {
-         version: ast.version,
+         projectVersion: ast.projectVersion,
+         leanwebVersion: ast.leanwebVersion,
       };
 
       this.glw = globalThis['leanweb'];
