@@ -80,13 +80,13 @@ this directory:
 
 `root.js` defines your new web component `demo-root`, which is a web component
 based on standard DOM api.
-`root.js`
 
+`root.js`
 ```javascript
-import LWElement from "~/src/lib/lw-element.js";
+import LWElement from './../../lib/lw-element.js';
 import ast from "./ast.js";
 
-customElements.define('f-root',
+customElements.define('demo-root',
   class extends LWElement { // LWElement extends HTMLElement
     constructor() {
       super(ast);
@@ -498,8 +498,6 @@ import agate from 'highlight.js/scss/agate.scss';
 
 ```
 
-assuming `some-js-file.js` exists in the project `src/` directory.
-
 ## Component Communication
 
 The following project demonstrates how Leanweb helps web components to talk to
@@ -510,10 +508,10 @@ each other.
 `pub.js`
 
 ```javascript
-// import LWElement from './../../../lib/lw-element.js';
+// import LWElement from './../../lib/lw-element.js';
 // import ast from './ast.js';
 
-// customElements.define(component.id,
+// customElements.define('demo-pub',
 //   class extends LWElement {  // LWElement extends HTMLElement
 //     constructor() {
 //       super(ast);
@@ -541,10 +539,10 @@ each other.
 `sub.js`
 
 ```javascript
-// import LWElement from './../../../lib/lw-element.js';
+// import LWElement from './../../lib/lw-element.js';
 // import ast from './ast.js';
 
-// customElements.define(component.id,
+// customElements.define('demo-sub',
 //   class extends LWElement {  // LWElement extends HTMLElement
 //     constructor() {
 //       super(ast);
@@ -590,7 +588,7 @@ Source code of this demo https://github.com/elgs/leanweb-pub-sub-demo.
 ### LWElement
 
 `LWElement` extends `HTMLElement`, and Leanweb components extend `LWElement`.
-So Leanweb components are just more specific versions of the stand
+So Leanweb components are just more specific versions of the standard
 `HTMLElement`. `LWElement` helps to wire up the `lw` directives in the HTML and
 provides some convenient methods to update the DOM.
 
@@ -623,15 +621,15 @@ great place to send events to the event bus.
 
 #### inputReady()
 
-`inputReady()` will be called after all input data from parent's `lw-input:` is
-ready. In this method, children are able to access the passed in data shared
-by parents.
+`inputReady()` will be called after all input data from parent's `lw-input:` 
+are ready. In this method, children are able to access the passed in data 
+shared by parents.
 
 #### urlHashChanged()
 If `urlHashChanged()` is defined as a function, it will be called whenever the
-urlHash changes. This could be useful to update the DOM on component routing.
+urlHash changes. This could be useful to update the DOM in component routing.
 
-#### applyStyles(styles)
+#### applyStyles(...styles)
 `applyStyles` will apply the styles that is imported from a css or scss into
 the web component DOM.
 
@@ -641,18 +639,19 @@ routing.
 
 ### LWEventBus
 
-`LWElement` comes with an instance of `LWEventBus` that helps web components to
-talk to each other by sending and receiving events and data. You could use your
-own way for component communication. `LWEventBus` is however a choice for you.
+`LWElement` comes with a global instance of `LWEventBus` that helps web 
+components to talk to each other by sending and receiving events and data. You 
+could use your own way for component communication. `LWEventBus` is just a 
+choice for you.
 
 #### addEventListener(eventName, callback)
 
-You can use `LWElement.eventBus` to get the instance of event bus, and use
-`LWElement.eventBus.addEventListener(eventName, callback)` to subscribe to a
-type of event from the event bus. `addEventListener` takes two parameters. The
-first `eventName` is the name of the event, and the second `callback` is a
+You can use `LWElement.eventBus` to get the global instance of event bus, and 
+use `LWElement.eventBus.addEventListener(eventName, callback)` to subscribe to 
+a type of event from the event bus. `addEventListener` takes two parameters. 
+The first `eventName` is the name of the event, and the second `callback` is a
 function that will get called when a event is sent to the event bus. The
-`callback` function takes a parameter `event`, which contains `eventName`
+callback function that takes a parameter `event`, which contains `eventName`
 and `data` fields. `addEventListener` returns the eventListener instance
 being added, which could be passed in `removeEventListener` as parameter.
 
@@ -664,7 +663,7 @@ being notified when a next event is fired.
 #### dispatchEvent(eventName, data = null)
 
 `dispatchEvent` is used to send an event to the event bus. It takes two
-parameter. `eventName` is the name of the event, and `data` is the payload data
+parameters. `eventName` is the name of the event, and `data` is the payload data
 of the event.
 
 ## More examples and tutorials
