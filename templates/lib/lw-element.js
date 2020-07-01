@@ -134,7 +134,7 @@ export default class LWElement extends HTMLElement {
    }
 
    async _bindMethods() {
-      const methodNames = [];
+      const methodNames = ['update', 'applyStyles'];
       const proto = Object.getPrototypeOf(this);
       methodNames.push(...Object.getOwnPropertyNames(proto).filter(name => hasMethod(proto, name)));
       methodNames.push(...Object.getOwnPropertyNames(this).filter(name => hasMethod(this, name)));
