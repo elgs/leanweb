@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.6.1",
+   "version": "0.6.2",
    "description": "A set of tools (as opposed to a framework) to generate web components based web project.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -10,6 +10,7 @@
       "type": "git",
       "url": "git+https://github.com/elgs/leanweb.git"
    },
+   "homepage": "https://leanweb.app",
    "keywords": [
       "leanweb",
       "lw",
@@ -24,13 +25,13 @@
       "fs-extra": "^9.0.1",
       "globby": "^11.0.1",
       "html-minifier": "^4.0.0",
-      "isomorphic-git": "^1.6.0",
+      "isomorphic-git": "^1.7.0",
       "json5-loader": "^4.0.0",
       "node-sass": "^4.14.1",
       "node-watch": "^0.6.4",
       "parse5": "^6.0.0",
       "raw-loader": "^4.0.1",
-      "sass-loader": "^8.0.2",
+      "sass-loader": "^9.0.1",
       "semver": "^7.3.2",
       "webpack": "^4.43.0",
       "webpack-dev-server": "^3.11.0"
