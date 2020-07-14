@@ -111,8 +111,8 @@
                ast.css = styleString;
                ast.globalCss = globalStyleString;
                ast.name = project.name;
-               ast.projectVersion = project.version;
-               ast.leanwebVersion = leanwebPackageJSON.version;
+               ast.runtimeVersion = project.version;
+               ast.builderVersion = leanwebPackageJSON.version;
                fs.writeFileSync(`${buildDir}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
             }
          });
