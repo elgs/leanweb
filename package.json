@@ -19,7 +19,7 @@
    "author": "Qian Chen",
    "license": "MIT",
    "dependencies": {
-      "@babel/parser": "^7.10.4",
+      "@babel/parser": "^7.10.5",
       "clean-css": "^4.2.3",
       "css-loader": "^3.6.0",
       "fs-extra": "^9.0.1",
