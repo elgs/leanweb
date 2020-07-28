@@ -26,17 +26,15 @@ export default class LWElement extends HTMLElement {
          builderVersion: ast.builderVersion,
       };
 
-      this.glw = globalThis['leanweb'];
-      if (!this.glw.componentsListeningOnUrlChanges) {
-         this.glw.componentsListeningOnUrlChanges = [];
-         globalThis.addEventListener('hashchange', () => {
-            this.glw.componentsListeningOnUrlChanges.forEach(component => {
-               setTimeout(() => {
-                  component?.urlHashChanged?.call(component);
-               });
+      const glw = globalThis['leanweb'];
+      glw.componentsListeningOnUrlChanges = glw.componentsListeningOnUrlChanges || [];
+      globalThis.addEventListener('hashchange', () => {
+         glw.componentsListeningOnUrlChanges.forEach(component => {
+            setTimeout(() => {
+               component?.urlHashChanged?.call(component);
             });
-         }, false);
-      }
+         });
+      }, false);
 
       const node = document.createElement('template');
       node.innerHTML = '<style>' + ast.globalCss + '</style>' +
@@ -50,8 +48,12 @@ export default class LWElement extends HTMLElement {
       });
 
       if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
-         this.glw.componentsListeningOnUrlChanges.push(this);
+         glw.componentsListeningOnUrlChanges.push(this);
       }
+
+      LWElement.eventBus.addEventListener('update', _ => {
+         this.update();
+      });
    }
 
    set urlHash(hash) {
