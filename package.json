@@ -21,7 +21,7 @@
    "dependencies": {
       "@babel/parser": "^7.10.5",
       "clean-css": "^4.2.3",
-      "css-loader": "^4.0.0",
+      "css-loader": "^4.1.0",
       "fs-extra": "^9.0.1",
       "globby": "^11.0.1",
       "html-minifier": "^4.0.0",
@@ -33,7 +33,7 @@
       "raw-loader": "^4.0.1",
       "sass-loader": "^9.0.2",
       "semver": "^7.3.2",
-      "webpack": "^4.44.0",
+      "webpack": "^4.44.1",
       "webpack-dev-server": "^3.11.0"
    }
 }
