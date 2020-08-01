@@ -82,12 +82,15 @@ this directory:
 based on standard DOM api.
 
 `root.js`
+
 ```javascript
-import LWElement from './../../lib/lw-element.js';
+import LWElement from "./../../lib/lw-element.js";
 import ast from "./ast.js";
 
-customElements.define('demo-root',
-  class extends LWElement { // LWElement extends HTMLElement
+customElements.define(
+  "demo-root",
+  class extends LWElement {
+    // LWElement extends HTMLElement
     constructor() {
       super(ast);
     }
@@ -479,23 +482,24 @@ import * as _ from "lodash-es"; // find from node_modules
 ```
 
 Importing a JSON file:
+
 ```javascript
 import someJSON from "./some.json";
 ```
 
 Importing CSS/SCSS:
+
 ```javascript
-import agate from 'highlight.js/scss/agate.scss';
+import agate from "highlight.js/scss/agate.scss";
 
 // customElements.define('demo-root',
 //  class extends LWElement {  // LWElement extends HTMLElement
 //    constructor() {
 //      super(ast);
-        super.applyStyles(agate);
+super.applyStyles(agate);
 //    }
 //  }
 //);
-
 ```
 
 ## Component Communication
@@ -516,11 +520,11 @@ each other.
 //     constructor() {
 //       super(ast);
 
-         setInterval(() => {
-           this.time = new Date(Date.now()).toLocaleString();
-           LWElement.eventBus.dispatchEvent("time", this.time);
-           this.update();
-         }, 1000);
+setInterval(() => {
+  this.time = new Date(Date.now()).toLocaleString();
+  LWElement.eventBus.dispatchEvent("time", this.time);
+  this.update();
+}, 1000);
 
 //     }
 //   }
@@ -621,34 +625,45 @@ great place to send events to the event bus.
 
 #### inputReady()
 
-`inputReady()` will be called after all input data from parent's `lw-input:` 
-are ready. In this method, children are able to access the passed in data 
+`inputReady()` will be called after all input data from parent's `lw-input:`
+are ready. In this method, children are able to access the passed in data
 shared by parents.
 
 #### urlHashChanged()
+
 If `urlHashChanged()` is defined as a function, it will be called whenever the
 urlHash changes. This could be useful to update the DOM in component routing.
 
 #### applyStyles(...styles)
+
 `applyStyles` will apply the styles that is imported from a css or scss into
 the web component DOM.
 
 #### urlHash
-`urlHash` is a reference to `window.location.hash` which can be used for 
+
+`urlHash` is a reference to `window.location.hash` which can be used for
 routing.
+
+#### static updateComponents(...tagNames)
+
+`updateComponents` is used to update all component DOMs or DOMs of specific
+component tag names. `updateComponents` is a static method and you will call it
+like `LWElement.updateComponents()`. `updateComponents` takes any number of
+component tag names as arguments. If no argument is provided, it will update
+all component DOMs app wide.
 
 ### LWEventBus
 
-`LWElement` comes with a global instance of `LWEventBus` that helps web 
-components to talk to each other by sending and receiving events and data. You 
-could use your own way for component communication. `LWEventBus` is just a 
+`LWElement` comes with a global instance of `LWEventBus` that helps web
+components to talk to each other by sending and receiving events and data. You
+could use your own way for component communication. `LWEventBus` is just a
 choice for you.
 
 #### addEventListener(eventName, callback)
 
-You can use `LWElement.eventBus` to get the global instance of event bus, and 
-use `LWElement.eventBus.addEventListener(eventName, callback)` to subscribe to 
-a type of event from the event bus. `addEventListener` takes two parameters. 
+You can use `LWElement.eventBus` to get the global instance of event bus, and
+use `LWElement.eventBus.addEventListener(eventName, callback)` to subscribe to
+a type of event from the event bus. `addEventListener` takes two parameters.
 The first `eventName` is the name of the event, and the second `callback` is a
 function that will get called when a event is sent to the event bus. The
 callback function that takes a parameter `event`, which contains `eventName`
