@@ -54,6 +54,10 @@ export default class LWElement extends HTMLElement {
       LWElement.eventBus.addEventListener('update', _ => {
          this.update();
       });
+
+      LWElement.eventBus.addEventListener(ast.componentFullName, _ => {
+         this.update();
+      });
    }
 
    set urlHash(hash) {
@@ -76,6 +80,16 @@ export default class LWElement extends HTMLElement {
          return contextNode['lw-context'];
       } else {
          return this;
+      }
+   }
+
+   static updateComponents(...tagNames) {
+      if (tagNames?.length) {
+         tagNames.forEach(tagName => {
+            LWElement.eventBus.dispatchEvent(tagName);
+         });
+      } else {
+         LWElement.eventBus.dispatchEvent('update');
       }
    }
 

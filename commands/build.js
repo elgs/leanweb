@@ -110,7 +110,8 @@
                const ast = parser.parse(htmlString);
                ast.css = styleString;
                ast.globalCss = globalStyleString;
-               ast.name = project.name;
+               // ast.name = project.name;
+               ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
                ast.runtimeVersion = project.version;
                ast.builderVersion = leanwebPackageJSON.version;
                fs.writeFileSync(`${buildDir}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
