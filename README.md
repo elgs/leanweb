@@ -522,7 +522,7 @@ each other.
 
 setInterval(() => {
   this.time = new Date(Date.now()).toLocaleString();
-  LWElement.eventBus.dispatchEvent("time", this.time);
+  leanweb.eventBus.dispatchEvent("time", this.time);
   this.update();
 }, 1000);
 
@@ -553,7 +553,7 @@ setInterval(() => {
 //     }
 
        sub() {
-         this.listener = LWElement.eventBus.addEventListener('time', event => {
+         this.listener = leanweb.eventBus.addEventListener('time', event => {
            this.time = event.data;
            this.update();
          });
@@ -561,7 +561,7 @@ setInterval(() => {
        }
 
        unsub() {
-         LWElement.eventBus.removeEventListener(this.listener);
+         leanweb.eventBus.removeEventListener(this.listener);
          this.subscribed = false;
        }
 //   }
@@ -588,6 +588,21 @@ setInterval(() => {
 Source code of this demo https://github.com/elgs/leanweb-pub-sub-demo.
 
 ## API
+
+### globalThis.leanweb
+
+`leanweb` is the only foot print on `globalThis` scope.
+
+#### updateComponents(...tagNames)
+
+`updateComponents` is used to update all component DOMs or DOMs of specific
+component tag names. `updateComponents` takes any number of component tag
+names as arguments. If no argument is provided, it will update all component
+DOMs app wide.
+
+#### eventBus
+
+An instance of `LWEventBus` managed by `leanweb` to pass DOM update events.
 
 ### LWElement
 
@@ -644,13 +659,16 @@ the web component DOM.
 `urlHash` is a reference to `window.location.hash` which can be used for
 routing.
 
-#### static updateComponents(...tagNames)
+#### urlHashPath
 
-`updateComponents` is used to update all component DOMs or DOMs of specific
-component tag names. `updateComponents` is a static method and you will call it
-like `LWElement.updateComponents()`. `updateComponents` takes any number of
-component tag names as arguments. If no argument is provided, it will update
-all component DOMs app wide.
+`urlHashPath` is used to set or get the `path` part in the urlHash. If the
+`urlHash` is `#/login?a=b&a=b&c=d`, `urlHashPath` will be `#/login`.
+
+#### urlHashParams
+
+`urlHashParams` is used to set or get the `parameters` in the urlHash. If the
+`urlHash` is `#/login?a=b&a=b&c=d`, `urlHashParams` will be
+`{a: ['b', 'b'], c: 'd'}`.
 
 ### LWEventBus
 
@@ -661,8 +679,8 @@ choice for you.
 
 #### addEventListener(eventName, callback)
 
-You can use `LWElement.eventBus` to get the global instance of event bus, and
-use `LWElement.eventBus.addEventListener(eventName, callback)` to subscribe to
+You can use `leanweb.eventBus` to get the global instance of event bus, and
+use `leanweb.eventBus.addEventListener(eventName, callback)` to subscribe to
 a type of event from the event bus. `addEventListener` takes two parameters.
 The first `eventName` is the name of the event, and the second `callback` is a
 function that will get called when a event is sent to the event bus. The
