@@ -62,7 +62,7 @@ const callFunction = (node, context) => {
          args.push(evalNode(argument, context));
       }
    });
-   return callee(...args);
+   return callee.apply(node, args);
 };
 
 const nodeHandlers = {
