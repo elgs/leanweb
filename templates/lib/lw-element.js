@@ -43,10 +43,8 @@ export default class LWElement extends HTMLElement {
       super();
       this.ast = ast;
 
-      globalThis['leanweb'] = globalThis['leanweb'] ?? {
-         runtimeVersion: ast.runtimeVersion,
-         builderVersion: ast.builderVersion,
-      };
+      leanweb.runtimeVersion = ast.runtimeVersion;
+      leanweb.builderVersion = ast.builderVersion;
 
       const node = document.createElement('template');
       node.innerHTML = '<style>' + ast.globalCss + '</style>' +
