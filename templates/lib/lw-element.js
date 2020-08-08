@@ -130,11 +130,7 @@ export default class LWElement extends HTMLElement {
 
    _getNodeContext(node) {
       const contextNode = node.closest('[lw-context]');
-      if (contextNode) {
-         return contextNode['lw-context'];
-      } else {
-         return this;
-      }
+      return contextNode?.['lw-context'] ?? [this, globalThis];
    }
 
    update(rootNode = this.shadowRoot) {
@@ -234,15 +230,7 @@ export default class LWElement extends HTMLElement {
             const context = this._getNodeContext(eventNode);
             eventNode.addEventListener(interpolation.lwValue, (event => {
                const eventContext = { '$event': event };
-
-               let localContext;
-               if (Array.isArray(context)) {
-                  localContext = [eventContext, ...context];
-               } else {
-                  localContext = [eventContext, context];
-               }
-               // const localContext = [eventContext, context].flat(Infinity);
-               const parsed = parser.evaluate(interpolation.ast, localContext, interpolation.loc);
+               const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
                this.update();
                return parsed;
             }).bind(this));
@@ -447,14 +435,7 @@ export default class LWElement extends HTMLElement {
             itemContext[interpolation.indexExpr] = index;
          }
 
-         let localContext;
-         if (Array.isArray(context)) {
-            localContext = [itemContext, ...context];
-         } else {
-            localContext = [itemContext, context];
-         }
-         // const localContext = [itemContext, context].flat(Infinity); // slow based on performance test
-         node['lw-context'] = localContext;
+         node['lw-context'] = [itemContext, ...context];
          this.update(node);
       });
    }
