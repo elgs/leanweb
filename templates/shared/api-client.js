@@ -7,8 +7,14 @@ class APIClient {
 
    async _fetch(method, url = '', data = {}, headers = {}) {
       if (!url.toLowerCase().startsWith('https://') && !url.toLowerCase().startsWith('http://')) {
-         url = this.baesUrl + '/' + url;
+         if (url.startsWith('/')) {
+            url = this.baesUrl + url;
+         } else {
+            url = this.baesUrl + '/' + url;
+         }
       }
+
+      // this is just a sample, please feel free to change to your authorizaton scheme
       if (this.sendToken) {
          const token = localStorage.getItem('access_token');
          if (token) {
@@ -31,7 +37,12 @@ class APIClient {
    options(url, data, headers) { return this._fetch('OPTIONS', url, data, headers); }
 }
 
-const apiUrl = 'http://localhost';
+// uncomment and edit to use
+// const apiUrl = 'http://localhost:1234';
+// const anotherApiUrl = 'http://127.0.0.1:4321';
 
-export const api = new APIClient(apiUrl, true);
-export const http = new APIClient(apiUrl);
+// export const api = new APIClient(apiUrl, true);
+// export const http = new APIClient(apiUrl);
+
+// export const anotherApi = new APIClient(anotherApiUrl, true);
+// export const anotherHttp = new APIClient(anotherApiUrl);
