@@ -27,6 +27,13 @@ const WebpackDevServer = require('webpack-dev-server');
       throttledBuild(eventType, filename);
    });
 
+   fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
+   fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
+   fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
+   project.resources && project.resources.forEach(resource => {
+      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
+   });
+
    const webpackConfig = utils.getWebPackConfig(utils.dirs.serve, project);
 
    const webpackDevConfig = {
@@ -52,12 +59,9 @@ const WebpackDevServer = require('webpack-dev-server');
    };
    const server = new WebpackDevServer(compiler, devServerOptions);
 
-   fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
-   fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
-   fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
-   project.resources && project.resources.forEach(resource => {
-      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
-   });
-
-   server.listen(2020, '127.0.0.1');
+   let port = 2020;
+   while (await utils.portInUse(port)) {
+      ++port;
+   }
+   server.listen(port, '127.0.0.1');
 })();

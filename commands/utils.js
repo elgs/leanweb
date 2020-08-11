@@ -1,6 +1,7 @@
 const { execSync } = require('child_process');
 const sass = require('node-sass');
 const path = require('path');
+const net = require('net');
 
 const dirs = {
    src: 'src',
@@ -100,7 +101,20 @@ module.exports.getWebPackConfig = (outputDir, project) => {
    }
 };
 
+module.exports.portInUse = port => {
+   return new Promise((resolve, reject) => {
+      const server = net.createServer(socket => socket.pipe(socket));
 
+      server.listen(port, '127.0.0.1');
+      server.on('error', e => {
+         resolve(true);
+      });
+      server.on('listening', e => {
+         server.close();
+         resolve(false);
+      });
+   });
+};
 
 module.exports.dirs = dirs;
 
