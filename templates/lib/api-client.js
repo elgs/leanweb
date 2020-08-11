@@ -1,3 +1,7 @@
+// Please don't modify this file. Create one outside of the lib directory with
+// your project speicific configurations. Files in the lib directory is subject
+// to overwrite on Leanweb upgrade.
+
 class APIClient {
    constructor(baesUrl, sendToken = false, defaultHeaders = {}) {
       this.baesUrl = baesUrl;
@@ -14,7 +18,6 @@ class APIClient {
          }
       }
 
-      // this is just a sample, please feel free to change to your authorizaton scheme
       if (this.sendToken) {
          const token = localStorage.getItem('access_token');
          if (token) {
@@ -37,7 +40,6 @@ class APIClient {
    options(url, data, headers) { return this._fetch('OPTIONS', url, data, headers); }
 }
 
-// uncomment and edit to use
 // const apiUrl = 'http://localhost:1234';
 // const anotherApiUrl = 'http://127.0.0.1:4321';
 

@@ -65,7 +65,6 @@
    utils.exec(`npx lw generate root`);
 
    fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);
-   fse.copySync(`${__dirname}/../templates/shared`, `./${utils.dirs.src}/shared/`);
 
    let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
    htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
