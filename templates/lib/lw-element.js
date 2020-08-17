@@ -13,6 +13,64 @@ globalThis.leanweb = globalThis.leanweb ?? {
          leanweb.eventBus.dispatchEvent('update');
       }
    },
+
+   set urlHash(hash) {
+      location.hash = hash;
+   },
+
+   get urlHash() {
+      return location.hash;
+   },
+
+   set urlHashPath(hashPath) {
+      const s = this.urlHash.split('?');
+      if (s.length === 1) {
+         this.urlHash = hashPath;
+      } else if (s.length > 1) {
+         this.urlHash = hashPath + '?' + s[1];
+      }
+   },
+
+   get urlHashPath() {
+      return this.urlHash.split('?')[0];
+   },
+
+   set urlHashParams(hashParams) {
+      if (!hashParams) {
+         return;
+      }
+
+      const paramArray = [];
+      Object.keys(hashParams).forEach(key => {
+         const value = hashParams[key];
+         if (Array.isArray(value)) {
+            value.forEach(v => {
+               paramArray.push(key + '=' + encodeURIComponent(v));
+            });
+         } else {
+            paramArray.push(key + '=' + encodeURIComponent(value));
+         }
+      });
+      this.urlHash = this.urlHashPath + '?' + paramArray.join('&');
+   },
+
+   get urlHashParams() {
+      const ret = {};
+      const s = this.urlHash.split('?');
+      if (s.length > 1) {
+         const p = new URLSearchParams(s[1]);
+         p.forEach((v, k) => {
+            if (ret[k] === undefined) {
+               ret[k] = v;
+            } else if (Array.isArray(ret[k])) {
+               ret[k].push(v);
+            } else {
+               ret[k] = [ret[k], v];
+            }
+         });
+      }
+      return ret;
+   }
 };
 
 globalThis.addEventListener('hashchange', () => {
@@ -68,64 +126,6 @@ export default class LWElement extends HTMLElement {
       leanweb.eventBus.addEventListener(ast.componentFullName, _ => {
          this.update();
       });
-   }
-
-   set urlHash(hash) {
-      location.hash = hash;
-   }
-
-   get urlHash() {
-      return location.hash;
-   }
-
-   set urlHashPath(hashPath) {
-      const s = this.urlHash.split('?');
-      if (s.length === 1) {
-         this.urlHash = hashPath;
-      } else if (s.length > 1) {
-         this.urlHash = hashPath + '?' + s[1];
-      }
-   }
-
-   get urlHashPath() {
-      return this.urlHash.split('?')[0];
-   }
-
-   set urlHashParams(hashParams) {
-      if (!hashParams) {
-         return;
-      }
-
-      const paramArray = [];
-      Object.keys(hashParams).forEach(key => {
-         const value = hashParams[key];
-         if (Array.isArray(value)) {
-            value.forEach(v => {
-               paramArray.push(key + '=' + encodeURIComponent(v));
-            });
-         } else {
-            paramArray.push(key + '=' + encodeURIComponent(value));
-         }
-      });
-      this.urlHash = this.urlHashPath + '?' + paramArray.join('&');
-   }
-
-   get urlHashParams() {
-      const ret = {};
-      const s = this.urlHash.split('?');
-      if (s.length > 1) {
-         const p = new URLSearchParams(s[1]);
-         p.forEach((v, k) => {
-            if (ret[k] === undefined) {
-               ret[k] = v;
-            } else if (Array.isArray(ret[k])) {
-               ret[k].push(v);
-            } else {
-               ret[k] = [ret[k], v];
-            }
-         });
-      }
-      return ret;
    }
 
    _getNodeContext(node) {

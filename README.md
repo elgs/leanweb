@@ -604,6 +604,22 @@ DOMs app wide.
 
 An instance of `LWEventBus` managed by `leanweb` to pass DOM update events.
 
+#### urlHash
+
+`urlHash` is a reference to `window.location.hash` which can be used for
+routing.
+
+#### urlHashPath
+
+`urlHashPath` is used to set or get the `path` part in the urlHash. If the
+`urlHash` is `#/login?a=b&a=b&c=d`, `urlHashPath` will be `#/login`.
+
+#### urlHashParams
+
+`urlHashParams` is used to set or get the `parameters` in the urlHash. If the
+`urlHash` is `#/login?a=b&a=b&c=d`, `urlHashParams` will be
+`{a: ['b', 'b'], c: 'd'}`.
+
 ### LWElement
 
 `LWElement` extends `HTMLElement`, and Leanweb components extend `LWElement`.
@@ -653,22 +669,6 @@ urlHash changes. This could be useful to update the DOM in component routing.
 
 `applyStyles` will apply the styles that is imported from a css or scss into
 the web component DOM.
-
-#### urlHash
-
-`urlHash` is a reference to `window.location.hash` which can be used for
-routing.
-
-#### urlHashPath
-
-`urlHashPath` is used to set or get the `path` part in the urlHash. If the
-`urlHash` is `#/login?a=b&a=b&c=d`, `urlHashPath` will be `#/login`.
-
-#### urlHashParams
-
-`urlHashParams` is used to set or get the `parameters` in the urlHash. If the
-`urlHash` is `#/login?a=b&a=b&c=d`, `urlHashParams` will be
-`{a: ['b', 'b'], c: 'd'}`.
 
 ### LWEventBus
 
