@@ -15,7 +15,7 @@ module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'i
 
 module.exports.buildCSS = scssString => {
    if (scssString.trim()) {
-      const cssResult = sass.renderSync({ data: scssString, includePaths: [process.cwd() + '/node_modules/'] });
+      const cssResult = sass.renderSync({ data: scssString, includePaths: [process.cwd()] });
       return cssResult.css.toString().trim();
    }
    return '';
