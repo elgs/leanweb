@@ -8,7 +8,10 @@
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
       return str.replace(/^(\s*import.+?['"])([^\.|\/].+?)(['"].*)$/gm, (m, a, b, c) => {
-         if (b.indexOf('/') > -1) {
+         if (b.startsWith(`~`)) {
+            // ~/package.json
+            return a + path.normalize(`${process.cwd()}/` + b.substring(1)) + c;
+         } else if (b.indexOf('/') > -1) {
             // lodash-es/get.js
             return a + path.normalize(`${process.cwd()}/node_modules/` + b) + c;
          } else {
