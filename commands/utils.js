@@ -15,7 +15,7 @@ module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'i
 
 module.exports.buildCSS = scssString => {
    if (scssString.trim()) {
-      const cssResult = sass.renderSync({ data: scssString });
+      const cssResult = sass.renderSync({ data: scssString, includePaths: [process.cwd() + '/node_modules/'] });
       return cssResult.css.toString().trim();
    }
    return '';
@@ -73,7 +73,7 @@ module.exports.getWebPackConfig = (outputDir, project) => {
                }]
             },
          }, {
-            test: /\.scss$/i,
+            test: /\.(scss|sass)$/i,
             use: [
                {
                   loader: require.resolve('css-loader'),
@@ -94,7 +94,7 @@ module.exports.getWebPackConfig = (outputDir, project) => {
             exclude: [
                /\.(js|mjs|jsx|ts|tsx)$/i,
                /\.(json|json5)$/i,
-               /\.(css|scss)$/i
+               /\.(css|scss|sass)$/i
             ],
          }]
       },
