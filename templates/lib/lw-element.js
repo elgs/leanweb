@@ -234,8 +234,10 @@ export default class LWElement extends HTMLElement {
             eventNode.addEventListener(interpolation.lwValue, (event => {
                const eventContext = { '$event': event };
                const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
-               this.update();
-               return parsed;
+               if (typeof parsed?.[0]?.then !== 'function') {
+                  this.update();
+               }
+               return parsed[0];
             }).bind(this));
          }
       }
@@ -402,11 +404,7 @@ export default class LWElement extends HTMLElement {
                   bindNode.setAttribute(interpolation.lwValue, parsed[0]);
                }
             } else {
-               if (interpolation.lwValue === 'class') {
-                  bindNode.classList.remove(parsed[0]);
-               } else {
-                  bindNode.removeAttribute(interpolation.lwValue);
-               }
+               bindNode.removeAttribute(interpolation.lwValue);
             }
          }
       }
