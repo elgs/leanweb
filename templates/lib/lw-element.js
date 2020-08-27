@@ -112,7 +112,9 @@ export default class LWElement extends HTMLElement {
 
       this._bindMethods().then(() => {
          this.update(this.shadowRoot);
-         this.domReady?.call(this);
+         setTimeout(() => {
+            this.domReady?.call(this);
+         });
       });
 
       if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
@@ -211,7 +213,7 @@ export default class LWElement extends HTMLElement {
          }
       }
       inputNode?.inputReady?.call(this);
-      inputNode?.update?.();
+      inputNode?.update?.call(this);
    }
 
    // properties:
@@ -350,10 +352,13 @@ export default class LWElement extends HTMLElement {
       const interpolation = this.ast[key];
       const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
-      if (!parsed[0]) {
-         ifNode.setAttribute('lw-false', '');
+      const hasLwFalse = ifNode.hasAttribute('lw-false');
+      if (parsed[0]) {
+         hasLwFalse && ifNode.removeAttribute('lw-false');
+         ifNode.turnedOn?.call(ifNode);
       } else {
-         ifNode.removeAttribute('lw-false');
+         !hasLwFalse && ifNode.setAttribute('lw-false', '');
+         ifNode.turnedOff?.call(ifNode);
       }
    }
 
