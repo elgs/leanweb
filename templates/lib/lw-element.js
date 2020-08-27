@@ -220,6 +220,7 @@ export default class LWElement extends HTMLElement {
    // properties:
    // lw-on:click: true
    _bindEvents(eventNode) {
+      const me = this;
       for (const attr of eventNode.attributes) {
          const attrName = attr.name;
          const attrValue = attr.value;
@@ -234,10 +235,12 @@ export default class LWElement extends HTMLElement {
             eventNode.addEventListener(interpolation.lwValue, (event => {
                const eventContext = { '$event': event };
                const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
-               if (typeof parsed?.[0]?.then !== 'function') {
-                  this.update();
+
+               const promises = parsed.filter(p => typeof p?.then === 'function');
+               if (parsed.length > promises.length) {
+                  me.update();
                }
-               return parsed[0];
+               Promise.allSettled(promises).then(_ => me.update());
             }).bind(this));
          }
       }
