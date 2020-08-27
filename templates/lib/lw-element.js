@@ -240,7 +240,9 @@ export default class LWElement extends HTMLElement {
                if (parsed.length > promises.length) {
                   me.update();
                }
-               Promise.allSettled(promises).then(_ => me.update());
+               if (promises.length > 0) {
+                  Promise.allSettled(promises).then(_ => me.update());
+               }
             }).bind(this));
          }
       }
