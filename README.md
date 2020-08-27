@@ -659,6 +659,14 @@ great place to send events to the event bus.
 are ready. In this method, children are able to access the passed in data
 shared by parents.
 
+#### turnedOn()
+
+Called when the componnet `lw-if` is evaluated `true`.
+
+#### turnedOff()
+
+Called when the componnet `lw-if` is evaluated `false`.
+
 #### urlHashChanged()
 
 If `urlHashChanged()` is defined as a function, it will be called whenever the
