@@ -356,10 +356,14 @@ export default class LWElement extends HTMLElement {
       const hasLwFalse = ifNode.hasAttribute('lw-false');
       if (parsed[0]) {
          hasLwFalse && ifNode.removeAttribute('lw-false');
-         ifNode.turnedOn?.call(ifNode);
+         setTimeout(() => {
+            ifNode.turnedOn?.call(ifNode);
+         });
       } else {
          !hasLwFalse && ifNode.setAttribute('lw-false', '');
-         ifNode.turnedOff?.call(ifNode);
+         setTimeout(() => {
+            ifNode.turnedOff?.call(ifNode);
+         });
       }
    }
 
