@@ -110,7 +110,8 @@ export default class LWElement extends HTMLElement {
          ast.html;
       this.attachShadow({ mode: 'open' }).appendChild(node.content);
 
-      this._bindMethods().then(() => {
+      this._bindMethods();
+      setTimeout(() => {
          this.update(this.shadowRoot);
          setTimeout(() => {
             this.domReady?.call(this);
@@ -191,7 +192,7 @@ export default class LWElement extends HTMLElement {
       while (treeWalker.nextNode()) { }
    }
 
-   async _bindMethods() {
+   _bindMethods() {
       const methodNames = ['update', 'applyStyles'];
       const proto = Object.getPrototypeOf(this);
       methodNames.push(...Object.getOwnPropertyNames(proto).filter(name => hasMethod(proto, name)));
