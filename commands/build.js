@@ -139,7 +139,7 @@
             const globalScssString = fs.readFileSync(globalScssFilename, 'utf8');
             globalCssString += utils.buildCSS(globalScssString);
          }
-         globalCssString += '[lw-false],[lw-for]{display:none;}\n';
+         globalCssString += '[lw-false],[lw-for]{display:none !important;}\n';
          return globalCssString;
       };
 
