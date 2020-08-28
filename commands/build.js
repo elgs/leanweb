@@ -4,6 +4,8 @@
    const fse = require('fs-extra');
    const utils = require('./utils.js');
    const parser = require('../lib/lw-html-parser.js');
+   const CleanCSS = require('clean-css');
+   const cleanCSS = new CleanCSS({});
 
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
@@ -139,8 +141,9 @@
             const globalScssString = fs.readFileSync(globalScssFilename, 'utf8');
             globalCssString += utils.buildCSS(globalScssString);
          }
-         globalCssString += '[lw-false],[lw-for]{display:none !important;}\n';
-         return globalCssString;
+         globalCssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
+         return cleanCSS.minify(globalCssString).styles;
+         // return globalCssString;
       };
 
       copySrc();
