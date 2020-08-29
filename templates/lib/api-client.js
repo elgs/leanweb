@@ -22,6 +22,8 @@ class APIClient {
          const token = localStorage.getItem('access_token');
          if (token) {
             headers['access_token'] = token;
+         } else {
+            return null;
          }
       }
       const response = await fetch(url, {
