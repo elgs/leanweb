@@ -3,6 +3,13 @@
    const fse = require('fs-extra');
    const webpack = require('webpack');
    const utils = require('./utils.js');
+
+   let env = '';
+   const args = process.argv;
+   if (args.length >= 3) {
+      env = args[2];
+   }
+
    if (!fs.existsSync(process.cwd() + `/${utils.dirs.src}/electron.js`)) {
       fse.copySync(`${__dirname}/../templates/electron.js`, `${process.cwd()}/${utils.dirs.src}/electron.js`);
    }
@@ -16,7 +23,7 @@
    }
 
    await utils.exec(`npx lw clean`);
-   await utils.exec(`npx lw build`);
+   await utils.exec(`npx lw build ${env}`);
 
    fse.copySync(`./${utils.dirs.build}/electron.js`, `./${utils.dirs.electron}/electron.js`);
    fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);

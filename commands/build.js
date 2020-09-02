@@ -7,6 +7,12 @@
    const CleanCSS = require('clean-css');
    const cleanCSS = new CleanCSS({});
 
+   let env;
+   const args = process.argv;
+   if (args.length >= 3) {
+      env = args[2];
+   }
+
    const replaceNodeModulesImport = (str, filePath) => {
       // match import not starting with dot or slash
       return str.replace(/^(\s*import.+?['"])([^\.|\/].+?)(['"].*)$/gm, (m, a, b, c) => {
@@ -85,6 +91,12 @@
          fse.copySync(`${projectPath}/${utils.dirs.src}/`, buildDir);
       };
 
+      const copyEnv = () => {
+         if (env) {
+            fse.copySync(`${buildDir}/env/${env}.js`, `${buildDir}/env.js`);
+         }
+      };
+
       const buildJS = () => {
          walkDirSync(buildDir, buildDirFilter, preprocessJsImport);
 
@@ -147,6 +159,7 @@
       };
 
       copySrc();
+      copyEnv();
       buildJS();
       const globalStyleString = buildCSS();
       buildHTML(globalStyleString);

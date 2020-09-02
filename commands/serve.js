@@ -4,15 +4,21 @@ const webpack = require('webpack');
 const watch = require('node-watch');
 const WebpackDevServer = require('webpack-dev-server');
 
+let env = '';
+const args = process.argv;
+if (args.length >= 3) {
+   env = args[2];
+}
+
 (async () => {
 
    const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
-   await utils.exec(`npx lw build`);
+   await utils.exec(`npx lw build ${env}`);
 
    const build = async (eventType, filename) => {
       // console.log(eventType + ': ', filename);
-      await utils.exec(`npx lw build ` + filename);
+      await utils.exec(`npx lw build ${env}`);
 
       fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
       fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);

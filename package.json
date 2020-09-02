@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.8.0",
+   "version": "0.8.1",
    "description": "Builds framework agnostic web components.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -19,7 +19,7 @@
    "author": "Qian Chen",
    "license": "MIT",
    "dependencies": {
-      "@babel/parser": "^7.11.4",
+      "@babel/parser": "^7.11.5",
       "clean-css": "^4.2.3",
       "css-loader": "^4.2.2",
       "fs-extra": "^9.0.1",

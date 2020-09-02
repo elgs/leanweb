@@ -5,11 +5,17 @@ const fse = require('fs-extra');
 const minify = require('html-minifier').minify;
 const CleanCSS = require('clean-css');
 
+let env = '';
+const args = process.argv;
+if (args.length >= 3) {
+   env = args[2];
+}
+
 (async () => {
    const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
    await utils.exec(`npx lw clean`);
-   await utils.exec(`npx lw build`);
+   await utils.exec(`npx lw build ${env}`);
 
    const webpackConfig = utils.getWebPackConfig(utils.dirs.dist, project);
 

@@ -72,6 +72,8 @@
    fs.writeFileSync(`./src/${projectName}.scss`, projectScss);
    fs.writeFileSync(`./${utils.dirs.src}/global-styles.scss`, globalScss);
    fse.copySync(`${__dirname}/../templates/favicon.svg`, `./${utils.dirs.src}/favicon.svg`);
+   fse.copySync(`${__dirname}/../templates/env.js`, `./${utils.dirs.src}/env.js`);
+   fse.copySync(`${__dirname}/../templates/env/`, `./${utils.dirs.src}/env/`);
 
    if (!(fs.existsSync(`${process.cwd()}/.git/`) && fs.statSync(`${process.cwd()}/.git/`).isDirectory())) {
       await git.init({ fs, dir: process.cwd() });
