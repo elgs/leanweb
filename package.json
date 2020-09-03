@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.8.1",
+   "version": "0.8.2",
    "description": "Builds framework agnostic web components.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -25,13 +25,13 @@
       "fs-extra": "^9.0.1",
       "globby": "^11.0.1",
       "html-minifier": "^4.0.0",
-      "isomorphic-git": "^1.7.4",
+      "isomorphic-git": "^1.7.5",
       "json5-loader": "^4.0.0",
       "node-sass": "^4.14.1",
       "node-watch": "^0.6.4",
       "parse5": "^6.0.1",
       "raw-loader": "^4.0.1",
-      "sass-loader": "^10.0.1",
+      "sass-loader": "^10.0.2",
       "semver": "^7.3.2",
       "webpack": "^4.44.1",
       "webpack-dev-server": "^3.11.0"

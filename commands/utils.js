@@ -172,20 +172,20 @@ Now, the demo-login component can be added in root.html as follows:
 <demo-login></demo-login>
 `;
 
-const serveNote = `Usage: leabweb serve or lw s
+const serveNote = `Usage: leabweb [env] serve or lw s [env]
 Running this command will start the dev server and open the app in a new 
 browser window. Any chances to the source code will cause the dev server to
 reload the app and the browser will be automatically refreshed.
 `;
 
-const buildNote = `Usage: leanweb build
+const buildNote = `Usage: leanweb build [env]
 This will build the app and the output files will be stored in the build/
 directory. In this phase, the build doesn't transpile the app code. So likely
 the build file will only work with latest Chrome. However, the dist will 
 produce output for most desktop and mobile browsers.
 `;
 
-const distNote = `Usage: leanweb dist
+const distNote = `Usage: leanweb dist [env]
 This will transpile the source code and produce output compatible with most
 desktop and mobile browsers. The output will be stored in dist/ directory.
 `;
@@ -198,7 +198,7 @@ const upgradeNote = `Usage: leanweb upgrade
 This will upgrade leanweb runtime in the src/lib directory.
 `;
 
-const electronNote = `Usage: leanweb electron
+const electronNote = `Usage: leanweb electron [env]
 This will run the app as native desktop app using Electron.
 `;
 
