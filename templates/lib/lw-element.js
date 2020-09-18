@@ -234,7 +234,7 @@ export default class LWElement extends HTMLElement {
             const context = this._getNodeContext(eventNode);
             interpolation.lwValue.split(',').forEach(eventType => {
                eventNode.addEventListener(eventType.trim(), (event => {
-                  const eventContext = { '$event': event };
+                  const eventContext = { '$event': event, '$node': eventNode };
                   const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
 
                   const promises = parsed.filter(p => typeof p?.then === 'function');

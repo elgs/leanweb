@@ -259,6 +259,7 @@ items = ["one", "two", "three"];
 <br />
 <button lw-on:click="resetName()">Reset Name</button>
 ```
+You could bind multiple events like `lw-on:click,change=handler($event, $node)`.
 
 ```javascript
 // ...
