@@ -232,18 +232,20 @@ export default class LWElement extends HTMLElement {
             const interpolation = this.ast[attrValue];
 
             const context = this._getNodeContext(eventNode);
-            eventNode.addEventListener(interpolation.lwValue, (event => {
-               const eventContext = { '$event': event };
-               const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
+            interpolation.lwValue.split(',').forEach(eventType => {
+               eventNode.addEventListener(eventType.trim(), (event => {
+                  const eventContext = { '$event': event };
+                  const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
 
-               const promises = parsed.filter(p => typeof p?.then === 'function');
-               if (parsed.length > promises.length) {
-                  me.update();
-               }
-               if (promises.length > 0) {
-                  Promise.allSettled(promises).then(_ => me.update());
-               }
-            }).bind(this));
+                  const promises = parsed.filter(p => typeof p?.then === 'function');
+                  if (parsed.length > promises.length) {
+                     me.update();
+                  }
+                  if (promises.length > 0) {
+                     Promise.allSettled(promises).then(_ => me.update());
+                  }
+               }).bind(me));
+            });
          }
       }
    }
