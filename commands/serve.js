@@ -45,7 +45,7 @@ if (args.length >= 3) {
    const webpackDevConfig = {
       ...webpackConfig,
       mode: 'development',
-      watch: true,
+      // watch: true,
       devtool: 'eval-cheap-module-source-map',
       performance: {
          hints: false,
