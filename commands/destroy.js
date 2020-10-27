@@ -17,8 +17,8 @@ if (projectName !== project.name) {
    return;
 }
 
-fs.rmdirSync(utils.dirs.build + '/', { recursive: true });
-fs.rmdirSync(utils.dirs.dist + '/', { recursive: true });
-fs.rmdirSync(utils.dirs.src + '/', { recursive: true });
-fs.rmdirSync(utils.dirs.serve + '/', { recursive: true });
-fs.rmdirSync(utils.dirs.electron + '/', { recursive: true });
+fs.rmSync(utils.dirs.build + '/', { recursive: true, force: true });
+fs.rmSync(utils.dirs.dist + '/', { recursive: true, force: true });
+fs.rmSync(utils.dirs.src + '/', { recursive: true, force: true });
+fs.rmSync(utils.dirs.serve + '/', { recursive: true, force: true });
+fs.rmSync(utils.dirs.electron + '/', { recursive: true, force: true });

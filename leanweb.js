@@ -51,6 +51,6 @@ Please consider running 'npm i leanweb -g' to upgrade your local leanweb tools.`
       }
    }
    const targetData = utils.targets[target];
-   const command = `node ${__dirname}/commands/${targetData.file} ${args.slice(3).join(' ')}`;
+   const command = `node --trace-deprecation ${__dirname}/commands/${targetData.file} ${args.slice(3).join(' ')}`;
    utils.exec(command);
 })();
