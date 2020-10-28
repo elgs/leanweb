@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "0.8.6",
+   "version": "0.8.7",
    "description": "Builds framework agnostic web components.",
    "bin": {
       "leanweb": "leanweb.js",
