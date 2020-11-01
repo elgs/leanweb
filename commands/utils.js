@@ -1,5 +1,5 @@
 const { execSync } = require('child_process');
-const sass = require('node-sass');
+const sass = require('sass');
 const path = require('path');
 const net = require('net');
 
