@@ -56,11 +56,7 @@
    fs.mkdirSync(`${utils.dirs.src}/resources/`, { recursive: true });
    fs.writeFileSync(`${utils.dirs.src}/leanweb.json`, JSON.stringify(leanwebData, null, 2));
 
-   utils.exec(`npm i -D @babel/core --loglevel=error`);
-   utils.exec(`npm i -D babel-loader --loglevel=error`);
-   utils.exec(`npm i -D @babel/preset-env --loglevel=error`);
-   utils.exec(`npm i -D @babel/plugin-proposal-class-properties --loglevel=error`);
-   utils.exec(`npm i -D @babel/plugin-transform-runtime --loglevel=error`);
+   utils.exec(`npm i -D @babel/runtime --loglevel=error`);
 
    utils.exec(`npx lw generate root`);
 

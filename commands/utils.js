@@ -63,13 +63,14 @@ module.exports.getWebPackConfig = (outputDir, project) => {
          rules: [{
             test: path.resolve(process.cwd()),
             exclude: /node_modules/,
-            loader: 'babel-loader',
+            loader: require.resolve('babel-loader'),
             options: {
-               presets: ['@babel/preset-env', {
+               presets: [require.resolve('@babel/preset-env'), {
+               // presets: ['@babel/preset-env', {
                   plugins: [
                      '@babel/plugin-proposal-class-properties',
                      '@babel/plugin-transform-runtime'
-                  ]
+                  ].map(require.resolve)
                }]
             },
          }, {
