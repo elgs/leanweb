@@ -140,8 +140,8 @@ export default class LWElement extends HTMLElement {
       if (rootNode !== this.shadowRoot) {
          if (rootNode.hasAttribute('lw-elem')) {
             if (rootNode.hasAttribute('lw-elem-bind')) {
-               this._bindEvents(rootNode);
                this._bindModels(rootNode);
+               this._bindEvents(rootNode);
                this._bindInputs(rootNode);
                rootNode.removeAttribute('lw-elem-bind');
             }
@@ -163,8 +163,8 @@ export default class LWElement extends HTMLElement {
          acceptNode: node => {
             if (node.hasAttribute('lw-elem')) {
                if (node.hasAttribute('lw-elem-bind')) {
-                  this._bindEvents(node);
                   this._bindModels(node);
+                  this._bindEvents(node);
                   this._bindInputs(node);
                   node.removeAttribute('lw-elem-bind');
                }
