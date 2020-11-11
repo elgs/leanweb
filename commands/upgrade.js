@@ -26,6 +26,10 @@ const upgradeTo081 = () => {
    fse.copySync(`${__dirname}/../templates/env.js`, `./${utils.dirs.src}/env.js`);
 };
 
+const upgradeTo088 = () => {
+   utils.exec(`npm i -D @babel/runtime --loglevel=error`);
+};
+
 const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);
 if (upgradeAvailable) {
    fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);
@@ -39,6 +43,10 @@ if (upgradeAvailable) {
 
    if (semver.gte(leanwebPackageJSON.version, '0.8.1') && semver.lt(oldVersion, '0.8.1')) {
       upgradeTo081();
+   }
+
+   if (semver.gte(leanwebPackageJSON.version, '0.8.8') && semver.lt(oldVersion, '0.8.8')) {
+      upgradeTo088();
    }
 
    console.log('Leanweb upgraded:', oldVersion, '=>', leanwebPackageJSON.version);
