@@ -14,18 +14,19 @@ if (args.length >= 3) {
 
    const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
-   await utils.exec(`npx lw build ${env}`);
-
    const build = async (eventType, filename) => {
       // console.log(eventType + ': ', filename);
-      await utils.exec(`npx lw build ${env}`);
-
-      fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
-      fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
-      fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
-      project.resources.forEach(resource => {
-         fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
-      });
+      try {
+         await utils.exec(`npx lw build ${env}`);
+         fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
+         fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
+         fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
+         project.resources?.forEach(resource => {
+            fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
+         });
+      } catch (e) {
+         console.error(e);
+      }
    };
 
    const throttledBuild = utils.throttle(build);
@@ -33,12 +34,7 @@ if (args.length >= 3) {
       throttledBuild(eventType, filename);
    });
 
-   fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
-   fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
-   fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
-   project.resources && project.resources.forEach(resource => {
-      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
-   });
+   build();
 
    const webpackConfig = utils.getWebPackConfig(utils.dirs.serve, project);
 
