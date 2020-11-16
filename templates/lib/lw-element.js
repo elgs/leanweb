@@ -405,17 +405,9 @@ export default class LWElement extends HTMLElement {
             const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
             if (parsed[0]) {
-               if (interpolation.lwValue === 'class') {
-                  bindNode.classList.add(parsed[0]);
-               } else {
-                  bindNode.setAttribute(interpolation.lwValue, parsed[0]);
-               }
+               bindNode.setAttribute(interpolation.lwValue, parsed[0]);
             } else {
-               if (interpolation.lwValue === 'class') {
-                  bindNode.classList.remove(parsed[0]);
-               } else {
-                  bindNode.removeAttribute(interpolation.lwValue);
-               }
+               bindNode.removeAttribute(interpolation.lwValue);
             }
          }
       }
