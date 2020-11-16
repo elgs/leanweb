@@ -411,7 +411,11 @@ export default class LWElement extends HTMLElement {
                   bindNode.setAttribute(interpolation.lwValue, parsed[0]);
                }
             } else {
-               bindNode.removeAttribute(interpolation.lwValue);
+               if (interpolation.lwValue === 'class') {
+                  bindNode.classList.remove(parsed[0]);
+               } else {
+                  bindNode.removeAttribute(interpolation.lwValue);
+               }
             }
          }
       }
