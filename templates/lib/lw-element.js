@@ -363,7 +363,7 @@ export default class LWElement extends HTMLElement {
       const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
       const hasLwFalse = ifNode.hasAttribute('lw-false');
-      if (parsed[0]) {
+      if (parsed[0] !== false && parsed[0] !== undefined && parsed[0] !== null) {
          hasLwFalse && ifNode.removeAttribute('lw-false');
          setTimeout(() => {
             ifNode.turnedOn?.call(ifNode);
@@ -404,7 +404,7 @@ export default class LWElement extends HTMLElement {
             const interpolation = this.ast[attrValue];
             const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
-            if (parsed[0]) {
+            if (parsed[0] !== undefined && parsed[0] !== null) {
                bindNode.setAttribute(interpolation.lwValue, parsed[0]);
             } else {
                bindNode.removeAttribute(interpolation.lwValue);
