@@ -62,8 +62,9 @@ if (args.length >= 3) {
    const server = new WebpackDevServer(compiler, devServerOptions);
 
    let port = 2020;
-   while (await utils.portInUse(port)) {
+   let address = "127.0.0.1";
+   while (await utils.portInUse(port, address)) {
       ++port;
    }
-   server.listen(port, '127.0.0.1');
+   server.listen(port, address);
 })();

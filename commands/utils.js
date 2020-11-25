@@ -101,11 +101,11 @@ module.exports.getWebPackConfig = (outputDir, project) => {
    }
 };
 
-module.exports.portInUse = port => {
+module.exports.portInUse = (port, address = '127.0.0.1') => {
    return new Promise((resolve, reject) => {
       const server = net.createServer(socket => socket.pipe(socket));
 
-      server.listen(port, '127.0.0.1');
+      server.listen(port, address);
       server.on('error', e => {
          resolve(true);
       });
