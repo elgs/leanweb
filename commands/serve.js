@@ -10,6 +10,10 @@ if (args.length >= 3) {
    env = args[2];
 }
 
+const address = process.env.address || '127.0.0.1';
+const port = process.env.port || 2020;
+const noopen = process.env.noopen || false;
+
 (async () => {
 
    const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
@@ -56,13 +60,11 @@ if (args.length >= 3) {
       watchContentBase: true,
       publicPath: '/',
       hot: true,
-      open: true,
+      open: !noopen,
       stats: 'errors-warnings',
    };
    const server = new WebpackDevServer(compiler, devServerOptions);
 
-   let port = 2020;
-   let address = "127.0.0.1";
    while (await utils.portInUse(port, address)) {
       ++port;
    }
