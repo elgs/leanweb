@@ -11,7 +11,7 @@ if (args.length >= 3) {
 }
 
 const address = process.env.address || '127.0.0.1';
-const port = process.env.port || 2020;
+let port = process.env.port || 2020;
 const noopen = process.env.noopen || false;
 
 (async () => {
