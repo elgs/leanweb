@@ -13,9 +13,10 @@ const dirs = {
 
 module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
-module.exports.buildCSS = scssString => {
+module.exports.buildCSS = (scssString, currentPaths) => {
    if (scssString.trim()) {
-      const cssResult = sass.renderSync({ data: scssString, includePaths: [process.cwd()] });
+      const includePaths = [currentPaths, path.resolve(process.cwd(), dirs.src), path.resolve(process.cwd(), 'node_modules')];
+      const cssResult = sass.renderSync({ data: scssString, includePaths });
       return cssResult.css.toString().trim();
    }
    return '';
@@ -80,8 +81,13 @@ module.exports.getWebPackConfig = (outputDir, project) => {
                },
                {
                   loader: require.resolve('sass-loader'),
+                  options: {
+                     sassOptions: {
+                        includePaths: [path.resolve(process.cwd(), 'node_modules')],
+                     }
+                  }
                },
-            ]
+            ],
          }, {
             test: /\.json$/i,
             loader: require.resolve('json5-loader'),

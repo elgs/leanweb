@@ -4,8 +4,6 @@
    const fse = require('fs-extra');
    const utils = require('./utils.js');
    const parser = require('../lib/lw-html-parser.js');
-   const CleanCSS = require('clean-css');
-   const cleanCSS = new CleanCSS({});
 
    let env;
    const args = process.argv;
@@ -108,7 +106,7 @@
          fs.writeFileSync(`${buildDir}/${project.name}.js`, jsString);
       };
 
-      const buildHTML = (globalStyleString) => {
+      const buildHTML = () => {
          project.components.forEach(cmp => {
             const cmpName = utils.getComponentName(cmp);
             const htmlFilename = `${projectPath}/${utils.dirs.src}/components/${cmp}/${cmpName}.html`;
@@ -119,15 +117,15 @@
                const scssFileExists = fs.existsSync(scssFilename);
                let cssString = '';
                if (scssFileExists) {
-                  const scssString = fs.readFileSync(scssFilename, 'utf8');
-                  cssString = utils.buildCSS(scssString);
+                  let scssString = `@import "global-styles.scss";\n`;
+                  scssString += fs.readFileSync(scssFilename, 'utf8');
+                  scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
+                  cssString = utils.buildCSS(scssString, `${projectPath}/${utils.dirs.src}/components/${cmp}`);
                }
                const styleString = cssString || '';
                const htmlString = fs.readFileSync(htmlFilename, 'utf8');
                const ast = parser.parse(htmlString);
                ast.css = styleString;
-               ast.globalCss = globalStyleString;
-               // ast.name = project.name;
                ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
                ast.runtimeVersion = project.version;
                ast.builderVersion = leanwebPackageJSON.version;
@@ -143,28 +141,17 @@
          let projectCssString = '';
          if (fs.existsSync(projectScssFilename)) {
             const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
-            projectCssString += utils.buildCSS(projectScssString);
+            projectCssString += utils.buildCSS(projectScssString, `${projectPath}/src`);
          }
          fs.writeFileSync(`${buildDir}/${project.name}.css`, projectCssString);
-
-         const globalScssFilename = `${projectPath}/${utils.dirs.src}/global-styles.scss`;
-         let globalCssString = '';
-         if (fs.existsSync(globalScssFilename)) {
-            const globalScssString = fs.readFileSync(globalScssFilename, 'utf8');
-            globalCssString += utils.buildCSS(globalScssString);
-         }
-         globalCssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
-         return cleanCSS.minify(globalCssString).styles;
-         // return globalCssString;
       };
 
       copySrc();
       copyEnv();
       buildJS();
-      const globalStyleString = buildCSS();
-      buildHTML(globalStyleString);
+      buildCSS();
+      buildHTML();
 
-      // return `import '${isMain ? '.' : '..'}/_dependencies/${project.name}/${project.name}.js';\n`;
       return project.name;
    };
 
