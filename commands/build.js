@@ -141,7 +141,7 @@
          let projectCssString = '';
          if (fs.existsSync(projectScssFilename)) {
             const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
-            projectCssString += utils.buildCSS(projectScssString, `${projectPath}/src`);
+            projectCssString += utils.buildCSS(projectScssString, `${projectPath}/${utils.src}`);
          }
          fs.writeFileSync(`${buildDir}/${project.name}.css`, projectCssString);
       };
