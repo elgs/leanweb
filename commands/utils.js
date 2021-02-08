@@ -15,7 +15,7 @@ module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'i
 
 module.exports.buildCSS = (scssString, currentPaths) => {
    if (scssString.trim()) {
-      const includePaths = [currentPaths, path.resolve(process.cwd(), dirs.src), path.resolve(process.cwd(), 'node_modules')];
+      const includePaths = [currentPaths, path.resolve(process.cwd(), dirs.build), path.resolve(process.cwd(), 'node_modules')];
       const cssResult = sass.renderSync({ data: scssString, includePaths });
       return cssResult.css.toString().trim();
    }

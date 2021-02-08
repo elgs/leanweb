@@ -68,7 +68,7 @@
          if (im.indexOf('/') < 0) {
             depPath = `${process.cwd()}/node_modules/${im}`;
          } else {
-            if (im.startsWith('.')) {
+            if (im.startsWith('./')) {
                depPath = `${process.cwd()}/${im}`;
             } else if (im.startsWith('/')) {
                depPath = im;
@@ -109,18 +109,18 @@
       const buildHTML = () => {
          project.components.forEach(cmp => {
             const cmpName = utils.getComponentName(cmp);
-            const htmlFilename = `${projectPath}/${utils.dirs.src}/components/${cmp}/${cmpName}.html`;
+            const htmlFilename = `${projectPath}/${buildDir}/components/${cmp}/${cmpName}.html`;
             const htmlFileExists = fs.existsSync(htmlFilename);
             if (htmlFileExists) {
 
-               const scssFilename = `${projectPath}/${utils.dirs.src}/components/${cmp}/${cmpName}.scss`;
+               const scssFilename = `${projectPath}/${buildDir}/components/${cmp}/${cmpName}.scss`;
                const scssFileExists = fs.existsSync(scssFilename);
                let cssString = '';
                if (scssFileExists) {
                   let scssString = `@import "global-styles.scss";\n`;
                   scssString += fs.readFileSync(scssFilename, 'utf8');
                   scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
-                  cssString = utils.buildCSS(scssString, `${projectPath}/${utils.dirs.src}/components/${cmp}`);
+                  cssString = utils.buildCSS(scssString, `${projectPath}/${buildDir}/components/${cmp}`);
                }
                const styleString = cssString || '';
                const htmlString = fs.readFileSync(htmlFilename, 'utf8');
@@ -132,16 +132,16 @@
                fs.writeFileSync(`${buildDir}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
             }
          });
-         const htmlString = fs.readFileSync(`${projectPath}/${utils.dirs.src}/index.html`, 'utf8');
+         const htmlString = fs.readFileSync(`${projectPath}/${buildDir}/index.html`, 'utf8');
          fs.writeFileSync(`${buildDir}/index.html`, htmlString);
       };
 
-      const buildCSS = () => {
+      const buildSCSS = () => {
          const projectScssFilename = `${projectPath}/src/${project.name}.scss`;
          let projectCssString = '';
          if (fs.existsSync(projectScssFilename)) {
             const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
-            projectCssString += utils.buildCSS(projectScssString, `${projectPath}/${utils.src}`);
+            projectCssString += utils.buildCSS(projectScssString, `${projectPath}/${buildDir}`);
          }
          fs.writeFileSync(`${buildDir}/${project.name}.css`, projectCssString);
       };
@@ -149,7 +149,7 @@
       copySrc();
       copyEnv();
       buildJS();
-      buildCSS();
+      buildSCSS();
       buildHTML();
 
       return project.name;
