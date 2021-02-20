@@ -19,13 +19,13 @@
    "author": "Qian Chen",
    "license": "MIT",
    "dependencies": {
-      "@babel/core": "^7.12.16",
-      "@babel/parser": "^7.12.16",
+      "@babel/core": "^7.12.17",
+      "@babel/parser": "^7.12.17",
       "@babel/plugin-proposal-class-properties": "^7.12.13",
-      "@babel/plugin-transform-runtime": "^7.12.15",
-      "@babel/preset-env": "^7.12.16",
+      "@babel/plugin-transform-runtime": "^7.12.17",
+      "@babel/preset-env": "^7.12.17",
       "babel-loader": "^8.2.2",
-      "clean-css": "^5.0.1",
+      "clean-css": "^5.1.0",
       "css-loader": "^5.0.2",
       "fs-extra": "^9.1.0",
       "globby": "^11.0.2",
@@ -35,10 +35,10 @@
       "node-watch": "^0.7.1",
       "parse5": "^6.0.1",
       "raw-loader": "^4.0.2",
-      "sass": "^1.32.7",
+      "sass": "^1.32.8",
       "sass-loader": "^11.0.1",
       "semver": "^7.3.4",
-      "webpack": "^5.22.0",
+      "webpack": "^5.23.0",
       "webpack-dev-server": "^3.11.2"
    }
 }
