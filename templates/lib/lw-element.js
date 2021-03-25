@@ -336,7 +336,10 @@ export default class LWElement extends HTMLElement {
             }
          }
       } else {
-         modelNode.value = parsed[0] ?? '';
+         const newValue = parsed[0] ?? '';
+         if (modelNode.value !== newValue) {
+            modelNode.value = newValue;
+         }
       }
    }
 
