@@ -11,10 +11,19 @@ class APIClient {
 
    async _fetch(method, url = '', data = {}, headers = {}) {
       if (!url.toLowerCase().startsWith('https://') && !url.toLowerCase().startsWith('http://')) {
-         if (url.startsWith('/')) {
-            url = this.baesUrl + url;
+         url = this.baesUrl + url;
+      }
+
+      if (method === 'GET' && data && typeof data === 'object') {
+         // encode data and append to url
+         const queryString = paramsToQueryString(data);
+         data = null;
+         if (url.endsWith('?')) {
+            url += queryString;
+         } else if (url.indexOf('?') >= 0) {
+            url += ('&' + queryString);
          } else {
-            url = this.baesUrl + '/' + url;
+            url += ('?' + queryString);
          }
       }
 
@@ -35,12 +44,25 @@ class APIClient {
    }
 
    post(url, data, headers) { return this._fetch('POST', url, data, headers); }
-   get(url, headers) { return this._fetch('GET', url, null, headers); }
+   get(url, data, headers) { return this._fetch('GET', url, data, headers); }
    patch(url, data, headers) { return this._fetch('PATCH', url, data, headers); }
    delete(url, data, headers) { return this._fetch('DELETE', url, data, headers); }
    put(url, data, headers) { return this._fetch('PUT', url, data, headers); }
    options(url, data, headers) { return this._fetch('OPTIONS', url, data, headers); }
 }
+
+const paramsToQueryString = (params) => {
+   return Object.keys(params).map(k => {
+      const v = params[k];
+      if (Array.isArray(v)) {
+         return v.reduce((vacc, vcurr) => {
+            return `${vacc}${k}=${encodeURIComponent(vcurr)}&`;
+         }, '');
+      } else {
+         return `${k}=${encodeURIComponent(v)}&`;
+      }
+   }).reduce((acc, curr) => acc + curr, '').slice(0, -1);
+};
 
 // const apiUrl = 'http://localhost:1234';
 // const anotherApiUrl = 'http://127.0.0.1:4321';
