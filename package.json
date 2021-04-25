@@ -38,7 +38,7 @@
       "sass": "^1.32.11",
       "sass-loader": "^11.0.1",
       "semver": "^7.3.5",
-      "webpack": "^5.35.0",
+      "webpack": "^5.35.1",
       "webpack-dev-server": "^3.11.2"
    }
 }
