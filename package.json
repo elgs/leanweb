@@ -29,15 +29,15 @@
       "fs-extra": "^10.0.0",
       "globby": "^11.0.4",
       "html-minifier": "^4.0.0",
-      "isomorphic-git": "^1.8.10",
+      "isomorphic-git": "^1.9.1",
       "json5-loader": "^4.0.1",
       "node-watch": "^0.7.1",
       "parse5": "^6.0.1",
       "raw-loader": "^4.0.2",
-      "sass": "^1.35.1",
+      "sass": "^1.35.2",
       "sass-loader": "^12.1.0",
       "semver": "^7.3.5",
-      "webpack": "^5.42.0",
+      "webpack": "^5.44.0",
       "webpack-dev-server": "^3.11.2"
    }
 }
