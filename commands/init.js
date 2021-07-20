@@ -96,5 +96,6 @@
       console.log('\nSome useful commands:');
       console.log('"lw s" to start the dev server.');
       console.log('"lw d" to build for production. The output will be in dist/ directory.');
+      console.log('"lw g my-new-component" to generate a new standard web component.');
    }
 })();
