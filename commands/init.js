@@ -91,7 +91,10 @@
             name: 'Leanweb',
             email: 'leanweb@leanweb.app',
          },
-         message: 'Init commit.'
-      })
+         message: 'lw init'
+      });
+      console.log('\nSome useful commands:');
+      console.log('"lw s" to start the dev server.');
+      console.log('"lw d" to build for production. The output will be in dist/ directory.');
    }
 })();

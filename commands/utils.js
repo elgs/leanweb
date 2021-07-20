@@ -68,7 +68,6 @@ module.exports.getWebPackConfig = (outputDir, project) => {
             options: {
                presets: [require.resolve('@babel/preset-env'), {
                   plugins: [
-                     // '@babel/plugin-proposal-class-properties',
                      '@babel/plugin-transform-runtime'
                   ].map(require.resolve)
                }]
