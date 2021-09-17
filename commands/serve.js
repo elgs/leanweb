@@ -56,17 +56,16 @@ const noopen = process.env.noopen || false;
 
    const devServerOptions = {
       ...webpackDevConfig.devServer,
-      contentBase: process.cwd() + `/${utils.dirs.serve}/`,
-      watchContentBase: true,
-      publicPath: '/',
-      hot: true,
+      static: {
+         directory: process.cwd() + `/${utils.dirs.serve}/`,
+         watch: true,
+      },
       open: !noopen,
-      stats: 'errors-warnings',
    };
-   const server = new WebpackDevServer(compiler, devServerOptions);
+   const server = new WebpackDevServer(devServerOptions, compiler);
 
    while (await utils.portInUse(port, address)) {
       ++port;
    }
-   server.listen(port, address);
+   server.start(port, address);
 })();
