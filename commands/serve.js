@@ -10,7 +10,7 @@ if (args.length >= 3) {
    env = args[2];
 }
 
-const address = process.env.address || '127.0.0.1';
+const host = process.env.host || '127.0.0.1';
 let port = process.env.port || 2020;
 const noopen = process.env.noopen || false;
 
@@ -54,18 +54,21 @@ const noopen = process.env.noopen || false;
 
    const compiler = webpack(webpackDevConfig);
 
+   while (await utils.portInUse(port, host)) {
+      ++port;
+   }
+
    const devServerOptions = {
       ...webpackDevConfig.devServer,
       static: {
          directory: process.cwd() + `/${utils.dirs.serve}/`,
          watch: true,
       },
+      port,
+      host,
       open: !noopen,
    };
    const server = new WebpackDevServer(devServerOptions, compiler);
 
-   while (await utils.portInUse(port, address)) {
-      ++port;
-   }
-   server.start(port, address);
+   server.start();
 })();
