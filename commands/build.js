@@ -117,7 +117,7 @@
                const scssFileExists = fs.existsSync(scssFilename);
                let cssString = '';
                if (scssFileExists) {
-                  let scssString = `@import "global-styles.scss";\n`;
+                  let scssString = `@use "global-styles.scss";\n`;
                   scssString += fs.readFileSync(scssFilename, 'utf8');
                   scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
                   cssString = utils.buildCSS(scssString, `${projectPath}/${buildDir}/components/${cmp}`);
