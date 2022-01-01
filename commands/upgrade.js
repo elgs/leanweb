@@ -32,7 +32,7 @@ const upgradeTo088 = () => {
 
 const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);
 if (upgradeAvailable) {
-   fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);
+   fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`, { dereference: true });
    const oldVersion = projectLeanwebJSON.version;
    projectLeanwebJSON.version = leanwebPackageJSON.version;
    fs.writeFileSync(`${process.cwd()}/${utils.dirs.src}/leanweb.json`, JSON.stringify(projectLeanwebJSON, null, 2));

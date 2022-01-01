@@ -26,7 +26,7 @@ const noopen = process.env.noopen || false;
          fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
          fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
          project.resources?.forEach(resource => {
-            fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`);
+            fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`, { dereference: true });
          });
       } catch (e) {
          console.error(e);

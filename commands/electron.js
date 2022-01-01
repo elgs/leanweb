@@ -30,7 +30,7 @@
    fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
    fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.electron}/favicon.svg`);
    project.resources && project.resources.forEach(resource => {
-      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.electron}/${resource}`);
+      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.electron}/${resource}`, { dereference: true });
    });
 
    const webpackConfig = utils.getWebPackConfig(utils.dirs.electron, project);
