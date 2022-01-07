@@ -29,7 +29,7 @@
    fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);
    fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
    fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.electron}/favicon.svg`);
-   project.resources && project.resources.forEach(resource => {
+   project.resources?.forEach(resource => {
       fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.electron}/${resource}`, { dereference: true });
    });
 

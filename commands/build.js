@@ -86,7 +86,7 @@
       });
 
       const copySrc = () => {
-         fse.copySync(`${projectPath}/${utils.dirs.src}/`, buildDir, { dereference: true });
+         fse.copySync(`${projectPath}/${utils.dirs.src}/`, buildDir, { filter: utils.copySymbolLinkFilter });
       };
 
       const copyEnv = () => {

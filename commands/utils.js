@@ -3,12 +3,19 @@ const sass = require('sass');
 const path = require('path');
 const net = require('net');
 
+const fse = require('fs-extra');
+
 const dirs = {
    src: 'src',
    build: 'build',
    serve: 'serve',
    dist: 'dist',
    electron: 'electron',
+};
+
+module.exports.copySymbolLinkFilter = (src, dest) => {
+   const destStats = fse.existsSync(dest) && fse.lstatSync(dest);
+   return !destStats?.isSymbolicLink?.();
 };
 
 module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
