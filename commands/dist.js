@@ -54,7 +54,7 @@ if (args.length >= 3) {
       fs.writeFileSync(`./${utils.dirs.dist}/${project.name}.css`, minifiedAppCss.styles);
 
       fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.dist}/favicon.svg`);
-      project.resources.forEach(resource => {
+      project.resources?.forEach(resource => {
          fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.dist}/${resource}`, { dereference: true });
       });
    });
