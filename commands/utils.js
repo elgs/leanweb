@@ -80,7 +80,7 @@ module.exports.getWebPackConfig = (outputDir, project) => {
                }]
             },
          }, {
-            test: /\.(scss|sass)$/i,
+            test: /\.(scss|sass|css)$/i,
             use: [
                {
                   loader: require.resolve('css-loader'),

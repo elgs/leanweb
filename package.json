@@ -20,16 +20,16 @@
    "license": "MIT",
    "dependencies": {
       "@babel/core": "^7.16.7",
-      "@babel/parser": "^7.16.7",
-      "@babel/plugin-transform-runtime": "^7.16.7",
-      "@babel/preset-env": "^7.16.7",
+      "@babel/parser": "^7.16.8",
+      "@babel/plugin-transform-runtime": "^7.16.8",
+      "@babel/preset-env": "^7.16.8",
       "babel-loader": "^8.2.3",
       "clean-css": "^5.2.2",
       "css-loader": "^6.5.1",
       "fs-extra": "^10.0.0",
       "globby": "^11.0.4",
       "html-minifier": "^4.0.0",
-      "isomorphic-git": "^1.10.3",
+      "isomorphic-git": "^1.10.4",
       "json5-loader": "^4.0.1",
       "node-watch": "^0.7.2",
       "parse5": "^6.0.1",
@@ -37,7 +37,7 @@
       "sass": "^1.47.0",
       "sass-loader": "^12.4.0",
       "semver": "^7.3.5",
-      "webpack": "^5.65.0",
-      "webpack-dev-server": "^4.7.2"
+      "webpack": "^5.66.0",
+      "webpack-dev-server": "^4.7.3"
    }
 }
