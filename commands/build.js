@@ -17,7 +17,7 @@
          if (b.startsWith(`~`)) {
             // ~/package.json
             return a + path.normalize(`${process.cwd()}/` + b.substring(1)) + c;
-         } else if (b.indexOf('/') > -1) {
+         } else if (!b.startsWith('http://') && !b.startsWith('https://') && b.indexOf('/') > -1) {
             // lodash-es/get.js
             return a + path.normalize(`${process.cwd()}/node_modules/` + b) + c;
          } else {
@@ -38,7 +38,12 @@
    };
 
    const preprocessJsImport = filePath => {
-      if (filePath.toLowerCase().endsWith('.js') && !filePath.toLowerCase().endsWith('/ast.js') && !filePath.startsWith(`${utils.dirs.build}/lib/`)) {
+      if (
+         filePath.toLowerCase().endsWith('.js') &&
+         !filePath.toLowerCase().endsWith('/ast.js') &&
+         !filePath.startsWith(`${utils.dirs.build}/lib/`) &&
+         !filePath.startsWith(`${utils.dirs.build}/resources/`)
+      ) {
          let jsFileString = fs.readFileSync(filePath, 'utf8');
          jsFileString = replaceNodeModulesImport(jsFileString, filePath);
          fs.writeFileSync(filePath, jsFileString);
