@@ -476,9 +476,7 @@ Assuming npm module `lodash-es` is installed, you could use any of the
 following `import` statements for your web component class:
 
 ```javascript
-import { get } from "lodash-es"; // find from node_modules
-import get from "lodash-es/get.js"; // find from node_modules
-import * as _ from "lodash-es"; // find from node_modules
+import get from "/node_modules/lodash-es/get.js"; // find from node_modules
 ```
 
 Importing a JSON file:
@@ -490,7 +488,7 @@ import someJSON from "./some.json";
 Importing CSS/SCSS:
 
 ```javascript
-import agate from "highlight.js/scss/agate.scss";
+import agate from "/node_modules/highlight.js/scss/agate.scss";
 
 // customElements.define('demo-root',
 //  class extends LWElement {  // LWElement extends HTMLElement
