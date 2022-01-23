@@ -1,7 +1,6 @@
+import * as utils from './utils.js';
+
 (async () => {
-
-   const utils = require('./utils.js');
-
    if (process.argv.length < 3) {
       utils.exec('npx lw version');
       console.log('Usage: lw target parameters');

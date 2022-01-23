@@ -1,7 +1,15 @@
-(async () => {
-   const fs = require('fs');
-   const utils = require('./utils.js');
+import fs from 'fs';
+import * as utils from './utils.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+(async () => {
    const args = process.argv;
    if (args.length < 3) {
       console.error('Usage: lw generate component-names');

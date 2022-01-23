@@ -1,10 +1,18 @@
 #!/usr/bin/env node
 
-(async () => {
+import fs from 'fs';
+import semver from 'semver';
+import * as utils from './commands/utils.js';
 
-   const fs = require('fs');
-   const semver = require('semver');
-   const utils = require('./commands/utils.js');
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+(async () => {
 
    const args = process.argv;
 

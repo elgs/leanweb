@@ -1,8 +1,11 @@
-const fse = require('fs-extra');
-const utils = require('./utils.js');
-const webpack = require('webpack');
-const watch = require('node-watch');
-const WebpackDevServer = require('webpack-dev-server');
+import fse from 'fs-extra';
+import * as utils from './utils.js';
+import webpack from 'webpack';
+import watch from 'node-watch';
+import WebpackDevServer from 'webpack-dev-server';
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
 let env = '';
 const args = process.argv;

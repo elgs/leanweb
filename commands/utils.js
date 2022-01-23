@@ -1,11 +1,19 @@
-const { execSync } = require('child_process');
-const sass = require('sass');
-const path = require('path');
-const net = require('net');
+// const { execSync } = require('child_process');
+import { execSync } from 'child_process';
+// const sass = require('sass');
+import sass from 'sass';
+// import path from 'path';
+import path from 'path';
+// const net = require('net');
+import net from 'net';
 
-const fse = require('fs-extra');
+// import fse from 'fs-extra';
+import fse from 'fs-extra';
 
-const dirs = {
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+export const dirs = {
    src: 'src',
    build: 'build',
    serve: 'serve',
@@ -13,14 +21,14 @@ const dirs = {
    electron: 'electron',
 };
 
-module.exports.copySymbolLinkFilter = (src, dest) => {
+export const copySymbolLinkFilter = (src, dest) => {
    const destStats = fse.existsSync(dest) && fse.lstatSync(dest);
    return !destStats?.isSymbolicLink?.();
 };
 
-module.exports.exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
+export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
-module.exports.buildCSS = (scssString, currentPaths) => {
+export const buildCSS = (scssString, currentPaths) => {
    if (scssString.trim()) {
       const includePaths = [currentPaths, path.resolve(process.cwd(), dirs.build), path.resolve(process.cwd(), 'node_modules')];
       const cssResult = sass.renderSync({ data: scssString, includePaths });
@@ -29,7 +37,7 @@ module.exports.buildCSS = (scssString, currentPaths) => {
    return '';
 };
 
-module.exports.getComponentName = cmp => {
+export const getComponentName = cmp => {
    const indexOfLastSlash = cmp.lastIndexOf('/');
    if (indexOfLastSlash > -1) {
       return cmp.substring(indexOfLastSlash + 1);
@@ -37,7 +45,7 @@ module.exports.getComponentName = cmp => {
    return cmp;
 };
 
-module.exports.getPathLevels = filePath => {
+export const getPathLevels = filePath => {
    filePath = path.normalize(filePath);
    const numSlashes = filePath.replace(/[^\/]/g, '').length;
    let ret = '';
@@ -47,7 +55,7 @@ module.exports.getPathLevels = filePath => {
    return ret;
 };
 
-module.exports.throttle = (callback, limit = 100) => {
+export const throttle = (callback, limit = 100) => {
    let wait = false;
    return function () {
       if (!wait) {
@@ -60,7 +68,7 @@ module.exports.throttle = (callback, limit = 100) => {
    };
 };
 
-module.exports.getWebPackConfig = (outputDir, project) => {
+export const getWebPackConfig = (outputDir, project) => {
    return {
       entry: process.cwd() + `/${dirs.build}/${project.name}.js`,
       output: {
@@ -113,7 +121,7 @@ module.exports.getWebPackConfig = (outputDir, project) => {
    }
 };
 
-module.exports.portInUse = (port, address = '127.0.0.1') => {
+export const portInUse = (port, address = '127.0.0.1') => {
    return new Promise((resolve, reject) => {
       const server = net.createServer(socket => socket.pipe(socket));
 
@@ -127,8 +135,6 @@ module.exports.portInUse = (port, address = '127.0.0.1') => {
       });
    });
 };
-
-module.exports.dirs = dirs;
 
 const initNote = `Usage: leanweb init or leanweb init project-name
 leanweb init will initialize a leanweb project with the name of the current
@@ -229,7 +235,7 @@ leanweb generate login is the same as leanweb g login
 const versionNote = `Usage: leanweb version
 Print version information for leanweb.`;
 
-module.exports.targets = {
+export const targets = {
    'init': { file: 'init.js', note: initNote },
    'generate': { file: 'generate.js', note: generateNote },
    'serve': { file: 'serve.js', note: serveNote },

@@ -1,10 +1,17 @@
-(async () => {
-   const fs = require('fs');
-   const path = require('path');
-   const fse = require('fs-extra');
-   const utils = require('./utils.js');
-   const parser = require('../lib/lw-html-parser.js');
+import fs from 'fs';
+import fse from 'fs-extra';
+import * as utils from './utils.js';
+import * as parser from '../lib/lw-html-parser.js';
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+(async () => {
    let env;
    const args = process.argv;
    if (args.length >= 3) {
@@ -50,12 +57,12 @@
    //    }
    // };
 
-   const buildDirFilter = dirPath => {
-      if (dirPath.startsWith(`${utils.dirs.build}/lib/`)) {
-         return false;
-      }
-      return true;
-   };
+   // const buildDirFilter = dirPath => {
+   //    if (dirPath.startsWith(`${utils.dirs.build}/lib/`)) {
+   //       return false;
+   //    }
+   //    return true;
+   // };
 
    const leanwebPackageJSON = require(`${__dirname}/../package.json`);
 

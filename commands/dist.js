@@ -1,9 +1,13 @@
-const webpack = require('webpack');
-const utils = require('./utils.js');
-const fs = require('fs');
-const fse = require('fs-extra');
-const minify = require('html-minifier').minify;
-const CleanCSS = require('clean-css');
+import webpack from 'webpack';
+import * as utils from './utils.js';
+import fs from 'fs';
+import fse from 'fs-extra';
+// const minify = require('html-minifier').minify;
+import { minify } from 'html-minifier';
+import CleanCSS from 'clean-css';
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
 
 let env = '';
 const args = process.argv;

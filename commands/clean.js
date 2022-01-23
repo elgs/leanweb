@@ -1,5 +1,5 @@
-const fs = require('fs');
-const utils = require('./utils.js');
+import fs from 'fs';
+import * as utils from './utils.js';
 
 (async () => {
    fs.rmSync(utils.dirs.build + '/', { recursive: true, force: true });

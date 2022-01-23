@@ -1,11 +1,19 @@
+import fs from 'fs';
+import fse from 'fs-extra';
+import git from 'isomorphic-git';
+import globby from 'globby';
+import * as utils from './utils.js';
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 (async () => {
-   const fs = require('fs');
-   const fse = require('fs-extra');
-   const path = require('path');
-   const git = require('isomorphic-git');
-   const globby = require('globby');
    const args = process.argv;
-   const utils = require('./utils.js');
 
    const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
    const packageJSONExisted = fs.existsSync(`${process.cwd()}/package.json`);
