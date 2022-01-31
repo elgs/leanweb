@@ -52,7 +52,7 @@ const require = createRequire(import.meta.url);
       }
 
       if (!fs.existsSync(`${cmpPath}/${cmpName}.scss`)) {
-         fs.writeFileSync(`${cmpPath}/${cmpName}.scss`, ':host {\n\tdisplay: inline-block;\n\tposition: relative;\n}');
+         fs.writeFileSync(`${cmpPath}/${cmpName}.scss`, '');
       }
    }
 })();
