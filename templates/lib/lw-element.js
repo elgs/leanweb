@@ -97,7 +97,7 @@ const nextAllSiblings = (el, selector) => {
 };
 
 export default class LWElement extends HTMLElement {
-   me = self;
+   self = this;
    constructor(ast) {
       super();
       this.ast = ast;
