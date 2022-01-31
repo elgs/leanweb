@@ -259,6 +259,7 @@ items = ["one", "two", "three"];
 <br />
 <button lw-on:click="resetName()">Reset Name</button>
 ```
+
 You could bind multiple events like `lw-on:click,change=handler($event, $node)`.
 
 ```javascript
@@ -318,24 +319,26 @@ imageWidth = 400;
 `demo-parent.html`
 
 ```html
-<demo-child lw-input:userData="user"></demo-child>
+<demo-child lw-input:parent="self" lw-input:userData="user"></demo-child>
 ```
 
 `demo-parent.js`
 
 ```javascript
 // ...
+// self is defined in LWElement as `self = this`;
 user = { firstname: "Qian", lastname: "Chen" };
 // ...
 ```
 
-The child is able to access the `user` object passed in with `lw-input:`
-directive from `inputReady()` method.
+The child is able to access the `parent` and `user` object passed in with
+`lw-input:` directive from `inputReady()` method.
 `demo-child.js`
 
 ```javascript
 // ...
 inputReady() {
+  console.log(this.parent);
   console.log(this.userData);
 }
 // ...
