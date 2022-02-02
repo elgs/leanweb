@@ -26,19 +26,19 @@
       "@babel/preset-env": "^7.16.11",
       "babel-loader": "^8.2.3",
       "clean-css": "^5.2.4",
-      "css-loader": "^6.5.1",
+      "css-loader": "^6.6.0",
       "fs-extra": "^10.0.0",
-      "globby": "^13.1.0",
+      "globby": "^13.1.1",
       "html-minifier": "^4.0.0",
       "isomorphic-git": "^1.11.1",
       "json5-loader": "^4.0.1",
       "node-watch": "^0.7.3",
       "parse5": "^6.0.1",
       "raw-loader": "^4.0.2",
-      "sass": "^1.49.4",
+      "sass": "^1.49.7",
       "sass-loader": "^12.4.0",
       "semver": "^7.3.5",
       "webpack": "^5.68.0",
-      "webpack-dev-server": "^4.7.3"
+      "webpack-dev-server": "^4.7.4"
    }
 }
