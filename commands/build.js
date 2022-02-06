@@ -18,52 +18,6 @@ const require = createRequire(import.meta.url);
       env = args[2];
    }
 
-   // const replaceNodeModulesImport = (str, filePath) => {
-   //    // match import not starting with dot or slash
-   //    return str.replace(/^([^\S\r\n]*(?:importScripts|import).+?['"])((?!\.|\/|http\:|https\:).*?)(['"].*)$/gm, (m, a, b, c) => {
-   //       if (b.startsWith(`~`)) {
-   //          // ~/package.json
-   //          return a + path.normalize(`${process.cwd()}/` + b.substring(1)) + c;
-   //       } else if (b.indexOf('/') > -1) {
-   //          // lodash-es/get.js
-   //          return a + path.normalize(`${process.cwd()}/node_modules/` + b) + c;
-   //       } else {
-   //          const nodeModulePath = `${process.cwd()}/node_modules/` + b + '/package.json';
-   //          const package = require(nodeModulePath);
-   //          // lodash-es
-   //          return a + path.normalize(`${process.cwd()}/node_modules/` + b + '/' + package.main) + c;
-   //       }
-   //    });
-   // };
-
-   // const walkDirSync = (dir, accept = null, callback) => {
-   //    fs.readdirSync(dir).forEach(f => {
-   //       let dirPath = path.join(dir, f);
-   //       const isDirectory = fs.statSync(dirPath).isDirectory() && (!accept || (typeof accept === 'function' && accept(dirPath, f)));
-   //       isDirectory ? walkDirSync(dirPath, accept, callback) : callback(path.join(dirPath));
-   //    });
-   // };
-
-   // const preprocessJsImport = filePath => {
-   //    if (
-   //       filePath.toLowerCase().endsWith('.js') &&
-   //       !filePath.toLowerCase().endsWith('/ast.js') &&
-   //       !filePath.startsWith(`${utils.dirs.build}/lib/`) &&
-   //       !filePath.startsWith(`${utils.dirs.build}/resources/`)
-   //    ) {
-   //       let jsFileString = fs.readFileSync(filePath, 'utf8');
-   //       jsFileString = replaceNodeModulesImport(jsFileString, filePath);
-   //       fs.writeFileSync(filePath, jsFileString);
-   //    }
-   // };
-
-   // const buildDirFilter = dirPath => {
-   //    if (dirPath.startsWith(`${utils.dirs.build}/lib/`)) {
-   //       return false;
-   //    }
-   //    return true;
-   // };
-
    const leanwebPackageJSON = require(`${__dirname}/../package.json`);
 
    const buildModule = (projectPath) => {
@@ -108,8 +62,6 @@ const require = createRequire(import.meta.url);
       };
 
       const buildJS = () => {
-         // walkDirSync(buildDir, buildDirFilter, preprocessJsImport);
-
          const jsString = project.components.reduce((acc, cur) => {
             const cmpName = utils.getComponentName(cur);
             let importString = `import './components/${cur}/${cmpName}.js';`;
@@ -129,7 +81,7 @@ const require = createRequire(import.meta.url);
                const scssFileExists = fs.existsSync(scssFilename);
                let cssString = '';
                if (scssFileExists) {
-                  let scssString = `@use "global-styles.scss";\n`;
+                  let scssString = `@use "${buildDir}/global-styles.scss";\n`;
                   scssString += fs.readFileSync(scssFilename, 'utf8');
                   scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
                   cssString = utils.buildCSS(scssString, `${buildDir}/components/${cmp}`);
