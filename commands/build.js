@@ -121,18 +121,18 @@ const require = createRequire(import.meta.url);
       const buildHTML = () => {
          project.components.forEach(cmp => {
             const cmpName = utils.getComponentName(cmp);
-            const htmlFilename = `${projectPath}/${buildDir}/components/${cmp}/${cmpName}.html`;
+            const htmlFilename = `${buildDir}/components/${cmp}/${cmpName}.html`;
             const htmlFileExists = fs.existsSync(htmlFilename);
             if (htmlFileExists) {
 
-               const scssFilename = `${projectPath}/${buildDir}/components/${cmp}/${cmpName}.scss`;
+               const scssFilename = `${buildDir}/components/${cmp}/${cmpName}.scss`;
                const scssFileExists = fs.existsSync(scssFilename);
                let cssString = '';
                if (scssFileExists) {
                   let scssString = `@use "global-styles.scss";\n`;
                   scssString += fs.readFileSync(scssFilename, 'utf8');
                   scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
-                  cssString = utils.buildCSS(scssString, `${projectPath}/${buildDir}/components/${cmp}`);
+                  cssString = utils.buildCSS(scssString, `${buildDir}/components/${cmp}`);
                }
                const styleString = cssString || '';
                const htmlString = fs.readFileSync(htmlFilename, 'utf8');
@@ -144,16 +144,16 @@ const require = createRequire(import.meta.url);
                fs.writeFileSync(`${buildDir}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
             }
          });
-         const htmlString = fs.readFileSync(`${projectPath}/${buildDir}/index.html`, 'utf8');
+         const htmlString = fs.readFileSync(`${buildDir}/index.html`, 'utf8');
          fs.writeFileSync(`${buildDir}/index.html`, htmlString);
       };
 
       const buildSCSS = () => {
-         const projectScssFilename = `${projectPath}/src/${project.name}.scss`;
+         const projectScssFilename = `${projectPath}/${utils.dirs.src}/${project.name}.scss`;
          let projectCssString = '';
          if (fs.existsSync(projectScssFilename)) {
             const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
-            projectCssString += utils.buildCSS(projectScssString, `${projectPath}/${buildDir}`);
+            projectCssString += utils.buildCSS(projectScssString, buildDir);
          }
          fs.writeFileSync(`${buildDir}/${project.name}.css`, projectCssString);
       };

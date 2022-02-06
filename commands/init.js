@@ -1,7 +1,7 @@
 import fs from 'fs';
 import fse from 'fs-extra';
 import git from 'isomorphic-git';
-import globby from 'globby';
+import { globby } from 'globby';
 import * as utils from './utils.js';
 
 import path from 'path';
