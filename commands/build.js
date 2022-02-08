@@ -81,10 +81,10 @@ const require = createRequire(import.meta.url);
                const scssFileExists = fs.existsSync(scssFilename);
                let cssString = '';
                if (scssFileExists) {
-                  let scssString = `@use "${buildDir}/global-styles.scss";\n`;
+                  let scssString = `@use "global-styles.scss";\n`;
                   scssString += fs.readFileSync(scssFilename, 'utf8');
                   scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
-                  cssString = utils.buildCSS(scssString, `${buildDir}/components/${cmp}`);
+                  cssString = utils.buildCSS(scssString, buildDir, `${buildDir}/components/${cmp}`);
                }
                const styleString = cssString || '';
                const htmlString = fs.readFileSync(htmlFilename, 'utf8');

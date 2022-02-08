@@ -28,10 +28,10 @@ export const copySymbolLinkFilter = (src, dest) => {
 
 export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
-export const buildCSS = (scssString, currentPaths) => {
+export const buildCSS = (scssString, ...currentPaths) => {
    if (scssString.trim()) {
-      const includePaths = [currentPaths, path.resolve(process.cwd(), dirs.build), path.resolve(process.cwd(), 'node_modules')];
-      const cssResult = sass.renderSync({ data: scssString, includePaths });
+      const loadPaths = [...currentPaths, path.resolve(process.cwd(), dirs.build), path.resolve(process.cwd(), 'node_modules')];
+      const cssResult = sass.compileString(scssString, { loadPaths });
       return cssResult.css.toString().trim();
    }
    return '';
