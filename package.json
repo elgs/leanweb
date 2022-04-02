@@ -25,7 +25,7 @@
       "@babel/plugin-transform-runtime": "^7.17.0",
       "@babel/preset-env": "^7.16.11",
       "babel-loader": "^8.2.4",
-      "clean-css": "^5.2.4",
+      "clean-css": "^5.3.0",
       "css-loader": "^6.7.1",
       "fs-extra": "^10.0.1",
       "globby": "^13.1.1",
@@ -35,10 +35,10 @@
       "node-watch": "^0.7.3",
       "parse5": "^6.0.1",
       "raw-loader": "^4.0.2",
-      "sass": "^1.49.9",
+      "sass": "^1.49.11",
       "sass-loader": "^12.6.0",
       "semver": "^7.3.5",
-      "webpack": "^5.70.0",
+      "webpack": "^5.71.0",
       "webpack-dev-server": "^4.7.4"
    }
 }
