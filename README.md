@@ -488,21 +488,6 @@ Importing a JSON file:
 import someJSON from "./some.json";
 ```
 
-Importing CSS/SCSS:
-
-```javascript
-import agate from "/node_modules/highlight.js/scss/agate.scss";
-
-// customElements.define('demo-root',
-//  class extends LWElement {  // LWElement extends HTMLElement
-//    constructor() {
-//      super(ast);
-super.applyStyles(agate);
-//    }
-//  }
-//);
-```
-
 ## Component Communication
 
 The following project demonstrates how Leanweb helps web components to talk to
@@ -673,11 +658,6 @@ Called when the componnet `lw-if` is evaluated `false`.
 
 If `urlHashChanged()` is defined as a function, it will be called whenever the
 urlHash changes. This could be useful to update the DOM in component routing.
-
-#### applyStyles(...styles)
-
-`applyStyles` will apply the styles that is imported from a css or scss into
-the web component DOM.
 
 ### LWEventBus
 
