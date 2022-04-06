@@ -193,7 +193,7 @@ export default class LWElement extends HTMLElement {
    }
 
    _bindMethods() {
-      const methodNames = ['update', 'applyStyles'];
+      const methodNames = ['update'];
       const proto = Object.getPrototypeOf(this);
       methodNames.push(...Object.getOwnPropertyNames(proto).filter(name => hasMethod(proto, name)));
       methodNames.push(...Object.getOwnPropertyNames(this).filter(name => hasMethod(this, name)));
@@ -465,20 +465,6 @@ export default class LWElement extends HTMLElement {
 
          node['lw-context'] = [itemContext, ...context];
          this.update(node);
-      });
-   }
-
-   applyStyles(...styles) {
-      if (!styles) {
-         return;
-      }
-      styles.forEach(style => {
-         if (typeof style !== 'string') {
-            style = style.toString();
-         }
-         const styleNode = document.createElement('style');
-         styleNode.innerHTML = style;
-         this.shadowRoot.appendChild(styleNode);
       });
    }
 }
