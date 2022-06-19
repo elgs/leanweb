@@ -30,7 +30,7 @@
       "fs-extra": "^10.1.0",
       "globby": "^13.1.2",
       "html-minifier": "^4.0.0",
-      "isomorphic-git": "^1.18.2",
+      "isomorphic-git": "^1.18.3",
       "json5-loader": "^4.0.1",
       "node-watch": "^0.7.3",
       "parse5": "^7.0.0",
