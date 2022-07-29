@@ -30,7 +30,7 @@
       "fs-extra": "^10.1.0",
       "globby": "^13.1.2",
       "html-minifier": "^4.0.0",
-      "isomorphic-git": "^1.19.0",
+      "isomorphic-git": "^1.19.1",
       "json5-loader": "^4.0.1",
       "node-watch": "^0.7.3",
       "parse5": "^7.0.0",
@@ -38,7 +38,7 @@
       "sass": "^1.54.0",
       "sass-loader": "^13.0.2",
       "semver": "^7.3.7",
-      "webpack": "^5.73.0",
+      "webpack": "^5.74.0",
       "webpack-dev-server": "^4.9.3"
    }
 }
