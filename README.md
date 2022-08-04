@@ -691,7 +691,8 @@ of the event.
 ### Post dist hook
 
 If `post-dist` file is present in the project root directory, it will be called
-after `lw dist` is done. This could be useful to copy dist/\* to somewhere else.
+after `lw dist` is done. This could be useful to copy `dist/\*` to somewhere
+else.
 
 ## More examples and tutorials
 

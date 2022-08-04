@@ -62,8 +62,9 @@ if (args.length >= 3) {
          fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.dist}/${resource}`, { dereference: true });
       });
 
-      if (fs.statSync(`./post-dist`).isFile()) {
-         await utils.exec(`./post-dist`);
+      const postDistFile = './post-dist';
+      if (fs.existsSync(postDistFile) && fs.statSync(postDistFile).isFile()) {
+         await utils.exec(postDistFile);
       }
    });
 })();
