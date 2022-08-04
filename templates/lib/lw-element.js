@@ -284,16 +284,17 @@ export default class LWElement extends HTMLElement {
             modelNode.do_not_update = true;
             object[propertyExpr] = modelNode.value * 1;
          } else if (modelNode.type === 'checkbox') {
-            if (!Array.isArray(object[propertyExpr])) {
-               object[propertyExpr] = [];
-            }
-            if (modelNode.checked) {
-               object[propertyExpr].push(modelNode.value);
-            } else {
-               const index = object[propertyExpr].indexOf(modelNode.value);
-               if (index > -1) {
-                  object[propertyExpr].splice(index, 1);
+            if (Array.isArray(object[propertyExpr])) {
+               if (modelNode.checked) {
+                  object[propertyExpr].push(modelNode.value);
+               } else {
+                  const index = object[propertyExpr].indexOf(modelNode.value);
+                  if (index > -1) {
+                     object[propertyExpr].splice(index, 1);
+                  }
                }
+            } else {
+               object[propertyExpr] = modelNode.checked;
             }
          } else if (modelNode.type === 'select-multiple') {
             if (!Array.isArray(object[propertyExpr])) {
@@ -326,7 +327,11 @@ export default class LWElement extends HTMLElement {
       const interpolation = this.ast[key];
       const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
       if (modelNode.type === 'checkbox') {
-         modelNode.checked = parsed[0].includes(modelNode.value);
+         if (Array.isArray(parsed[0])) {
+            modelNode.checked = parsed[0].includes?.(modelNode.value);
+         } else {
+            modelNode.checked = !!parsed[0];
+         }
       } else if (modelNode.type === 'radio') {
          modelNode.checked = parsed[0] === modelNode.value;
       } else if (modelNode.type === 'select-multiple') {
