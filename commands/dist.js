@@ -61,5 +61,9 @@ if (args.length >= 3) {
       project.resources?.forEach(resource => {
          fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.dist}/${resource}`, { dereference: true });
       });
+
+      if (fs.statSync(`./post-dist`).isFile()) {
+         await utils.exec(`./post-dist`);
+      }
    });
 })();
