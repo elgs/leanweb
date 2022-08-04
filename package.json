@@ -35,7 +35,7 @@
       "node-watch": "^0.7.3",
       "parse5": "^7.0.0",
       "raw-loader": "^4.0.2",
-      "sass": "^1.54.2",
+      "sass": "^1.54.3",
       "sass-loader": "^13.0.2",
       "semver": "^7.3.7",
       "webpack": "^5.74.0",
