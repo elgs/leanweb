@@ -251,6 +251,11 @@ items = ["one", "two", "three"];
 2: three
 ```
 
+#### access DOM from lw-for
+
+`lw-for` binds the DOM to the list of elements respectively if `typeof element`
+evaluates `object`. To access the DOM node, use `element.getDom()`.
+
 ### lw-model and lw-on:
 
 ```html
@@ -350,6 +355,8 @@ Here is a few examples how Leanweb helps web components work with form binding.
 
 ### Checkbox
 
+#### Multiple chechboxes bound to an array
+
 ```javascript
 // ...
 items = ['one', 'two', 'three'];
@@ -374,6 +381,24 @@ checkedValues = [];
 ```
 
 <img src='https://leanweb.app/images/leanweb-form-binding-checkbox.gif' alt='Leanweb Form Binding Checkbox'/>
+
+#### Single checkbox bound to a boolean value
+
+```javascript
+checked = false;
+toggleCheckbox() {
+    this.checked = !this.checked;
+    this.update();
+}
+```
+
+```html
+<button lw-on:click="toggleCheckbox()">Toggle Checkbox</button>
+<div>
+  <input type="checkbox" lw-model="checked" />
+  <span lw>checked</span>
+</div>
+```
 
 ### Select
 

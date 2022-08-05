@@ -462,6 +462,9 @@ export default class LWElement extends HTMLElement {
             node.setAttribute('lw-context', '');
             currentNode.insertAdjacentElement('afterend', node);
          }
+         if (item && typeof item === 'object') {
+            item.getDom = () => node;
+         }
          currentNode = node;
          const itemContext = { [interpolation.itemExpr]: item };
          if (interpolation.indexExpr) {
