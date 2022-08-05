@@ -253,8 +253,8 @@ items = ["one", "two", "three"];
 
 #### access DOM from lw-for
 
-`lw-for` binds the DOM to the list of elements respectively if `typeof element`
-evaluates `object`. To access the DOM node, use `element.getDom()`.
+You could access DOM nodes for each element in a `lw-for` loop by calling
+`elem.getDom()` as long as `typeof elem` evaluates `object`.
 
 ### lw-model and lw-on:
 
