@@ -230,10 +230,9 @@ export default class LWElement extends HTMLElement {
             }
             eventNode[attrName] = true;
             const interpolation = this.ast[attrValue];
-
-            const context = this._getNodeContext(eventNode);
             interpolation.lwValue.split(',').forEach(eventType => {
                eventNode.addEventListener(eventType.trim(), (event => {
+                  const context = this._getNodeContext(eventNode);
                   const eventContext = { '$event': event, '$node': eventNode };
                   const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
 
@@ -262,8 +261,8 @@ export default class LWElement extends HTMLElement {
       }
       modelNode['model_event_bound'] = true;
       const interpolation = this.ast[key];
-      const context = this._getNodeContext(modelNode);
       modelNode.addEventListener('input', (event => {
+         const context = this._getNodeContext(modelNode);
          const astModel = interpolation.ast[0].expression;
          let object;
          let propertyExpr;
