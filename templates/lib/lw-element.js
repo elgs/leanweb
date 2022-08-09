@@ -97,7 +97,6 @@ const nextAllSiblings = (el, selector) => {
 };
 
 export default class LWElement extends HTMLElement {
-   self = this;
    constructor(ast) {
       super();
       this.ast = ast;
@@ -133,7 +132,7 @@ export default class LWElement extends HTMLElement {
 
    _getNodeContext(node) {
       const contextNode = node.closest('[lw-context]');
-      return contextNode?.['lw-context'] ?? [this, globalThis];
+      return contextNode?.['lw-context'] ?? [{ 'this': this }, this, globalThis];
    }
 
    update(rootNode = this.shadowRoot) {

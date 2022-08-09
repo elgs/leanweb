@@ -324,14 +324,13 @@ imageWidth = 400;
 `demo-parent.html`
 
 ```html
-<demo-child lw-input:parent="self" lw-input:userData="user"></demo-child>
+<demo-child lw-input:parent="this" lw-input:userData="user"></demo-child>
 ```
 
 `demo-parent.js`
 
 ```javascript
 // ...
-// self is defined in LWElement as `self = this`;
 user = { firstname: "Qian", lastname: "Chen" };
 // ...
 ```

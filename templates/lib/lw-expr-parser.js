@@ -127,6 +127,14 @@ const nodeHandlers = {
          return context[node.name];
       }
    },
+   'ThisExpression': (node, context) => {
+      if (Array.isArray(context)) {
+         const hitContext = context.find(contextObj => 'this' in contextObj);
+         return hitContext ? hitContext['this'] : undefined;
+      } else if (typeof context === 'object') {
+         return context['this'];
+      }
+   },
 
    'CallExpression': (node, context) => callFunction(node, context),
    'OptionalCallExpression': (node, context) => callFunction(node, context),
