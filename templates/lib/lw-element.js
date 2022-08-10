@@ -77,6 +77,7 @@ globalThis.addEventListener('hashchange', () => {
    leanweb.componentsListeningOnUrlChanges.forEach(component => {
       setTimeout(() => {
          component?.urlHashChanged?.call(component);
+         component?.update?.call(component);
       });
    });
 }, false);

@@ -1,6 +1,6 @@
 {
    "name": "leanweb",
-   "version": "1.2.6",
+   "version": "1.2.7",
    "description": "Builds framework agnostic web components.",
    "bin": {
       "leanweb": "leanweb.js",
@@ -39,6 +39,6 @@
       "sass-loader": "^13.0.2",
       "semver": "^7.3.7",
       "webpack": "^5.74.0",
-      "webpack-dev-server": "^4.9.3"
+      "webpack-dev-server": "^4.10.0"
    }
 }
