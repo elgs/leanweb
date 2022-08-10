@@ -387,7 +387,6 @@ checkedValues = [];
 checked = false;
 toggleCheckbox() {
     this.checked = !this.checked;
-    this.update();
 }
 ```
 
