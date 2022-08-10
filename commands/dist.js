@@ -2,7 +2,6 @@ import webpack from 'webpack';
 import * as utils from './utils.js';
 import fs from 'fs';
 import fse from 'fs-extra';
-// const minify = require('html-minifier').minify;
 import { minify } from 'html-minifier';
 import CleanCSS from 'clean-css';
 
@@ -49,7 +48,7 @@ if (args.length >= 3) {
          collapseWhitespace: true,
          minifyCSS: true,
          minifyJS: true,
-         caseSensitive: true,
+         removeComments: true,
       });
       fs.writeFileSync(`./${utils.dirs.dist}/index.html`, minifiedIndexHtml);
 

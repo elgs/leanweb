@@ -1,5 +1,6 @@
 import fs from 'fs';
 import fse from 'fs-extra';
+import { minify } from 'html-minifier';
 import * as utils from './utils.js';
 import * as parser from '../lib/lw-html-parser.js';
 
@@ -88,7 +89,14 @@ const require = createRequire(import.meta.url);
                }
                const styleString = cssString || '';
                const htmlString = fs.readFileSync(htmlFilename, 'utf8');
-               const ast = parser.parse(htmlString);
+               const minifiedHtml = minify(htmlString, {
+                caseSensitive: true,
+                collapseWhitespace: true,
+                minifyCSS: true,
+                minifyJS: true,
+                removeComments: true,
+             });
+               const ast = parser.parse(minifiedHtml);
                ast.css = styleString;
                ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
                ast.runtimeVersion = project.version;
