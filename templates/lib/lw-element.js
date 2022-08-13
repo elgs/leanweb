@@ -200,6 +200,8 @@ export default class LWElement extends HTMLElement {
       });
    }
 
+   // properties:
+   // lw_input_bound: boolean
    _bindInputs(inputNode) {
       if (inputNode['lw_input_bound']) {
          return;
@@ -237,14 +239,15 @@ export default class LWElement extends HTMLElement {
                   const context = this._getNodeContext(eventNode);
                   const eventContext = { '$event': event, '$node': eventNode };
                   const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
-
-                  const promises = parsed.filter(p => typeof p?.then === 'function');
+                  const promises = parsed.filter(p => typeof p?.then === 'function' && typeof p?.finally === 'function');
                   if (parsed.length > promises.length) {
                      me.update();
                   }
-                  if (promises.length > 0) {
-                     Promise.allSettled(promises).then(_ => me.update());
-                  }
+                  promises.forEach(p => {
+                     p?.finally(() => {
+                        me.update();
+                     });
+                  });
                }).bind(me));
             });
          }

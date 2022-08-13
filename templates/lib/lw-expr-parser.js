@@ -24,6 +24,25 @@ const binaryOperations = {
    //  '|>': (a, b) => a |> b,
 };
 
+const assignmentOperations = {
+   '=': (c, a, b) => { c[a] = b; },
+   '+=': (c, a, b) => { c[a] += b; },
+   '-=': (c, a, b) => { c[a] -= b; },
+   '*=': (c, a, b) => { c[a] *= b; },
+   '/=': (c, a, b) => { c[a] /= b; },
+   '%=': (c, a, b) => { c[a] %= b; },
+   '**=': (c, a, b) => { c[a] **= b; },
+   '&&=': (c, a, b) => { c[a] &&= b; },
+   '??=': (c, a, b) => { c[a] ??= b; },
+   '||=': (c, a, b) => { c[a] ||= b; },
+   '>>=': (c, a, b) => { c[a] >>= b; },
+   '>>>=': (c, a, b) => { c[a] >>>= b; },
+   '<<=': (c, a, b) => { c[a] <<= b; },
+   '&=': (c, a, b) => { c[a] &= b; },
+   '|=': (c, a, b) => { c[a] |= b; },
+   '^=': (c, a, b) => { c[a] ^= b; },
+};
+
 const logicalOperators = {
    '||': (a, b) => a || b,
    '&&': (a, b) => a && b,
@@ -43,9 +62,9 @@ const unaryOperators = {
 
 const updateOperators = (operator, prefix) => {
    if (operator === '++') {
-      return prefix ? a => ++a : a => a++;
+      return (c, a) => prefix ? ++c[a] : c[a]++;
    } else if (operator === '--') {
-      return prefix ? a => --a : a => a--;
+      return (c, a) => prefix ? --c[a] : c[a]--;
    }
 };
 
@@ -75,9 +94,16 @@ const nodeHandlers = {
 
    'ExpressionStatement': (node, context) => evalNode(node.expression, context),
    'BinaryExpression': (node, context) => binaryOperations[node.operator](evalNode(node.left, context), evalNode(node.right, context)),
+   'AssignmentExpression': (node, context) => {
+      const immediateCtx = immediateContext(node.left, context);
+      assignmentOperations[node.operator](immediateCtx, node.left.name, evalNode(node.right, context));
+   },
    'LogicalExpression': (node, context) => logicalOperators[node.operator](evalNode(node.left, context), evalNode(node.right, context)),
    'UnaryExpression': (node, context) => unaryOperators[node.operator](evalNode(node.argument, context)),
-   'UpdateExpression': (node, context) => updateOperators(node.operator, node.prefix)(evalNode(node.argument, context)),
+   'UpdateExpression': (node, context) => {
+      const immediateCtx = immediateContext(node.argument, context);
+      updateOperators(node.operator, node.prefix)(immediateCtx, node.argument.name, evalNode(node.argument, context));
+   },
    'ConditionalExpression': (node, context) => {
       const test = evalNode(node.test, context);
       const consequent = evalNode(node.consequent, context);
@@ -143,6 +169,14 @@ const nodeHandlers = {
    'Directive': (node, context) => evalNode(node.value, context),
    'DirectiveLiteral': (node, context) => node.value,
 };
+
+const immediateContext = (node, context) => {
+   if (Array.isArray(context)) {
+      return context.find(contextObj => node.name in contextObj);
+   } else if (typeof context === 'object') {
+      return context;
+   }
+}
 
 const evalNode = (node, context) => nodeHandlers[node.type](node, context);
 
