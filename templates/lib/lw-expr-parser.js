@@ -172,7 +172,10 @@ const nodeHandlers = {
 
 const immediateContext = (node, context) => {
    if (Array.isArray(context)) {
-      return context.find(contextObj => node.name in contextObj);
+      if (context.length === 0) {
+         return null;
+      }
+      return context.find(contextObj => node.name in contextObj) ?? context[0];
    } else if (typeof context === 'object') {
       return context;
    }
