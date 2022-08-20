@@ -17,8 +17,8 @@ if (args.length >= 3) {
 (async () => {
    const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
-   await utils.exec(`npx lw clean`);
-   await utils.exec(`npx lw build ${env}`);
+   await utils.exec(`npx leanweb clean`);
+   await utils.exec(`npx leanweb build ${env}`);
 
    const webpackConfig = utils.getWebPackConfig(utils.dirs.dist, project);
 

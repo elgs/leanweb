@@ -31,8 +31,8 @@ const require = createRequire(import.meta.url);
       fs.writeFileSync(leanwebJSONPath, JSON.stringify(project, null, 2));
    }
 
-   await utils.exec(`npx lw clean`);
-   await utils.exec(`npx lw build ${env}`);
+   await utils.exec(`npx leanweb clean`);
+   await utils.exec(`npx leanweb build ${env}`);
 
    fse.copySync(`./${utils.dirs.build}/electron.js`, `./${utils.dirs.electron}/electron.js`);
    fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.electron}/index.html`);

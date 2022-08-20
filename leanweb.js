@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
    const args = process.argv;
 
    if (args.length < 3) {
-      utils.exec('npx lw help');
+      utils.exec('npx leanweb help');
       return;
    }
 

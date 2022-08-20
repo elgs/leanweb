@@ -2,7 +2,7 @@ import * as utils from './utils.js';
 
 (async () => {
    if (process.argv.length < 3) {
-      utils.exec('npx lw version');
+      utils.exec('npx leanweb version');
       console.log('Usage: lw target parameters');
       console.log('Targets:\n');
       Object.keys(utils.targets).forEach(t => {

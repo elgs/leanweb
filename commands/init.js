@@ -66,7 +66,7 @@ const require = createRequire(import.meta.url);
 
    utils.exec(`npm i -D @babel/runtime --loglevel=error`);
 
-   utils.exec(`npx lw generate root`);
+   utils.exec(`npx leanweb generate root`);
 
    fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);
 
