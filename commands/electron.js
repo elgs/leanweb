@@ -39,7 +39,10 @@ const require = createRequire(import.meta.url);
    fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.electron}/${project.name}.css`);
    fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.electron}/favicon.svg`);
    project.resources?.forEach(resource => {
-      fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.electron}/${resource}`, { dereference: true });
+      const source = `./${utils.dirs.build}/${resource}`;
+      if (fs.existsSync(source)) {
+         fse.copySync(source, `./${utils.dirs.electron}/${resource}`, { dereference: true });
+      }
    });
 
    const webpackConfig = utils.getWebPackConfig(utils.dirs.electron, project);

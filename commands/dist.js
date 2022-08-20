@@ -58,7 +58,10 @@ if (args.length >= 3) {
 
       fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.dist}/favicon.svg`);
       project.resources?.forEach(resource => {
-         fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.dist}/${resource}`, { dereference: true });
+         const source = `./${utils.dirs.build}/${resource}`;
+         if (fs.existsSync(source)) {
+            fse.copySync(source, `./${utils.dirs.dist}/${resource}`, { dereference: true });
+         }
       });
 
       const postDistFile = './post-dist';

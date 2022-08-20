@@ -29,7 +29,10 @@ const noopen = process.env.noopen || false;
          fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
          fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
          project.resources?.forEach(resource => {
-            fse.copySync(`./${utils.dirs.build}/${resource}`, `./${utils.dirs.serve}/${resource}`, { filter: utils.copySymbolLinkFilter });
+            const source = `./${utils.dirs.build}/${resource}`;
+            if (fs.existsSync(source)) {
+               fse.copySync(source, `./${utils.dirs.serve}/${resource}`, { filter: utils.copySymbolLinkFilter });
+            }
          });
       } catch (e) {
          console.error(e);
