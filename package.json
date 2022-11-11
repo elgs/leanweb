@@ -36,9 +36,9 @@
       "parse5": "^7.1.1",
       "raw-loader": "^4.0.2",
       "sass": "^1.56.1",
-      "sass-loader": "^13.1.0",
+      "sass-loader": "^13.2.0",
       "semver": "^7.3.8",
-      "webpack": "^5.74.0",
+      "webpack": "^5.75.0",
       "webpack-dev-server": "^4.11.1"
    }
 }
