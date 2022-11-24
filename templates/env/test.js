@@ -1,3 +1,3 @@
 export default {
-   // apiUrl: 'http://test:1234'
+  // apiUrl: 'http://test:1234'
 };

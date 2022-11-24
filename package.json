@@ -1,34 +1,34 @@
 {
-   "name": "leanweb",
-   "version": "2.0.0",
-   "description": "Builds framework agnostic web components.",
-   "bin": {
-      "leanweb": "leanweb.js",
-      "lw": "leanweb.js"
-   },
-   "type": "module",
-   "repository": {
-      "type": "git",
-      "url": "git+https://github.com/elgs/leanweb.git"
-   },
-   "homepage": "https://leanweb.app",
-   "keywords": [
-      "leanweb",
-      "lw",
-      "web components"
-   ],
-   "author": "Qian Chen",
-   "license": "MIT",
-   "dependencies": {
-      "fs-extra": "^10.1.0",
-      "node-watch": "^0.7.3",
-      "semver": "^7.3.8",
-      "parse5": "^7.1.2",
-      "@babel/parser": "^7.20.3",
-      "html-minifier": "^4.0.0",
-      "clean-css": "^5.3.1",
-      "sass": "^1.56.1",
-      "isomorphic-git": "^1.21.0",
-      "globby": "^13.1.2"
-   }
+  "name": "leanweb",
+  "version": "2.0.0",
+  "description": "Builds framework agnostic web components.",
+  "bin": {
+    "leanweb": "leanweb.js",
+    "lw": "leanweb.js"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elgs/leanweb.git"
+  },
+  "homepage": "https://leanweb.app",
+  "keywords": [
+    "leanweb",
+    "lw",
+    "web components"
+  ],
+  "author": "Qian Chen",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^10.1.0",
+    "node-watch": "^0.7.3",
+    "semver": "^7.3.8",
+    "parse5": "^7.1.2",
+    "@babel/parser": "^7.20.3",
+    "html-minifier": "^4.0.0",
+    "clean-css": "^5.3.1",
+    "sass": "^1.56.1",
+    "isomorphic-git": "^1.21.0",
+    "globby": "^13.1.2"
+  }
 }

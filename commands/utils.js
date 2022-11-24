@@ -14,72 +14,72 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
 export const dirs = {
-   src: 'src',
-   build: 'build',
-   serve: 'serve',
-   dist: 'dist',
+  src: 'src',
+  build: 'build',
+  serve: 'serve',
+  dist: 'dist',
 };
 
 export const copySymbolLinkFilter = (src, dest) => {
-   const destStats = fse.existsSync(dest) && fse.lstatSync(dest);
-   return !destStats?.isSymbolicLink?.();
+  const destStats = fse.existsSync(dest) && fse.lstatSync(dest);
+  return !destStats?.isSymbolicLink?.();
 };
 
 export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
 export const buildCSS = (scssString, ...currentPaths) => {
-   if (scssString.trim()) {
-      const loadPaths = [...currentPaths, path.resolve(process.cwd(), dirs.build), path.resolve(process.cwd(), 'node_modules')];
-      const cssResult = sass.compileString(scssString, { loadPaths });
-      return cssResult.css.toString().trim();
-   }
-   return '';
+  if (scssString.trim()) {
+    const loadPaths = [...currentPaths, path.resolve(process.cwd(), dirs.build), path.resolve(process.cwd(), 'node_modules')];
+    const cssResult = sass.compileString(scssString, { loadPaths });
+    return cssResult.css.toString().trim();
+  }
+  return '';
 };
 
 export const getComponentName = cmp => {
-   const indexOfLastSlash = cmp.lastIndexOf('/');
-   if (indexOfLastSlash > -1) {
-      return cmp.substring(indexOfLastSlash + 1);
-   }
-   return cmp;
+  const indexOfLastSlash = cmp.lastIndexOf('/');
+  if (indexOfLastSlash > -1) {
+    return cmp.substring(indexOfLastSlash + 1);
+  }
+  return cmp;
 };
 
 export const getPathLevels = filePath => {
-   filePath = path.normalize(filePath);
-   const numSlashes = filePath.replace(/[^\/]/g, '').length;
-   let ret = '';
-   for (let i = 0; i < numSlashes; ++i) {
-      ret += '../';
-   }
-   return ret;
+  filePath = path.normalize(filePath);
+  const numSlashes = filePath.replace(/[^\/]/g, '').length;
+  let ret = '';
+  for (let i = 0; i < numSlashes; ++i) {
+    ret += '../';
+  }
+  return ret;
 };
 
 export const throttle = (callback, limit = 100) => {
-   let wait = false;
-   return function () {
-      if (!wait) {
-         wait = true;
-         setTimeout(() => {
-            wait = false;
-            callback.apply(null, arguments);
-         }, limit);
-      }
-   };
+  let wait = false;
+  return function () {
+    if (!wait) {
+      wait = true;
+      setTimeout(() => {
+        wait = false;
+        callback.apply(null, arguments);
+      }, limit);
+    }
+  };
 };
 
 export const portInUse = (port, address = '127.0.0.1') => {
-   return new Promise((resolve, reject) => {
-      const server = net.createServer(socket => socket.pipe(socket));
+  return new Promise((resolve, reject) => {
+    const server = net.createServer(socket => socket.pipe(socket));
 
-      server.listen(port, address);
-      server.on('error', e => {
-         resolve(true);
-      });
-      server.on('listening', e => {
-         server.close();
-         resolve(false);
-      });
-   });
+    server.listen(port, address);
+    server.on('error', e => {
+      resolve(true);
+    });
+    server.on('listening', e => {
+      server.close();
+      resolve(false);
+    });
+  });
 };
 
 const initNote = `Usage: leanweb init or leanweb init project-name
@@ -178,14 +178,14 @@ const versionNote = `Usage: leanweb version
 Print version information for leanweb.`;
 
 export const targets = {
-   'init': { file: 'init.js', note: initNote },
-   'generate': { file: 'generate.js', note: generateNote },
-   'serve': { file: 'serve.js', note: serveNote },
-   'build': { file: 'build.js', note: buildNote },
-   'dist': { file: 'dist.js', note: distNote },
-   'upgrade': { file: 'upgrade.js', note: upgradeNote },
-   'clean': { file: 'clean.js', note: cleanNote },
-   'destroy': { file: 'destroy.js', note: destroyNote },
-   'help': { file: 'help.js', note: helpNote },
-   'version': { file: 'version.js', note: versionNote },
+  'init': { file: 'init.js', note: initNote },
+  'generate': { file: 'generate.js', note: generateNote },
+  'serve': { file: 'serve.js', note: serveNote },
+  'build': { file: 'build.js', note: buildNote },
+  'dist': { file: 'dist.js', note: distNote },
+  'upgrade': { file: 'upgrade.js', note: upgradeNote },
+  'clean': { file: 'clean.js', note: cleanNote },
+  'destroy': { file: 'destroy.js', note: destroyNote },
+  'help': { file: 'help.js', note: helpNote },
+  'version': { file: 'version.js', note: versionNote },
 };
