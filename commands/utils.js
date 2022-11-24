@@ -68,59 +68,6 @@ export const throttle = (callback, limit = 100) => {
    };
 };
 
-export const getWebPackConfig = (outputDir, project) => {
-   return {
-      entry: process.cwd() + `/${dirs.build}/${project.name}.js`,
-      output: {
-         path: process.cwd() + `/${outputDir}/`,
-         filename: `${project.name}.js`,
-      },
-      module: {
-         rules: [{
-            test: path.resolve(process.cwd()),
-            exclude: /node_modules/,
-            loader: require.resolve('babel-loader'),
-            options: {
-               presets: [require.resolve('@babel/preset-env'), {
-                  plugins: [
-                     '@babel/plugin-transform-runtime'
-                  ].map(require.resolve)
-               }]
-            },
-         }, {
-            test: /\.(scss|sass|css)$/i,
-            use: [
-               {
-                  loader: require.resolve('css-loader'),
-               },
-               {
-                  loader: require.resolve('sass-loader'),
-                  options: {
-                     sassOptions: {
-                        includePaths: [path.resolve(process.cwd(), 'node_modules')],
-                     }
-                  }
-               },
-            ],
-         }, {
-            test: /\.json$/i,
-            loader: require.resolve('json5-loader'),
-            options: {
-               esModule: true,
-            },
-            type: 'javascript/auto',
-         }, {
-            loader: require.resolve('raw-loader'),
-            exclude: [
-               /\.(js|mjs|jsx|ts|tsx)$/i,
-               /\.(json|json5)$/i,
-               /\.(css|scss|sass)$/i
-            ],
-         }]
-      },
-   }
-};
-
 export const portInUse = (port, address = '127.0.0.1') => {
    return new Promise((resolve, reject) => {
       const server = net.createServer(socket => socket.pipe(socket));

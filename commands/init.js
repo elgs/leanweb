@@ -64,8 +64,6 @@ const require = createRequire(import.meta.url);
    fs.mkdirSync(`${utils.dirs.src}/resources/`, { recursive: true });
    fs.writeFileSync(`${utils.dirs.src}/leanweb.json`, JSON.stringify(leanwebData, null, 2));
 
-   utils.exec(`npm i -D @babel/runtime --loglevel=error`);
-
    utils.exec(`npx leanweb generate root`);
 
    fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`);
