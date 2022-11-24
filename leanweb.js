@@ -43,7 +43,7 @@ const __dirname = path.dirname(__filename);
       return;
    }
 
-   if (leanwebJSONExisted && target === 'version' || target === 'serve' || target === 'dist' || target === 'electron') {
+   if (leanwebJSONExisted && target === 'version' || target === 'serve' || target === 'dist') {
       const leanwebPackageJSON = require(`${__dirname}/package.json`);
       const projectLeanwebJSON = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
       const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);

@@ -1,4 +1,3 @@
-import webpack from 'webpack';
 import * as utils from './utils.js';
 import fs from 'fs';
 import fse from 'fs-extra';

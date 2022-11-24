@@ -1,8 +1,6 @@
 import fse from 'fs-extra';
 import * as utils from './utils.js';
-import webpack from 'webpack';
 import watch from 'node-watch';
-import WebpackDevServer from 'webpack-dev-server';
 
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);

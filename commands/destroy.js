@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
    const args = process.argv;
    if (args.length < 3) {
       console.log('Usage: lw destroy project-name');
-      console.log(`This will delete ${utils.dirs.src}/ ${utils.dirs.build}/ ${utils.dirs.dist}/ ${utils.dirs.serve}/ and ${utils.dirs.electron}/`)
+      console.log(`This will delete ${utils.dirs.src}/ ${utils.dirs.build}/ ${utils.dirs.dist}/ and ${utils.dirs.serve}/`)
       return;
    }
 
@@ -25,5 +25,4 @@ const require = createRequire(import.meta.url);
    fs.rmSync(utils.dirs.dist + '/', { recursive: true, force: true });
    fs.rmSync(utils.dirs.src + '/', { recursive: true, force: true });
    fs.rmSync(utils.dirs.serve + '/', { recursive: true, force: true });
-   fs.rmSync(utils.dirs.electron + '/', { recursive: true, force: true });
 })();

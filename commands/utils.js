@@ -18,7 +18,6 @@ export const dirs = {
    build: 'build',
    serve: 'serve',
    dist: 'dist',
-   electron: 'electron',
 };
 
 export const copySymbolLinkFilter = (src, dest) => {
@@ -163,10 +162,6 @@ const upgradeNote = `Usage: leanweb upgrade
 This will upgrade leanweb runtime in the src/lib directory.
 `;
 
-const electronNote = `Usage: leanweb electron [env]
-This will run the app as native desktop app using Electron.
-`;
-
 const destroyNote = `Usage leanweb destroy project-name
 This will remove the src/, build/ and dist/ directory. Please
 note the src directory will be deleted by this command.
@@ -190,7 +185,6 @@ export const targets = {
    'dist': { file: 'dist.js', note: distNote },
    'upgrade': { file: 'upgrade.js', note: upgradeNote },
    'clean': { file: 'clean.js', note: cleanNote },
-   'electron': { file: 'electron.js', note: electronNote },
    'destroy': { file: 'destroy.js', note: destroyNote },
    'help': { file: 'help.js', note: helpNote },
    'version': { file: 'version.js', note: versionNote },

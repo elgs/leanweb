@@ -16,17 +16,12 @@ const require = createRequire(import.meta.url);
    const args = process.argv;
 
    const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
-   const packageJSONExisted = fs.existsSync(`${process.cwd()}/package.json`);
 
    const lwPackage = require(`${__dirname}/../package.json`);
 
    if (leanwebJSONExisted) {
       console.error('Error: leanweb.json existed.');
       return;
-   }
-
-   if (!packageJSONExisted) {
-      utils.exec(`npm init -y`);
    }
 
    let projectName = path.basename(path.resolve());
@@ -81,9 +76,9 @@ const require = createRequire(import.meta.url);
       await git.init({ fs, dir: process.cwd() });
 
       if (fs.existsSync(`${process.cwd()}/.gitignore`) && fs.statSync(`${process.cwd()}/.gitignore`).isFile()) {
-         fs.appendFileSync(`${process.cwd()}/.gitignore`, `\nnode_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n${utils.dirs.electron}/\n`, 'utf8');
+         fs.appendFileSync(`${process.cwd()}/.gitignore`, `\nnode_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n`, 'utf8');
       } else {
-         fs.writeFileSync(`${process.cwd()}/.gitignore`, `node_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n${utils.dirs.electron}/\n`, 'utf8');
+         fs.writeFileSync(`${process.cwd()}/.gitignore`, `node_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n`, 'utf8');
       }
 
       const paths = await globby(['./**', './**/.*'], { gitignore: true });
