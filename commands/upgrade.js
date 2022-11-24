@@ -1,15 +1,14 @@
-import fs from 'fs';
-import fse from 'fs-extra';
-import semver from 'semver';
-import * as utils from './utils.js';
-
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
+
+import fs from 'fs';
+import fse from 'fs-extra';
+import semver from 'semver';
+import * as utils from './utils.js';
 
 const leanwebPackageJSON = require(`${__dirname}/../package.json`);
 const projectLeanwebJSON = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);

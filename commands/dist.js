@@ -1,11 +1,11 @@
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 import * as utils from './utils.js';
 import fs from 'fs';
 import fse from 'fs-extra';
 import { minify } from 'html-minifier';
 import CleanCSS from 'clean-css';
-
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
 
 let env = '';
 const args = process.argv;

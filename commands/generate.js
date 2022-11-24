@@ -1,13 +1,12 @@
-import fs from 'fs';
-import * as utils from './utils.js';
-
 import path from 'path';
 import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
+
+import fs from 'fs';
+import * as utils from './utils.js';
 
 (async () => {
   const args = process.argv;

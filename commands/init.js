@@ -1,16 +1,15 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 import fs from 'fs';
 import fse from 'fs-extra';
 import git from 'isomorphic-git';
 import { globby } from 'globby';
 import * as utils from './utils.js';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
 
 (async () => {
   const args = process.argv;
@@ -34,7 +33,6 @@ const require = createRequire(import.meta.url);
     name: projectName,
     version: lwPackage.version,
     components: [],
-    imports: [],
     resources: [
       'resources/'
     ],
@@ -76,9 +74,9 @@ const require = createRequire(import.meta.url);
     await git.init({ fs, dir: process.cwd() });
 
     if (fs.existsSync(`${process.cwd()}/.gitignore`) && fs.statSync(`${process.cwd()}/.gitignore`).isFile()) {
-      fs.appendFileSync(`${process.cwd()}/.gitignore`, `\nnode_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n`, 'utf8');
+      fs.appendFileSync(`${process.cwd()}/.gitignore`, `\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n`, 'utf8');
     } else {
-      fs.writeFileSync(`${process.cwd()}/.gitignore`, `node_modules/\n${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n`, 'utf8');
+      fs.writeFileSync(`${process.cwd()}/.gitignore`, `${utils.dirs.build}/\n${utils.dirs.dist}/\n${utils.dirs.serve}/\n`, 'utf8');
     }
 
     const paths = await globby(['./**', './**/.*'], { gitignore: true });

@@ -1,17 +1,8 @@
-// const { execSync } = require('child_process');
 import { execSync } from 'child_process';
-// const sass = require('sass');
 import sass from 'sass';
-// import path from 'path';
 import path from 'path';
-// const net = require('net');
 import net from 'net';
-
-// import fse from 'fs-extra';
 import fse from 'fs-extra';
-
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
 
 export const dirs = {
   src: 'src',
@@ -29,7 +20,7 @@ export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inh
 
 export const buildCSS = (scssString, ...currentPaths) => {
   if (scssString.trim()) {
-    const loadPaths = [...currentPaths, path.resolve(process.cwd(), dirs.build), path.resolve(process.cwd(), 'node_modules')];
+    const loadPaths = [...currentPaths, path.resolve(process.cwd(), dirs.build)];
     const cssResult = sass.compileString(scssString, { loadPaths });
     return cssResult.css.toString().trim();
   }

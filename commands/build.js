@@ -1,16 +1,15 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
 import fs from 'fs';
 import fse from 'fs-extra';
 import { minify } from 'html-minifier';
 import * as utils from './utils.js';
 import * as parser from '../lib/lw-html-parser.js';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
 
 (async () => {
   let env;
@@ -42,7 +41,7 @@ const require = createRequire(import.meta.url);
         const cmpName = utils.getComponentName(cur);
         let importString = `import './components/${cur}/${cmpName}.js';`;
         return acc + importString + '\n';
-      }, depImports + '\n');
+      }, '');
       fs.writeFileSync(`${utils.dirs.build}/${project.name}.js`, jsString);
     };
 
