@@ -33,7 +33,7 @@
       "isomorphic-git": "^1.21.0",
       "json5-loader": "^4.0.1",
       "node-watch": "^0.7.3",
-      "parse5": "^7.1.1",
+      "parse5": "^7.1.2",
       "raw-loader": "^4.0.2",
       "sass": "^1.56.1",
       "sass-loader": "^13.2.0",
