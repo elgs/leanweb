@@ -106,8 +106,7 @@ export default class LWElement extends HTMLElement {
     leanweb.builderVersion = ast.builderVersion;
 
     const node = document.createElement('template');
-    node.innerHTML = '<style>' + ast.css + '</style>' +
-      ast.html;
+    node.innerHTML = `<style>${ast.css}</style>${ast.html}`;
     this.attachShadow({ mode: 'open' }).appendChild(node.content);
 
     this._bindMethods();
