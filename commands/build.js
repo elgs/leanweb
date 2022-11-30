@@ -51,7 +51,6 @@ import * as parser from '../lib/lw-html-parser.js';
         const htmlFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.html`;
         const htmlFileExists = fs.existsSync(htmlFilename);
         if (htmlFileExists) {
-
           const scssFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.scss`;
           const scssFileExists = fs.existsSync(scssFilename);
           let cssString = '';
@@ -78,8 +77,6 @@ import * as parser from '../lib/lw-html-parser.js';
           fs.writeFileSync(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
         }
       });
-      const htmlString = fs.readFileSync(`${utils.dirs.build}/index.html`, 'utf8');
-      fs.writeFileSync(`${utils.dirs.build}/index.html`, htmlString);
     };
 
     const buildSCSS = () => {

@@ -5,6 +5,8 @@ import fs from 'fs';
 import fse from 'fs-extra';
 import * as utils from './utils.js';
 import watch from 'node-watch';
+import liveServer from 'live-server';
+
 
 let env = '';
 const args = process.argv;
@@ -45,35 +47,14 @@ const noopen = process.env.noopen || false;
 
   build();
 
-  const webpackConfig = utils.getWebPackConfig(utils.dirs.serve, project);
-
-  const webpackDevConfig = {
-    ...webpackConfig,
-    mode: 'development',
-    // watch: true,
-    devtool: 'eval-cheap-module-source-map',
-    performance: {
-      hints: false,
-    },
-  };
-
-  const compiler = webpack(webpackDevConfig);
-
-  while (await utils.portInUse(port, host)) {
-    ++port;
-  }
-
-  const devServerOptions = {
-    ...webpackDevConfig.devServer,
-    static: {
-      directory: process.cwd() + `/${utils.dirs.serve}/`,
-      watch: true,
-    },
+  const params = {
     port,
     host,
+    root: "build",
     open: !noopen,
+    file: 'index.html',
+    wait: 1000,
+    logLevel: 0,
   };
-  const server = new WebpackDevServer(devServerOptions, compiler);
-
-  server.start();
+  liveServer.start(params);
 })();
