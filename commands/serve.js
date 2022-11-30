@@ -1,6 +1,7 @@
 import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 
+import fs from 'fs';
 import fse from 'fs-extra';
 import * as utils from './utils.js';
 import watch from 'node-watch';
