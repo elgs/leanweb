@@ -1,3 +1,3 @@
 export default {
-   // apiUrl: 'https://prod.com'
+  // apiUrl: 'https://prod.com'
 };

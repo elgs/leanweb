@@ -1,44 +1,36 @@
 {
-   "name": "leanweb",
-   "version": "1.3.6",
-   "description": "Builds framework agnostic web components.",
-   "bin": {
-      "leanweb": "leanweb.js",
-      "lw": "leanweb.js"
-   },
-   "type": "module",
-   "repository": {
-      "type": "git",
-      "url": "git+https://github.com/elgs/leanweb.git"
-   },
-   "homepage": "https://leanweb.app",
-   "keywords": [
-      "leanweb",
-      "lw",
-      "web components"
-   ],
-   "author": "Qian Chen",
-   "license": "MIT",
-   "dependencies": {
-      "@babel/core": "^7.20.5",
-      "@babel/parser": "^7.20.5",
-      "@babel/plugin-transform-runtime": "^7.19.6",
-      "@babel/preset-env": "^7.20.2",
-      "babel-loader": "^9.1.0",
-      "clean-css": "^5.3.1",
-      "css-loader": "^6.7.2",
-      "fs-extra": "^11.1.0",
-      "globby": "^13.1.2",
-      "html-minifier": "^4.0.0",
-      "isomorphic-git": "^1.21.0",
-      "json5-loader": "^4.0.1",
-      "node-watch": "^0.7.3",
-      "parse5": "^7.1.2",
-      "raw-loader": "^4.0.2",
-      "sass": "^1.56.1",
-      "sass-loader": "^13.2.0",
-      "semver": "^7.3.8",
-      "webpack": "^5.75.0",
-      "webpack-dev-server": "^4.11.1"
-   }
+  "name": "leanweb",
+  "version": "2.0.0",
+  "description": "Builds framework agnostic web components.",
+  "bin": {
+    "leanweb": "leanweb.js",
+    "lw": "leanweb.js"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elgs/leanweb.git"
+  },
+  "homepage": "https://leanweb.app",
+  "keywords": [
+    "leanweb",
+    "lw",
+    "web components"
+  ],
+  "author": "Qian Chen",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/parser": "^7.20.5",
+    "clean-css": "^5.3.1",
+    "esbuild": "^0.15.16",
+    "fs-extra": "^11.1.0",
+    "globby": "^13.1.2",
+    "html-minifier": "^4.0.0",
+    "isomorphic-git": "^1.21.0",
+    "live-server": "^1.2.2",
+    "node-watch": "^0.7.3",
+    "parse5": "^7.1.2",
+    "sass": "^1.56.1",
+    "semver": "^7.3.8"
+  }
 }
