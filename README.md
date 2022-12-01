@@ -105,13 +105,6 @@ changes in the code, and save, the browser should refresh automatically to
 reflect your changes.
 <img src='https://leanweb.app/images/leanweb-serve.png' alt='lw serve' width='640'/>
 
-### `leanweb electron` or `lw electron`
-
-Run `lw electron` or even `lw elec` and you should see an electron app window
-open as follows:
-
-<img src='https://leanweb.app/images/leanweb-electron.png' alt='lw electron' width='640'/>
-
 ### `leanweb generate` or `lw generate`
 
 Let's create a `login` web component with `lw generate` or `lw g`.
@@ -161,11 +154,6 @@ And you should see the changes in the browser. Please note the styles added to
 the `login` component does not affect other components.
 
 <img src='https://leanweb.app/images/leanweb-serve-1.png' alt='lw serve' width='640'/>
-
-Run `lw electron` again, and you will see the same changes reflected in
-the electron app.
-
-<img src='https://leanweb.app/images/leanweb-electron-1.png' alt='lw electron' width='640'/>
 
 ### `leanweb dist` or `lw dist`
 
@@ -493,21 +481,6 @@ selectedRange = 10;
 ```
 
 <img src='https://leanweb.app/images/leanweb-form-binding-range.gif' alt='Leanweb Form Binding Range' />
-
-## Import libraries from `node_modules`
-
-Assuming npm module `lodash-es` is installed, you could use any of the
-following `import` statements for your web component class:
-
-```javascript
-import get from "/node_modules/lodash-es/get.js"; // find from node_modules
-```
-
-Importing a JSON file:
-
-```javascript
-import someJSON from "./some.json";
-```
 
 ## Component Communication
 
