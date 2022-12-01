@@ -50,7 +50,7 @@ const noopen = process.env.noopen || false;
   const params = {
     port,
     host,
-    root: "build",
+    root: utils.dirs.build,
     open: !noopen,
     file: 'index.html',
     wait: 1000,
