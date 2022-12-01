@@ -15,6 +15,8 @@ if (args.length >= 3) {
   env = args[2];
 }
 
+const verbose = process.env.verbose || false;
+
 (async () => {
   const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
@@ -22,12 +24,19 @@ if (args.length >= 3) {
   await utils.exec(`npx leanweb build ${env}`);
 
   fs.mkdirSync(utils.dirs.dist, { recursive: true });
-  esbuild.build({
+  const result = await esbuild.build({
     entryPoints: [`./${utils.dirs.build}/${project.name}.js`],
     bundle: true,
+    minify: true,
+    sourcemap: true,
     format: 'esm',
     outfile: `./${utils.dirs.dist}/${project.name}.js`,
-  }).catch(() => process.exit(1))
+    metafile: !!verbose,
+  });
+  if (verbose) {
+    const text = await esbuild.analyzeMetafile(result.metafile);
+    console.log(text);
+  }
 
   const indexHTML = fs.readFileSync(`./${utils.dirs.build}/index.html`, 'utf8');
   const minifiedIndexHtml = minify(indexHTML, {

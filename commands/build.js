@@ -10,6 +10,7 @@ import fse from 'fs-extra';
 import { minify } from 'html-minifier';
 import * as utils from './utils.js';
 import * as parser from '../lib/lw-html-parser.js';
+import CleanCSS from 'clean-css';
 
 (async () => {
   let env;
@@ -60,7 +61,6 @@ import * as parser from '../lib/lw-html-parser.js';
             scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
             cssString = utils.buildCSS(scssString, utils.dirs.build, `${utils.dirs.build}/components/${cmp}`);
           }
-          const styleString = cssString || '';
           const htmlString = fs.readFileSync(htmlFilename, 'utf8');
           const minifiedHtml = minify(htmlString, {
             caseSensitive: true,
@@ -70,7 +70,8 @@ import * as parser from '../lib/lw-html-parser.js';
             removeComments: true,
           });
           const ast = parser.parse(minifiedHtml);
-          ast.css = styleString;
+          const minifiedCss = new CleanCSS({}).minify(cssString ?? '');
+          ast.css = minifiedCss.styles ?? '';
           ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
           ast.runtimeVersion = project.version;
           ast.builderVersion = leanwebPackageJSON.version;
