@@ -8,7 +8,7 @@ import * as utils from './utils.js';
   const args = process.argv;
   if (args.length < 3) {
     console.log('Usage: lw destroy project-name');
-    console.log(`This will delete ${utils.dirs.src}/ ${utils.dirs.build}/ ${utils.dirs.dist}/ and ${utils.dirs.serve}/`)
+    console.log(`This will delete ${utils.dirs.src}/ ${utils.dirs.build}/ and ${utils.dirs.dist}/.`);
     return;
   }
 
@@ -24,5 +24,4 @@ import * as utils from './utils.js';
   fs.rmSync(utils.dirs.build + '/', { recursive: true, force: true });
   fs.rmSync(utils.dirs.dist + '/', { recursive: true, force: true });
   fs.rmSync(utils.dirs.src + '/', { recursive: true, force: true });
-  fs.rmSync(utils.dirs.serve + '/', { recursive: true, force: true });
 })();

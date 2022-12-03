@@ -28,12 +28,12 @@ import CleanCSS from 'clean-css';
     fs.mkdirSync(utils.dirs.build, { recursive: true });
 
     const copySrc = () => {
-      fse.copySync(`${projectPath}/${utils.dirs.src}/`, utils.dirs.build, { filter: utils.copySymbolLinkFilter });
+      fse.copySync(`${projectPath}/${utils.dirs.src}/`, utils.dirs.build, { filter: utils.copyFilter });
     };
 
     const copyEnv = () => {
       if (env) {
-        fse.copySync(`${utils.dirs.build}/env/${env}.js`, `${utils.dirs.build}/env.js`);
+        fse.copySync(`${utils.dirs.build}/env/${env}.js`, `${utils.dirs.build}/env.js`, { filter: utils.copyFilter });
       }
     };
 
@@ -43,7 +43,7 @@ import CleanCSS from 'clean-css';
         let importString = `import './components/${cur}/${cmpName}.js';`;
         return acc + importString + '\n';
       }, '');
-      fs.writeFileSync(`${utils.dirs.build}/${project.name}.js`, jsString);
+      utils.writeIfChanged(`${utils.dirs.build}/${project.name}.js`, jsString);
     };
 
     const buildHTML = () => {
@@ -75,7 +75,7 @@ import CleanCSS from 'clean-css';
           ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
           ast.runtimeVersion = project.version;
           ast.builderVersion = leanwebPackageJSON.version;
-          fs.writeFileSync(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
+          utils.writeIfChanged(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
         }
       });
     };
@@ -87,7 +87,7 @@ import CleanCSS from 'clean-css';
         const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
         projectCssString += utils.buildCSS(projectScssString, utils.dirs.build);
       }
-      fs.writeFileSync(`${utils.dirs.build}/${project.name}.css`, projectCssString);
+      utils.writeIfChanged(`${utils.dirs.build}/${project.name}.css`, projectCssString);
     };
 
     copySrc();

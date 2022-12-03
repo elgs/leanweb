@@ -2,6 +2,7 @@ import { execSync } from 'child_process';
 import sass from 'sass';
 import path from 'path';
 import net from 'net';
+import fs from 'fs';
 import fse from 'fs-extra';
 
 export const dirs = {
@@ -11,10 +12,29 @@ export const dirs = {
   dist: 'dist',
 };
 
-export const copySymbolLinkFilter = (src, dest) => {
+export const copyFilter = (src, dest) => {
+  const srcStats = fse.existsSync(src) && fse.lstatSync(src);
   const destStats = fse.existsSync(dest) && fse.lstatSync(dest);
+  if (srcStats?.isFile?.() && destStats?.isFile?.()) {
+    const srcBuf = fs.readFileSync(src);
+    const destBuf = fs.readFileSync(dest);
+    if (srcBuf.equals(destBuf)) {
+      return false;
+    }
+  }
   return !destStats?.isSymbolicLink?.();
 };
+
+export const writeIfChanged = (file, string) => {
+  const stats = fse.existsSync(file) && fse.lstatSync(file);
+  if (stats?.isFile?.()) {
+    const data = fs.readFileSync(file, 'utf8');
+    if (data === string) {
+      return;
+    }
+  }
+  fs.writeFileSync(file, string);
+}
 
 export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 

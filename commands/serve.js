@@ -24,20 +24,7 @@ const noopen = process.env.noopen || false;
 
   const build = async (eventType, filename) => {
     // console.log(eventType + ': ', filename);
-    try {
-      await utils.exec(`npx leanweb build ${env}`);
-      fse.copySync(`./${utils.dirs.build}/index.html`, `./${utils.dirs.serve}/index.html`);
-      fse.copySync(`./${utils.dirs.build}/${project.name}.css`, `./${utils.dirs.serve}/${project.name}.css`);
-      fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.serve}/favicon.svg`);
-      project.resources?.forEach(resource => {
-        const source = `./${utils.dirs.build}/${resource}`;
-        if (fs.existsSync(source)) {
-          fse.copySync(source, `./${utils.dirs.serve}/${resource}`, { filter: utils.copySymbolLinkFilter });
-        }
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    await utils.exec(`npx leanweb build ${env}`);
   };
 
   const throttledBuild = utils.throttle(build);
@@ -54,7 +41,7 @@ const noopen = process.env.noopen || false;
     open: !noopen,
     file: 'index.html',
     wait: 1000,
-    logLevel: 0,
+    logLevel: 1,
   };
   liveServer.start(params);
 })();
