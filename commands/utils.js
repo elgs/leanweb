@@ -8,7 +8,6 @@ import fse from 'fs-extra';
 export const dirs = {
   src: 'src',
   build: 'build',
-  serve: 'serve',
   dist: 'dist',
 };
 
@@ -34,7 +33,7 @@ export const writeIfChanged = (file, string) => {
     }
   }
   fs.writeFileSync(file, string);
-}
+};
 
 export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
 
