@@ -271,11 +271,8 @@ export default class LWElement extends HTMLElement {
       let object;
       let propertyExpr;
       if (astModel.type === 'MemberExpression') {
-        propertyExpr = astModel.property.name;
-        if (astModel.computed) {
-          // . false and [] true
-          propertyExpr = parser.evaluate([astModel.property], context, interpolation.loc)[0];
-        }
+        // . false and [] true
+        propertyExpr = astModel.computed ? parser.evaluate([astModel.property], context, interpolation.loc)[0] : astModel.property.name;
         object = parser.evaluate([astModel.object], context, interpolation.loc)[0];
       } else if (astModel.type === 'Identifier') {
         object = this;
