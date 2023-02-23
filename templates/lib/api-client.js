@@ -30,7 +30,7 @@ class APIClient {
     if (this.sendToken) {
       const token = localStorage.getItem('access_token');
       if (token) {
-        headers['access_token'] = token;
+        headers['authorization'] = token;
       } else {
         return null;
       }
