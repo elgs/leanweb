@@ -5,7 +5,6 @@ import * as utils from './utils.js';
 import fs from 'fs';
 import fse from 'fs-extra';
 import { minify } from 'html-minifier';
-import CleanCSS from 'clean-css';
 
 import esbuild from 'esbuild';
 
@@ -49,10 +48,10 @@ const verbose = process.env.verbose || false;
   fs.writeFileSync(`./${utils.dirs.dist}/index.html`, minifiedIndexHtml);
 
   const appCSS = fs.readFileSync(`./${utils.dirs.build}/${project.name}.css`, 'utf8');
-  const minifiedAppCss = new CleanCSS({}).minify(appCSS);
-  fs.writeFileSync(`./${utils.dirs.dist}/${project.name}.css`, minifiedAppCss.styles);
+  fs.writeFileSync(`./${utils.dirs.dist}/${project.name}.css`, appCSS);
 
   fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.dist}/favicon.svg`);
+  fse.copySync(`./${utils.dirs.build}/global-styles.css`, `./${utils.dirs.dist}/global-styles.css`);
   project.resources?.forEach(resource => {
     const source = `./${utils.dirs.build}/${resource}`;
     if (fs.existsSync(source)) {

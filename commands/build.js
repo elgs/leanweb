@@ -10,7 +10,6 @@ import fse from 'fs-extra';
 import { minify } from 'html-minifier';
 import * as utils from './utils.js';
 import * as parser from '../lib/lw-html-parser.js';
-import CleanCSS from 'clean-css';
 
 (async () => {
   let env;
@@ -54,7 +53,7 @@ import CleanCSS from 'clean-css';
         if (htmlFileExists) {
           const cssFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.css`;
           const cssFileExists = fs.existsSync(cssFilename);
-          let cssString = `@import "${utils.dirs.build}/global-styles.css";\n`;
+          let cssString = `@import "global-styles.css";\n`;
           if (cssFileExists) {
             cssString += fs.readFileSync(cssFilename, 'utf8');
           }
@@ -68,8 +67,7 @@ import CleanCSS from 'clean-css';
             removeComments: true,
           });
           const ast = parser.parse(minifiedHtml);
-          const minifiedCss = new CleanCSS({}).minify(cssString ?? '');
-          ast.css = minifiedCss.styles ?? '';
+          ast.css = cssString;
           ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
           ast.runtimeVersion = project.version;
           ast.builderVersion = leanwebPackageJSON.version;
