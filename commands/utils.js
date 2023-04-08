@@ -1,5 +1,4 @@
 import { execSync } from 'child_process';
-import sass from 'sass';
 import path from 'path';
 import net from 'net';
 import fs from 'fs';
@@ -36,15 +35,6 @@ export const writeIfChanged = (file, string) => {
 };
 
 export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
-
-export const buildCSS = (scssString, ...currentPaths) => {
-  if (scssString.trim()) {
-    const loadPaths = [...currentPaths, path.resolve(process.cwd(), dirs.build)];
-    const cssResult = sass.compileString(scssString, { loadPaths });
-    return cssResult.css.toString().trim();
-  }
-  return '';
-};
 
 export const getComponentName = cmp => {
   const indexOfLastSlash = cmp.lastIndexOf('/');
@@ -115,9 +105,9 @@ will be created. demo-root web component contains 3 files:
 
 root.html
 root.js
-root.scss
+root.css
 
-Under src/ directory, global-styles.scss is created for global styling.
+Under src/ directory, global-styles.css is created for global styling.
 `;
 
 const generateNote = `Usage: leanweb generate component-name
@@ -140,7 +130,7 @@ demo-login web component will contain 3 files:
 
 login.html
 login.js
-login.scss
+login.css
 
 Now, the demo-login component can be added in root.html as follows:
 <demo-login></demo-login>

@@ -52,15 +52,13 @@ import CleanCSS from 'clean-css';
         const htmlFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.html`;
         const htmlFileExists = fs.existsSync(htmlFilename);
         if (htmlFileExists) {
-          const scssFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.scss`;
-          const scssFileExists = fs.existsSync(scssFilename);
-          let cssString = '';
-          if (scssFileExists) {
-            let scssString = `@use "global-styles.scss";\n`;
-            scssString += fs.readFileSync(scssFilename, 'utf8');
-            scssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
-            cssString = utils.buildCSS(scssString, utils.dirs.build, `${utils.dirs.build}/components/${cmp}`);
+          const cssFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.css`;
+          const cssFileExists = fs.existsSync(cssFilename);
+          let cssString = `@import "${utils.dirs.build}/global-styles.css";\n`;
+          if (cssFileExists) {
+            cssString += fs.readFileSync(cssFilename, 'utf8');
           }
+          cssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
           const htmlString = fs.readFileSync(htmlFilename, 'utf8');
           const minifiedHtml = minify(htmlString, {
             caseSensitive: true,
@@ -80,20 +78,9 @@ import CleanCSS from 'clean-css';
       });
     };
 
-    const buildSCSS = () => {
-      const projectScssFilename = `${projectPath}/${utils.dirs.src}/${project.name}.scss`;
-      let projectCssString = '';
-      if (fs.existsSync(projectScssFilename)) {
-        const projectScssString = fs.readFileSync(projectScssFilename, 'utf8');
-        projectCssString += utils.buildCSS(projectScssString, utils.dirs.build);
-      }
-      utils.writeIfChanged(`${utils.dirs.build}/${project.name}.css`, projectCssString);
-    };
-
     copySrc();
     copyEnv();
     buildJS();
-    buildSCSS();
     buildHTML();
 
     return project.name;

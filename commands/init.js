@@ -38,20 +38,20 @@ import * as utils from './utils.js';
     ],
   };
 
-  const projectScss = `// html,
-// body {
-   // height: 100%;
-   // width: 100%;
-   // margin: 0 auto;
-   // padding: 0;
+  const projectCss = `/* html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0;
 
-   // font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-// }
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+} */
 `
 
-  const globalScss = `// div {
-//    color: tomato;
-// }
+  const globalCss = `/* div {
+  color: tomato;
+} */
 `;
 
   fs.mkdirSync(`${utils.dirs.src}/resources/`, { recursive: true });
@@ -64,8 +64,8 @@ import * as utils from './utils.js';
   let htmlString = fs.readFileSync(`${__dirname}/../templates/index.html`, 'utf8');
   htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
   fs.writeFileSync(`./${utils.dirs.src}/index.html`, htmlString);
-  fs.writeFileSync(`./src/${projectName}.scss`, projectScss);
-  fs.writeFileSync(`./${utils.dirs.src}/global-styles.scss`, globalScss);
+  fs.writeFileSync(`./src/${projectName}.css`, projectCss);
+  fs.writeFileSync(`./${utils.dirs.src}/global-styles.css`, globalCss);
   fse.copySync(`${__dirname}/../templates/favicon.svg`, `./${utils.dirs.src}/favicon.svg`);
   fse.copySync(`${__dirname}/../templates/env.js`, `./${utils.dirs.src}/env.js`);
   fse.copySync(`${__dirname}/../templates/env/`, `./${utils.dirs.src}/env/`);
