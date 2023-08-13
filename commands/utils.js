@@ -44,6 +44,14 @@ export const getComponentName = cmp => {
   return cmp;
 };
 
+export const getComponentPath = cmp => {
+  const indexOfLastSlash = cmp.lastIndexOf('/');
+  if (indexOfLastSlash > -1) {
+    return cmp.substring(0, indexOfLastSlash);
+  }
+  return '';
+};
+
 export const getPathLevels = filePath => {
   filePath = path.normalize(filePath);
   const numSlashes = filePath.replace(/[^\/]/g, '').length;
@@ -110,7 +118,7 @@ root.css
 Under src/ directory, global-styles.css is created for global styling.
 `;
 
-const generateNote = `Usage: leanweb generate component-name
+const generateNote = `Usage: leanweb generate component-names
 For example leanweb g login will create demo-login web component in
 src/components directory. The leanweb.json will be updated to look like:
 
@@ -135,6 +143,8 @@ login.css
 Now, the demo-login component can be added in root.html as follows:
 <demo-login></demo-login>
 `;
+
+const addpageNote = `Usage: leanweb addpage page-names`;
 
 const serveNote = `Usage: leabweb [env] serve or lw s [env]
 Running this command will start the dev server and open the app in a new 
@@ -179,6 +189,7 @@ Print version information for leanweb.`;
 
 export const targets = {
   'init': { file: 'init.js', note: initNote },
+  'addpage': { file: 'addpage.js', note: addpageNote },
   'generate': { file: 'generate.js', note: generateNote },
   'serve': { file: 'serve.js', note: serveNote },
   'build': { file: 'build.js', note: buildNote },

@@ -36,15 +36,24 @@ if (verbose) {
   console.log(text);
 }
 
-const indexHTML = fs.readFileSync(`./${utils.dirs.build}/index.html`, 'utf8');
-const minifiedIndexHtml = minify(indexHTML, {
-  caseSensitive: true,
-  collapseWhitespace: true,
-  minifyCSS: true,
-  minifyJS: true,
-  removeComments: true,
-});
-fs.writeFileSync(`./${utils.dirs.dist}/index.html`, minifiedIndexHtml);
+const minimizePage = page => {
+  const html = fs.readFileSync(`./${utils.dirs.build}/${page}.html`, 'utf8');
+  const minifiedIndexHtml = minify(html, {
+    caseSensitive: true,
+    collapseWhitespace: true,
+    minifyCSS: true,
+    minifyJS: true,
+    removeComments: true,
+  });
+
+  const pageName = utils.getComponentName(page);
+  const pagePath = `${utils.dirs.dist}/${utils.getComponentPath(page)}`;
+  fs.mkdirSync(pagePath, { recursive: true });
+  fs.writeFileSync(`${pagePath}/${pageName}.html`, minifiedIndexHtml);
+};
+
+project.pages.push('index');
+project.pages.forEach(minimizePage);
 
 const appCSS = fs.readFileSync(`./${utils.dirs.build}/${project.name}.css`, 'utf8');
 fs.writeFileSync(`./${utils.dirs.dist}/${project.name}.css`, appCSS);

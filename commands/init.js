@@ -23,7 +23,7 @@ import * as utils from './utils.js';
     return;
   }
 
-  let projectName = path.basename(path.resolve());
+  const projectName = path.basename(path.resolve());
 
   if (args.length >= 3) {
     projectName = args[2];
