@@ -50,8 +50,8 @@ import * as utils from './utils.js';
       fs.writeFileSync(`${cmpPath}/${cmpName}.html`, `<div>${leanwebJSON.name}-${cmpName} works!</div>`);
     }
 
-    if (!fs.existsSync(`${cmpPath}/${cmpName}.scss`)) {
-      fs.writeFileSync(`${cmpPath}/${cmpName}.scss`, '');
+    if (!fs.existsSync(`${cmpPath}/${cmpName}.css`)) {
+      fs.writeFileSync(`${cmpPath}/${cmpName}.css`, '');
     }
   }
 })();
