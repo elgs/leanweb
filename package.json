@@ -20,7 +20,7 @@
   "author": "Qian Chen",
   "license": "MIT",
   "dependencies": {
-    "@babel/parser": "^7.22.15",
+    "@babel/parser": "^7.22.16",
     "esbuild": "^0.19.2",
     "fs-extra": "^11.1.1",
     "globby": "^13.2.2",
