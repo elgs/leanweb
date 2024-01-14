@@ -21,11 +21,11 @@
   "license": "MIT",
   "dependencies": {
     "@babel/parser": "^7.23.6",
-    "esbuild": "^0.19.10",
+    "esbuild": "^0.19.11",
     "fs-extra": "^11.2.0",
     "globby": "^14.0.0",
     "html-minifier": "^4.0.0",
-    "isomorphic-git": "^1.25.2",
+    "isomorphic-git": "^1.25.3",
     "live-server": "^1.2.2",
     "node-watch": "^0.7.4",
     "parse5": "^7.1.2",
