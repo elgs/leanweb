@@ -23,7 +23,7 @@
     "@babel/parser": "^7.23.9",
     "esbuild": "^0.20.0",
     "fs-extra": "^11.2.0",
-    "globby": "^14.0.0",
+    "globby": "^14.0.1",
     "html-minifier": "^4.0.0",
     "isomorphic-git": "^1.25.3",
     "live-server": "^1.2.2",
