@@ -52,6 +52,7 @@ const minimizePage = page => {
   fs.writeFileSync(`${pagePath}/${pageName}.html`, minifiedIndexHtml);
 };
 
+project.pages ??= [];
 project.pages.push('index');
 project.pages.forEach(minimizePage);
 
