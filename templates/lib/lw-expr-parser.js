@@ -175,7 +175,8 @@ const immediateContext = (node, context) => {
     if (context.length === 0) {
       return null;
     }
-    return context.find(contextObj => node.name in contextObj) ?? context[0];
+    const qualifiedContext = context.filter(contextObj => !(('$event' in contextObj && '$node' in contextObj) || 'this' in contextObj));
+    return context.find(contextObj => node.name in contextObj) ?? qualifiedContext[0];
   } else if (typeof context === 'object') {
     return context;
   }
