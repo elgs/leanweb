@@ -426,7 +426,7 @@ export default class LWElement extends HTMLElement {
             bindNode.classList = initClass + ' ' + parsed[0];
           }
         } else {
-          if (parsed[0] !== undefined && parsed[0] !== null) {
+          if (parsed[0] !== false && parsed[0] !== undefined && parsed[0] !== null) {
             bindNode.setAttribute(interpolation.lwValue, parsed[0]);
           } else {
             bindNode.removeAttribute(interpolation.lwValue);
