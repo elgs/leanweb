@@ -12,6 +12,7 @@ if (args.length >= 3) {
 const host = process.env.host || '127.0.0.1';
 let port = process.env.port || 2020;
 const noopen = process.env.noopen || false;
+const https = process.env.https;
 
 const build = (eventType, filename) => {
   // console.log(eventType + ': ', filename);
@@ -28,6 +29,7 @@ build();
 const params = {
   port,
   host,
+  https,
   root: utils.dirs.build,
   open: !noopen,
   file: 'index.html',
