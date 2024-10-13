@@ -28,7 +28,7 @@
     "isomorphic-git": "^1.27.1",
     "live-server": "^1.2.2",
     "node-watch": "^0.7.4",
-    "parse5": "^7.1.2",
+    "parse5": "^7.2.0",
     "semver": "^7.6.3"
   }
 }
