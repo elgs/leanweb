@@ -22,7 +22,7 @@
   "dependencies": {
     "@babel/parser": "^7.26.5",
     "esbuild": "^0.24.2",
-    "fs-extra": "^11.2.0",
+    "fs-extra": "^11.3.0",
     "globby": "^14.0.2",
     "html-minifier": "^4.0.0",
     "isomorphic-git": "^1.29.0",
