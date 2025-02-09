@@ -20,10 +20,10 @@
   "author": "Qian Chen",
   "license": "MIT",
   "dependencies": {
-    "@babel/parser": "^7.26.7",
+    "@babel/parser": "^7.26.8",
     "esbuild": "^0.25.0",
     "fs-extra": "^11.3.0",
-    "globby": "^14.0.2",
+    "globby": "^14.1.0",
     "html-minifier": "^4.0.0",
     "isomorphic-git": "^1.29.0",
     "live-server": "^1.2.2",
