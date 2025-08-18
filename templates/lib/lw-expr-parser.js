@@ -81,7 +81,8 @@ const callFunction = (node, context) => {
       args.push(evalNode(argument, context));
     }
   });
-  return callee(...args);
+  const thisContext = getThisContext(context);
+  return callee.apply(thisContext, args);
 };
 
 const nodeHandlers = {
@@ -154,12 +155,7 @@ const nodeHandlers = {
     }
   },
   'ThisExpression': (node, context) => {
-    if (Array.isArray(context)) {
-      const hitContext = context.find(contextObj => 'this' in contextObj);
-      return hitContext ? hitContext['this'] : undefined;
-    } else if (typeof context === 'object') {
-      return context['this'];
-    }
+    return getThisContext(context);
   },
 
   'CallExpression': (node, context) => callFunction(node, context),
@@ -168,6 +164,15 @@ const nodeHandlers = {
 
   'Directive': (node, context) => evalNode(node.value, context),
   'DirectiveLiteral': (node, context) => node.value,
+};
+
+const getThisContext = (context) => {
+  if (Array.isArray(context)) {
+    const hitContext = context.find(contextObj => 'this' in contextObj);
+    return hitContext ? hitContext['this'] : undefined;
+  } else if (typeof context === 'object') {
+    return context['this'];
+  }
 };
 
 const immediateContext = (node, context) => {
