@@ -45,34 +45,38 @@ const buildModule = (projectPath) => {
   };
 
   const buildHTML = () => {
-    project.components.forEach(cmp => {
-      const cmpName = utils.getComponentName(cmp);
-      const htmlFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.html`;
-      const htmlFileExists = fs.existsSync(htmlFilename);
-      if (htmlFileExists) {
-        const cssFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.css`;
-        const cssFileExists = fs.existsSync(cssFilename);
-        let cssString = `@import "global-styles.css";\n`;
-        if (cssFileExists) {
-          cssString += fs.readFileSync(cssFilename, 'utf8');
+    try {
+      project.components.forEach(cmp => {
+        const cmpName = utils.getComponentName(cmp);
+        const htmlFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.html`;
+        const htmlFileExists = fs.existsSync(htmlFilename);
+        if (htmlFileExists) {
+          const cssFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.css`;
+          const cssFileExists = fs.existsSync(cssFilename);
+          let cssString = `@import "global-styles.css";\n`;
+          if (cssFileExists) {
+            cssString += fs.readFileSync(cssFilename, 'utf8');
+          }
+          cssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
+          const htmlString = fs.readFileSync(htmlFilename, 'utf8');
+          const minifiedHtml = minify(htmlString, {
+            caseSensitive: true,
+            collapseWhitespace: true,
+            minifyCSS: true,
+            minifyJS: true,
+            removeComments: true,
+          });
+          const ast = parser.parse(minifiedHtml);
+          ast.css = cssString;
+          ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
+          ast.runtimeVersion = project.version;
+          ast.builderVersion = leanwebPackageJSON.version;
+          utils.writeIfChanged(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
         }
-        cssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
-        const htmlString = fs.readFileSync(htmlFilename, 'utf8');
-        const minifiedHtml = minify(htmlString, {
-          caseSensitive: true,
-          collapseWhitespace: true,
-          minifyCSS: true,
-          minifyJS: true,
-          removeComments: true,
-        });
-        const ast = parser.parse(minifiedHtml);
-        ast.css = cssString;
-        ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
-        ast.runtimeVersion = project.version;
-        ast.builderVersion = leanwebPackageJSON.version;
-        utils.writeIfChanged(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
-      }
-    });
+      });
+    } catch (e) {
+      console.error('Error in buildHTML:', e);
+    }
   };
 
   copySrc();
