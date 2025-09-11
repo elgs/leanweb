@@ -111,10 +111,14 @@ export default class LWElement extends HTMLElement {
 
     this._bindMethods();
     setTimeout(() => {
-      this.update(this.shadowRoot);
-      setTimeout(() => {
-        this.domReady?.call(this);
-      });
+      const result = this.domReady?.call(this);
+      if (result && typeof result.then === 'function') {
+        // domReady is async
+        result.then(() => this.update());
+      } else {
+        // domReady is sync
+        this.update();
+      }
     });
 
     if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
@@ -286,7 +290,9 @@ export default class LWElement extends HTMLElement {
       } else if (modelNode.type === 'checkbox') {
         if (Array.isArray(object[propertyExpr])) {
           if (modelNode.checked) {
-            object[propertyExpr].push(modelNode.value);
+            if (!object[propertyExpr].includes(modelNode.value)) {
+              object[propertyExpr].push(modelNode.value);
+            }
           } else {
             const index = object[propertyExpr].indexOf(modelNode.value);
             if (index > -1) {
@@ -335,9 +341,14 @@ export default class LWElement extends HTMLElement {
     } else if (modelNode.type === 'radio') {
       modelNode.checked = parsed[0] === modelNode.value;
     } else if (modelNode.type === 'select-multiple') {
+      // First, clear all selections
       for (let i = 0; i < modelNode.options.length; ++i) {
-        const option = modelNode.options[i];
-        if (parsed[0]) {
+        modelNode.options[i].selected = false;
+      }
+      // Then, set selected options
+      if (parsed[0]) {
+        for (let i = 0; i < modelNode.options.length; ++i) {
+          const option = modelNode.options[i];
           option.selected = parsed[0].includes(option.value);
         }
       }
@@ -419,11 +430,20 @@ export default class LWElement extends HTMLElement {
         const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
         if (interpolation.lwValue === 'class') {
-          const initClass = bindNode.getAttribute('lw-init-class');
-          if (!parsed[0]) {
-            bindNode.classList.remove(parsed[0]);
-          } else {
-            bindNode.classList = initClass + ' ' + parsed[0];
+          const dynamicClass = parsed[0];
+          const initClass = bindNode.getAttribute('lw-init-class') || '';
+          // Ensure initial classes are present
+          if (initClass) {
+            initClass.split(' ').forEach(cls => {
+              if (cls) bindNode.classList.add(cls);
+            });
+          }
+          // Add or remove the dynamic class
+          if (dynamicClass) {
+            bindNode.classList.add(dynamicClass);
+          } else if (dynamicClass !== undefined) {
+            // Only remove if not undefined (so we don't remove all classes accidentally)
+            bindNode.classList.remove(dynamicClass);
           }
         } else {
           if (parsed[0] !== false && parsed[0] !== undefined && parsed[0] !== null) {
