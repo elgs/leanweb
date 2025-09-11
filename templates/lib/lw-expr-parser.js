@@ -96,14 +96,35 @@ const nodeHandlers = {
   'ExpressionStatement': (node, context) => evalNode(node.expression, context),
   'BinaryExpression': (node, context) => binaryOperations[node.operator](evalNode(node.left, context), evalNode(node.right, context)),
   'AssignmentExpression': (node, context) => {
-    const immediateCtx = immediateContext(node.left, context);
-    assignmentOperations[node.operator](immediateCtx, node.left.name, evalNode(node.right, context));
+    // Support complex left-hand sides (e.g., obj.prop = 1, obj[expr] = 1)
+    let obj, prop;
+    if (node.left.type === 'MemberExpression' || node.left.type === 'OptionalMemberExpression') {
+      obj = evalNode(node.left.object, context);
+      prop = node.left.computed ? evalNode(node.left.property, context) : node.left.property.name;
+    } else if (node.left.type === 'Identifier') {
+      // Simple variable assignment
+      obj = immediateContext(node.left, context);
+      prop = node.left.name;
+    } else {
+      throw new Error('Unsupported assignment left-hand side');
+    }
+    assignmentOperations[node.operator](obj, prop, evalNode(node.right, context));
   },
   'LogicalExpression': (node, context) => logicalOperators[node.operator](evalNode(node.left, context), evalNode(node.right, context)),
   'UnaryExpression': (node, context) => unaryOperators[node.operator](evalNode(node.argument, context)),
   'UpdateExpression': (node, context) => {
-    const immediateCtx = immediateContext(node.argument, context);
-    updateOperators(node.operator, node.prefix)(immediateCtx, node.argument.name, evalNode(node.argument, context));
+    // Support complex left-hand sides (e.g., ++obj.prop, ++obj[expr])
+    let obj, prop;
+    if (node.argument.type === 'MemberExpression' || node.argument.type === 'OptionalMemberExpression') {
+      obj = evalNode(node.argument.object, context);
+      prop = node.argument.computed ? evalNode(node.argument.property, context) : node.argument.property.name;
+    } else if (node.argument.type === 'Identifier') {
+      obj = immediateContext(node.argument, context);
+      prop = node.argument.name;
+    } else {
+      throw new Error('Unsupported update left-hand side');
+    }
+    return updateOperators(node.operator, node.prefix)(obj, prop);
   },
   'ConditionalExpression': (node, context) => {
     const test = evalNode(node.test, context);
