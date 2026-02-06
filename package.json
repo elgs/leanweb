@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/parser": "^7.29.0",
-    "esbuild": "^0.27.2",
+    "esbuild": "^0.27.3",
     "fs-extra": "^11.3.3",
     "globby": "^16.1.0",
     "html-minifier": "^4.0.0",
