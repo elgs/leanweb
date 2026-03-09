@@ -322,7 +322,7 @@ export default class LWElement extends HTMLElement {
   }
 
   updateModel(modelNode) {
-    if (modelNode.do_not_update && modelNode.type === 'number') {
+    if (modelNode.do_not_update && (modelNode.type === 'number' || modelNode.type === 'range')) {
       return;
     }
     const key = modelNode.getAttribute('lw-model');
@@ -388,7 +388,7 @@ export default class LWElement extends HTMLElement {
     const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
     const hasLwFalse = ifNode.hasAttribute('lw-false');
-    if (parsed[0] !== false && parsed[0] !== undefined && parsed[0] !== null) {
+    if (parsed[0]) {
       hasLwFalse && ifNode.removeAttribute('lw-false');
       setTimeout(() => {
         ifNode.turnedOn?.call(ifNode);
@@ -438,12 +438,17 @@ export default class LWElement extends HTMLElement {
               if (cls) bindNode.classList.add(cls);
             });
           }
-          // Add or remove the dynamic class
+          // Remove previously applied dynamic class
+          const prevClass = bindNode['lw-prev-class-' + attrValue];
+          if (prevClass && prevClass !== dynamicClass) {
+            bindNode.classList.remove(prevClass);
+          }
+          // Add or record the dynamic class
           if (dynamicClass) {
             bindNode.classList.add(dynamicClass);
-          } else if (dynamicClass !== undefined) {
-            // Only remove if not undefined (so we don't remove all classes accidentally)
-            bindNode.classList.remove(dynamicClass);
+            bindNode['lw-prev-class-' + attrValue] = dynamicClass;
+          } else {
+            bindNode['lw-prev-class-' + attrValue] = null;
           }
         } else {
           if (parsed[0] !== false && parsed[0] !== undefined && parsed[0] !== null) {

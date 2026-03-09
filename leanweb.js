@@ -42,7 +42,7 @@ import * as utils from './commands/utils.js';
     return;
   }
 
-  if (leanwebJSONExisted && target === 'version' || target === 'serve' || target === 'dist') {
+  if (leanwebJSONExisted && (target === 'version' || target === 'serve' || target === 'dist')) {
     const leanwebPackageJSON = require(`${__dirname}/package.json`);
     const projectLeanwebJSON = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
     const upgradeAvailable = semver.gt(leanwebPackageJSON.version, projectLeanwebJSON.version);

@@ -43,11 +43,6 @@ const assignmentOperations = {
   '^=': (c, a, b) => { c[a] ^= b; },
 };
 
-const logicalOperators = {
-  '||': (a, b) => a || b,
-  '&&': (a, b) => a && b,
-  '??': (a, b) => a ?? b,
-};
 
 const unaryOperators = {
   '-': a => -a,
@@ -110,7 +105,12 @@ const nodeHandlers = {
     }
     assignmentOperations[node.operator](obj, prop, evalNode(node.right, context));
   },
-  'LogicalExpression': (node, context) => logicalOperators[node.operator](evalNode(node.left, context), evalNode(node.right, context)),
+  'LogicalExpression': (node, context) => {
+    const left = evalNode(node.left, context);
+    if (node.operator === '&&') return left ? evalNode(node.right, context) : left;
+    if (node.operator === '||') return left ? left : evalNode(node.right, context);
+    if (node.operator === '??') return left ?? evalNode(node.right, context);
+  },
   'UnaryExpression': (node, context) => unaryOperators[node.operator](evalNode(node.argument, context)),
   'UpdateExpression': (node, context) => {
     // Support complex left-hand sides (e.g., ++obj.prop, ++obj[expr])
@@ -128,9 +128,7 @@ const nodeHandlers = {
   },
   'ConditionalExpression': (node, context) => {
     const test = evalNode(node.test, context);
-    const consequent = evalNode(node.consequent, context);
-    const alternate = evalNode(node.alternate, context);
-    return test ? consequent : alternate;
+    return test ? evalNode(node.consequent, context) : evalNode(node.alternate, context);
   },
   'MemberExpression': (node, context) => {
     const object = evalNode(node.object, context);
@@ -164,7 +162,7 @@ const nodeHandlers = {
     return arr;
   },
   'ObjectExpression': (node, context) => node.properties.reduce((acc, prop) => ({ ...acc, ...evalNode(prop, context) }), {}),
-  'ObjectProperty': (node, context) => ({ [evalNode(node.key, context)]: evalNode(node.value, context) }),
+  'ObjectProperty': (node, context) => ({ [node.computed ? evalNode(node.key, context) : (node.key.name ?? node.key.value)]: evalNode(node.value, context) }),
   'SpreadElement': (node, context) => evalNode(node.argument, context),
 
   'Identifier': (node, context) => {
@@ -181,7 +179,18 @@ const nodeHandlers = {
 
   'CallExpression': (node, context) => callFunction(node, context),
   'OptionalCallExpression': (node, context) => callFunction(node, context),
-  'NewExpression': (node, context) => callFunction(node, context),
+  'NewExpression': (node, context) => {
+    const callee = evalNode(node.callee, context);
+    const args = [];
+    node.arguments.map(argument => {
+      if (argument.type === 'SpreadElement') {
+        args.push(...evalNode(argument, context));
+      } else {
+        args.push(evalNode(argument, context));
+      }
+    });
+    return new callee(...args);
+  },
 
   'Directive': (node, context) => evalNode(node.value, context),
   'DirectiveLiteral': (node, context) => node.value,
