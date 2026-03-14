@@ -60,7 +60,6 @@ const appCSS = fs.readFileSync(`./${utils.dirs.build}/${project.name}.css`, 'utf
 fs.writeFileSync(`./${utils.dirs.dist}/${project.name}.css`, appCSS);
 
 fse.copySync(`./${utils.dirs.build}/favicon.svg`, `./${utils.dirs.dist}/favicon.svg`);
-fse.copySync(`./${utils.dirs.build}/global-styles.css`, `./${utils.dirs.dist}/global-styles.css`);
 project.resources?.forEach(resource => {
   const source = `./${utils.dirs.build}/${resource}`;
   if (fs.existsSync(source)) {

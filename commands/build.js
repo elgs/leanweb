@@ -44,6 +44,13 @@ const buildModule = (projectPath) => {
     utils.writeIfChanged(`${utils.dirs.build}/${project.name}.js`, jsString);
   };
 
+  const buildGlobalStyles = () => {
+    const globalCssPath = `${utils.dirs.build}/global-styles.css`;
+    const globalCss = fs.existsSync(globalCssPath) ? fs.readFileSync(globalCssPath, 'utf8') : '';
+    const jsModule = `const sheet = new CSSStyleSheet();\nsheet.replaceSync(${JSON.stringify(globalCss)});\nexport default sheet;\n`;
+    utils.writeIfChanged(`${utils.dirs.build}/global-styles.js`, jsModule);
+  };
+
   const buildHTML = () => {
     try {
       project.components.forEach(cmp => {
@@ -53,7 +60,7 @@ const buildModule = (projectPath) => {
         if (htmlFileExists) {
           const cssFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.css`;
           const cssFileExists = fs.existsSync(cssFilename);
-          let cssString = `@import "global-styles.css";\n`;
+          let cssString = '';
           if (cssFileExists) {
             cssString += fs.readFileSync(cssFilename, 'utf8');
           }
@@ -82,6 +89,7 @@ const buildModule = (projectPath) => {
   copySrc();
   copyEnv();
   buildJS();
+  buildGlobalStyles();
   buildHTML();
 
   return project.name;
