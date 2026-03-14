@@ -110,8 +110,8 @@ export default class LWElement extends HTMLElement {
     componentSheet.replaceSync(ast.css);
     node.innerHTML = ast.html;
     this.attachShadow({ mode: 'open' }).appendChild(node.content);
-    this.shadowRoot.adoptedStyleSheets = [globalThis.__lw_globalStyleSheet, componentSheet];
-    globalThis.__lw_globalStyleImports?.forEach(url => {
+    this.shadowRoot.adoptedStyleSheets = [globalThis.leanweb.__lw_globalStyleSheet, componentSheet];
+    globalThis.leanweb.__lw_globalStyleImports?.forEach(url => {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = url;
