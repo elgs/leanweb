@@ -1,6 +1,5 @@
 import * as parser from './lw-expr-parser.js';
 import LWEventBus from './lw-event-bus.js';
-import globalStyleSheet from '../global-styles.js';
 
 globalThis.leanweb = globalThis.leanweb ?? {
   componentsListeningOnUrlChanges: [],
@@ -111,7 +110,13 @@ export default class LWElement extends HTMLElement {
     componentSheet.replaceSync(ast.css);
     node.innerHTML = ast.html;
     this.attachShadow({ mode: 'open' }).appendChild(node.content);
-    this.shadowRoot.adoptedStyleSheets = [globalStyleSheet, componentSheet];
+    this.shadowRoot.adoptedStyleSheets = [globalThis.__lw_globalStyleSheet, componentSheet];
+    globalThis.__lw_globalStyleImports?.forEach(url => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      this.shadowRoot.appendChild(link);
+    });
 
     this._bindMethods();
     setTimeout(() => {

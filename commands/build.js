@@ -40,14 +40,21 @@ const buildModule = (projectPath) => {
       const cmpName = utils.getComponentName(cur);
       let importString = `import './components/${cur}/${cmpName}.js';`;
       return acc + importString + '\n';
-    }, '');
+    }, `import './global-styles.js';\n`);
     utils.writeIfChanged(`${utils.dirs.build}/${project.name}.js`, jsString);
   };
 
   const buildGlobalStyles = () => {
     const globalCssPath = `${utils.dirs.build}/global-styles.css`;
     const globalCss = fs.existsSync(globalCssPath) ? fs.readFileSync(globalCssPath, 'utf8') : '';
-    const jsModule = `const sheet = new CSSStyleSheet();\nsheet.replaceSync(${JSON.stringify(globalCss)});\nexport default sheet;\n`;
+
+    // Extract @import statements and create a JS module that sets up the global styles, including the inline styles and the imports, and write it to global-styles.js
+    const imports = [];
+    const inlineCss = globalCss.replace(/@import\s+(?:url\()?['"]?([^'"\)]+)['"]?\)?[^;]*;/g, (_, url) => {
+      imports.push(url);
+      return '';
+    });
+    const jsModule = `const sheet = new CSSStyleSheet();\nsheet.replaceSync(${JSON.stringify(inlineCss)});\nglobalThis.__lw_globalStyleSheet = sheet;\nglobalThis.__lw_globalStyleImports = ${JSON.stringify(imports)};\n`;
     utils.writeIfChanged(`${utils.dirs.build}/global-styles.js`, jsModule);
   };
 
