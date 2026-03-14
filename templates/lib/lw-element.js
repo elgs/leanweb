@@ -1,77 +1,74 @@
 import * as parser from './lw-expr-parser.js';
 import LWEventBus from './lw-event-bus.js';
 
-globalThis.leanweb = globalThis.leanweb ?? {
-  componentsListeningOnUrlChanges: [],
-  eventBus: new LWEventBus(),
-  updateComponents(...tagNames) {
-    if (tagNames?.length) {
-      tagNames.forEach(tagName => {
-        leanweb.eventBus.dispatchEvent(tagName);
-      });
-    } else {
-      leanweb.eventBus.dispatchEvent('update');
-    }
-  },
+globalThis.leanweb ??= {};
 
-  set urlHash(hash) {
-    location.hash = hash;
-  },
-
-  get urlHash() {
-    return location.hash;
-  },
-
-  set urlHashPath(hashPath) {
-    const s = this.urlHash.split('?');
-    if (s.length === 1) {
-      this.urlHash = hashPath;
-    } else if (s.length > 1) {
-      this.urlHash = hashPath + '?' + s[1];
-    }
-  },
-
-  get urlHashPath() {
-    return this.urlHash.split('?')[0];
-  },
-
-  set urlHashParams(hashParams) {
-    if (!hashParams) {
-      return;
-    }
-
-    const paramArray = [];
-    Object.keys(hashParams).forEach(key => {
-      const value = hashParams[key];
-      if (Array.isArray(value)) {
-        value.forEach(v => {
-          paramArray.push(key + '=' + encodeURIComponent(v));
-        });
-      } else {
-        paramArray.push(key + '=' + encodeURIComponent(value));
-      }
+leanweb.componentsListeningOnUrlChanges = [];
+leanweb.eventBus = new LWEventBus();
+leanweb.updateComponents = function (...tagNames) {
+  if (tagNames?.length) {
+    tagNames.forEach(tagName => {
+      leanweb.eventBus.dispatchEvent(tagName);
     });
-    this.urlHash = this.urlHashPath + '?' + paramArray.join('&');
-  },
-
-  get urlHashParams() {
-    const ret = {};
-    const s = this.urlHash.split('?');
-    if (s.length > 1) {
-      const p = new URLSearchParams(s[1]);
-      p.forEach((v, k) => {
-        if (ret[k] === undefined) {
-          ret[k] = v;
-        } else if (Array.isArray(ret[k])) {
-          ret[k].push(v);
-        } else {
-          ret[k] = [ret[k], v];
-        }
-      });
-    }
-    return ret;
+  } else {
+    leanweb.eventBus.dispatchEvent('update');
   }
 };
+
+Object.defineProperties(leanweb, {
+  urlHash: {
+    set(hash) { location.hash = hash; },
+    get() { return location.hash; }
+  },
+  urlHashPath: {
+    set(hashPath) {
+      const s = this.urlHash.split('?');
+      if (s.length === 1) {
+        this.urlHash = hashPath;
+      } else if (s.length > 1) {
+        this.urlHash = hashPath + '?' + s[1];
+      }
+    },
+    get() { return this.urlHash.split('?')[0]; }
+  },
+  urlHashParams: {
+    set(hashParams) {
+      if (!hashParams) {
+        return;
+      }
+
+      const paramArray = [];
+      Object.keys(hashParams).forEach(key => {
+        const value = hashParams[key];
+        if (Array.isArray(value)) {
+          value.forEach(v => {
+            paramArray.push(key + '=' + encodeURIComponent(v));
+          });
+        } else {
+          paramArray.push(key + '=' + encodeURIComponent(value));
+        }
+      });
+      this.urlHash = this.urlHashPath + '?' + paramArray.join('&');
+    },
+    get() {
+      const ret = {};
+      const s = this.urlHash.split('?');
+      if (s.length > 1) {
+        const p = new URLSearchParams(s[1]);
+        p.forEach((v, k) => {
+          if (ret[k] === undefined) {
+            ret[k] = v;
+          } else if (Array.isArray(ret[k])) {
+            ret[k].push(v);
+          } else {
+            ret[k] = [ret[k], v];
+          }
+        });
+      }
+      return ret;
+    }
+  }
+});
 
 globalThis.addEventListener('hashchange', () => {
   leanweb.componentsListeningOnUrlChanges.forEach(component => {
@@ -110,7 +107,7 @@ export default class LWElement extends HTMLElement {
     componentSheet.replaceSync(ast.css);
     node.innerHTML = ast.html;
     this.attachShadow({ mode: 'open' }).appendChild(node.content);
-    this.shadowRoot.adoptedStyleSheets = [globalThis.leanweb.__lw_globalStyleSheet, componentSheet];
+    this.shadowRoot.adoptedStyleSheets = [globalThis.leanweb.__lw_globalStyleSheet, componentSheet].filter(Boolean);
     globalThis.leanweb.__lw_globalStyleImports?.forEach(url => {
       const link = document.createElement('link');
       link.rel = 'stylesheet';

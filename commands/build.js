@@ -54,7 +54,7 @@ const buildModule = (projectPath) => {
       imports.push(url);
       return '';
     });
-    const jsModule = `globalThis.leanweb = globalThis.leanweb ?? {};\nconst sheet = new CSSStyleSheet();\nsheet.replaceSync(${JSON.stringify(inlineCss)});\nglobalThis.leanweb.__lw_globalStyleSheet = sheet;\nglobalThis.leanweb.__lw_globalStyleImports = ${JSON.stringify(imports)};\n`;
+    const jsModule = `globalThis.leanweb ??= {};\nconst sheet = new CSSStyleSheet();\nsheet.replaceSync(${JSON.stringify(inlineCss)});\nglobalThis.leanweb.__lw_globalStyleSheet = sheet;\nglobalThis.leanweb.__lw_globalStyleImports = ${JSON.stringify(imports)};\n`;
     utils.writeIfChanged(`${utils.dirs.build}/global-styles.js`, jsModule);
   };
 
