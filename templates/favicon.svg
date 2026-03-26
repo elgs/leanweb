@@ -1,7 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="400px" height="247px" viewBox="0 0 400 247" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect id="Rectangle" fill="#FF6347" x="0" y="0" width="400" height="247"></rect>
-        <path d="M164.382947,200 L164.382947,182.969188 L94.5504862,182.969188 L94.5504862,48 L77,48 L77,200 L164.382947,200 Z M209.459985,200 L239.942408,72.2689076 L240.311892,72.2689076 L270.424832,200 L288.714286,200 L324,48 L306.449514,48 L279.66193,174.453782 L279.292446,174.453782 L250.103216,48 L231.074794,48 L201.516081,174.453782 L201.146597,174.453782 L175.282723,48 L157.362752,48 L191.170531,200 L209.459985,200 Z" id="LW" fill="#FFFFFF" fill-rule="nonzero"></path>
-    </g>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+
+  <!-- Sparkles icon scaled from 24x24 to fit, centered -->
+  <g transform="translate(64, 64) scale(16)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Main 4-point star -->
+    <path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275z" stroke="url(#star)" stroke-width="1.4" fill="url(#starfill)" fill-opacity="0.15"/>
+
+    <!-- Small accent sparkles -->
+    <path d="M5 3v4M19 17v4M3 5h4M17 19h4" stroke="#c7d2fe" stroke-width="1.4" opacity="0.7"/>
+  </g>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1e1b4b"/>
+      <stop offset="0.5" stop-color="#312e81"/>
+      <stop offset="1" stop-color="#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="star" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e0e7ff"/>
+      <stop offset="1" stop-color="#a5b4fc"/>
+    </linearGradient>
+    <linearGradient id="starfill" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#c7d2fe"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
 </svg>
