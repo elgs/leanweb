@@ -18,6 +18,9 @@
     "web components"
   ],
   "author": "Qian Chen",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
   "license": "MIT",
   "dependencies": {
     "@babel/parser": "^7.29.2",
