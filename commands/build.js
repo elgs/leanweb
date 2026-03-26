@@ -48,9 +48,10 @@ const buildModule = (projectPath) => {
     const globalCssPath = `${utils.dirs.build}/global-styles.css`;
     const globalCss = fs.existsSync(globalCssPath) ? fs.readFileSync(globalCssPath, 'utf8') : '';
 
-    // Extract @import statements and create a JS module that sets up the global styles, including the inline styles and the imports, and write it to global-styles.js
+    // Strip CSS comments, then extract @import statements and create a JS module that sets up the global styles
     const imports = [];
-    const inlineCss = globalCss.replace(/@import\s+(?:url\()?['"]?([^'"\)]+)['"]?\)?[^;]*;/g, (_, url) => {
+    const uncommented = globalCss.replace(/\/\*[\s\S]*?\*\//g, '');
+    const inlineCss = uncommented.replace(/@import\s+(?:url\()?['"]?([^'"\)]+)['"]?\)?[^;]*;/g, (_, url) => {
       imports.push(url);
       return '';
     });
