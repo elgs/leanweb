@@ -101,6 +101,7 @@ export default class LWElement extends HTMLElement {
 
     leanweb.runtimeVersion = ast.runtimeVersion;
     leanweb.builderVersion = ast.builderVersion;
+    leanweb.componentPrefix ??= ast.componentFullName.split('-')[0] + '-';
 
     const node = document.createElement('template');
     node.innerHTML = ast.html;
@@ -162,6 +163,10 @@ export default class LWElement extends HTMLElement {
   }
 
   update(rootNode = this._root) {
+    // Process rootNode itself when called from updateFor with a cloned node.
+    // TreeWalker never visits its own root, so we handle it manually here.
+    // Skipped when rootNode === this._root because the component's own root
+    // element is owned by the parent component's TreeWalker, not ours.
     if (rootNode !== this._root) {
       if (rootNode.hasAttribute('lw-elem')) {
         if (rootNode.hasAttribute('lw-elem-bind')) {
@@ -183,6 +188,10 @@ export default class LWElement extends HTMLElement {
         }
       }
     }
+    // Walk all descendant elements and process lw-* directives.
+    // With shadow DOM, the shadow boundary naturally prevents walking into
+    // child components. Without shadow DOM, we check for child components
+    // by tag name (see FILTER_REJECT below) to mimic that boundary.
     const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
       acceptNode: node => {
         if (node.hasAttribute('lw-elem')) {
@@ -208,6 +217,12 @@ export default class LWElement extends HTMLElement {
           this.updateClass(node);
           this.updateBind(node);
           this.updateModel(node);
+        }
+        // Light DOM boundary: process directives on child components above
+        // (e.g. lw-if, lw-class owned by this parent), but don't descend
+        // into their internal DOM which belongs to the child's own ast.
+        if (node !== rootNode && node.localName.startsWith(leanweb.componentPrefix)) {
+          return NodeFilter.FILTER_REJECT;
         }
         return NodeFilter.FILTER_ACCEPT;
       }
