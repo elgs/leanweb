@@ -10,7 +10,6 @@ import fse from 'fs-extra';
 import { minify } from 'html-minifier';
 import * as utils from './utils.js';
 import * as parser from '../lib/lw-html-parser.js';
-import { scopeCss } from '../lib/lw-css-scoper.js';
 
 let env;
 const args = process.argv;
@@ -79,7 +78,8 @@ const buildModule = (projectPath) => {
           cssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
           const componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
           if (!useShadowDom) {
-            cssString = scopeCss(cssString, componentFullName);
+            cssString = cssString.replace(/:host\(([^)]*)\)/g, '&$1').replace(/:host/g, '&');
+            cssString = `${componentFullName} {\n${cssString}\n}\n`;
           }
           const htmlString = fs.readFileSync(htmlFilename, 'utf8');
           const minifiedHtml = minify(htmlString, {
