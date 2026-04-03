@@ -10,6 +10,7 @@ import fse from 'fs-extra';
 import { minify } from 'html-minifier';
 import * as utils from './utils.js';
 import * as parser from '../lib/lw-html-parser.js';
+import { scopeCss } from '../lib/lw-css-scoper.js';
 
 let env;
 const args = process.argv;
@@ -35,12 +36,15 @@ const buildModule = (projectPath) => {
     }
   };
 
+  const useShadowDom = project.shadowDom ?? false;
+
   const buildJS = () => {
+    const prefix = useShadowDom ? `import './global-styles.js';\n` : `globalThis.leanweb ??= {};\n`;
     const jsString = project.components.reduce((acc, cur) => {
       const cmpName = utils.getComponentName(cur);
       let importString = `import './components/${cur}/${cmpName}.js';`;
       return acc + importString + '\n';
-    }, `import './global-styles.js';\n`);
+    }, prefix);
     utils.writeIfChanged(`${utils.dirs.build}/${project.name}.js`, jsString);
   };
 
@@ -73,6 +77,10 @@ const buildModule = (projectPath) => {
             cssString += fs.readFileSync(cssFilename, 'utf8');
           }
           cssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
+          const componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
+          if (!useShadowDom) {
+            cssString = scopeCss(cssString, componentFullName);
+          }
           const htmlString = fs.readFileSync(htmlFilename, 'utf8');
           const minifiedHtml = minify(htmlString, {
             caseSensitive: true,
@@ -83,7 +91,8 @@ const buildModule = (projectPath) => {
           });
           const ast = parser.parse(minifiedHtml);
           ast.css = cssString;
-          ast.componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
+          ast.componentFullName = componentFullName;
+          ast.shadowDom = useShadowDom;
           ast.runtimeVersion = project.version;
           ast.builderVersion = leanwebPackageJSON.version;
           utils.writeIfChanged(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
@@ -97,7 +106,9 @@ const buildModule = (projectPath) => {
   copySrc();
   copyEnv();
   buildJS();
-  buildGlobalStyles();
+  if (useShadowDom) {
+    buildGlobalStyles();
+  }
   buildHTML();
 
   return project.name;

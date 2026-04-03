@@ -103,17 +103,33 @@ export default class LWElement extends HTMLElement {
     leanweb.builderVersion = ast.builderVersion;
 
     const node = document.createElement('template');
-    const componentSheet = new CSSStyleSheet();
-    componentSheet.replaceSync(ast.css);
     node.innerHTML = ast.html;
-    this.attachShadow({ mode: 'open' }).appendChild(node.content);
-    this.shadowRoot.adoptedStyleSheets = [globalThis.leanweb.__lw_globalStyleSheet, componentSheet].filter(Boolean);
-    globalThis.leanweb.__lw_globalStyleImports?.forEach(url => {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = url;
-      this.shadowRoot.appendChild(link);
-    });
+
+    if (ast.shadowDom) {
+      const componentSheet = new CSSStyleSheet();
+      componentSheet.replaceSync(ast.css);
+      this.attachShadow({ mode: 'open' }).appendChild(node.content);
+      this.shadowRoot.adoptedStyleSheets = [globalThis.leanweb.__lw_globalStyleSheet, componentSheet].filter(Boolean);
+      globalThis.leanweb.__lw_globalStyleImports?.forEach(url => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = url;
+        this.shadowRoot.appendChild(link);
+      });
+      this._root = this.shadowRoot;
+    } else {
+      this.appendChild(node.content);
+      if (!LWElement._injectedStyles) {
+        LWElement._injectedStyles = new Set();
+      }
+      if (!LWElement._injectedStyles.has(ast.componentFullName)) {
+        LWElement._injectedStyles.add(ast.componentFullName);
+        const style = document.createElement('style');
+        style.textContent = ast.css;
+        document.head.appendChild(style);
+      }
+      this._root = this;
+    }
 
     this._bindMethods();
     setTimeout(() => {
@@ -145,8 +161,8 @@ export default class LWElement extends HTMLElement {
     return contextNode?.['lw-context'] ?? [{ 'this': this }, this, globalThis];
   }
 
-  update(rootNode = this.shadowRoot) {
-    if (rootNode !== this.shadowRoot) {
+  update(rootNode = this._root) {
+    if (rootNode !== this._root) {
       if (rootNode.hasAttribute('lw-elem')) {
         if (rootNode.hasAttribute('lw-elem-bind')) {
           this._bindModels(rootNode);

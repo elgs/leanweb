@@ -22,6 +22,12 @@ if (upgradeAvailable) {
   fse.copySync(`${__dirname}/../templates/lib`, `./${utils.dirs.src}/lib/`, { dereference: true });
   const oldVersion = projectLeanwebJSON.version;
   projectLeanwebJSON.version = leanwebPackageJSON.version;
+
+  // Existing projects default to shadow DOM for backward compatibility
+  if (projectLeanwebJSON.shadowDom === undefined) {
+    projectLeanwebJSON.shadowDom = true;
+  }
+
   fs.writeFileSync(`${process.cwd()}/${utils.dirs.src}/leanweb.json`, JSON.stringify(projectLeanwebJSON, null, 2));
 
   if (semver.gte(leanwebPackageJSON.version, '0.8.8') && semver.lt(oldVersion, '0.8.8')) {

@@ -90,15 +90,19 @@ export const portInUse = (port, address = '127.0.0.1') => {
   });
 };
 
-const initNote = `Usage: leanweb init or leanweb init project-name
+const initNote = `Usage: leanweb init [project-name] [--shadow-dom]
 leanweb init will initialize a leanweb project with the name of the current
 working directory, otherwise, if a project-name is provided, the provided
 project-name will be used as the leanweb project name.
+
+Use --shadow-dom to enable Shadow DOM encapsulation. Without this flag,
+components use light DOM with scoped CSS (default).
 
 leanweb init command will create src/leanweb.json file, which looks like:
 {
   "name": "demo",
   "version": "0.4.5",
+  "shadowDom": false,
   "components": [
     "demo-root",
   ],

@@ -13,6 +13,8 @@ import * as utils from './utils.js';
 
 (async () => {
   const args = process.argv;
+  const shadowDom = args.includes('--shadow-dom');
+  const positionalArgs = args.slice(2).filter(a => !a.startsWith('--'));
 
   const leanwebJSONExisted = fs.existsSync(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
@@ -25,13 +27,14 @@ import * as utils from './utils.js';
 
   let projectName = path.basename(path.resolve());
 
-  if (args.length >= 3) {
-    projectName = args[2];
+  if (positionalArgs.length >= 1) {
+    projectName = positionalArgs[0];
   }
 
   const leanwebData = {
     name: projectName,
     version: lwPackage.version,
+    shadowDom,
     components: [],
     resources: [
       'resources/'
@@ -49,10 +52,10 @@ body {
 } */
 `
 
-  const globalCss = `/* div {
+  const globalCss = shadowDom ? `/* div {
   color: tomato;
 } */
-`;
+` : null;
 
   fs.mkdirSync(`${utils.dirs.src}/resources/`, { recursive: true });
   fs.writeFileSync(`${utils.dirs.src}/leanweb.json`, JSON.stringify(leanwebData, null, 2));
@@ -65,7 +68,9 @@ body {
   htmlString = htmlString.replace(/\$\{project\.name\}/g, projectName);
   fs.writeFileSync(`./${utils.dirs.src}/index.html`, htmlString);
   fs.writeFileSync(`./src/${projectName}.css`, projectCss);
-  fs.writeFileSync(`./${utils.dirs.src}/global-styles.css`, globalCss);
+  if (shadowDom) {
+    fs.writeFileSync(`./${utils.dirs.src}/global-styles.css`, globalCss);
+  }
   fse.copySync(`${__dirname}/../templates/favicon.svg`, `./${utils.dirs.src}/favicon.svg`);
   fse.copySync(`${__dirname}/../templates/env.js`, `./${utils.dirs.src}/env.js`);
   fse.copySync(`${__dirname}/../templates/env/`, `./${utils.dirs.src}/env/`);
