@@ -148,18 +148,37 @@ export default class LWElement extends HTMLElement {
       leanweb.componentsListeningOnUrlChanges.push(this);
     }
 
-    leanweb.eventBus.addEventListener('update', _ => {
+    this._eventBusListeners = [];
+    this._eventBusListeners.push(leanweb.eventBus.addEventListener('update', _ => {
       this.update();
-    });
+    }));
 
-    leanweb.eventBus.addEventListener(ast.componentFullName, _ => {
+    this._eventBusListeners.push(leanweb.eventBus.addEventListener(ast.componentFullName, _ => {
       this.update();
+    }));
+  }
+
+  disconnectedCallback() {
+    const idx = leanweb.componentsListeningOnUrlChanges.indexOf(this);
+    if (idx > -1) {
+      leanweb.componentsListeningOnUrlChanges.splice(idx, 1);
+    }
+    this._eventBusListeners?.forEach(listener => {
+      leanweb.eventBus.removeEventListener(listener);
     });
+    this._eventBusListeners = [];
   }
 
   _getNodeContext(node) {
     const contextNode = node.closest('[lw-context]');
-    return contextNode?.['lw-context'] ?? [{ 'this': this }, this, globalThis];
+    // contextNode must be inside this component's root, not the root itself.
+    // In non-shadow DOM, the component element (this._root === this) may carry
+    // a [lw-context] set by a parent's lw-for — that context belongs to the
+    // parent, not this component.
+    if (contextNode && contextNode !== this._root && this._root.contains(contextNode)) {
+      return contextNode['lw-context'];
+    }
+    return [{ 'this': this }, this, globalThis];
   }
 
   update(rootNode = this._root) {
@@ -187,6 +206,12 @@ export default class LWElement extends HTMLElement {
           }
         }
       }
+    }
+    // If rootNode is a child component (called from updateFor on a component
+    // element), don't walk its descendants — they belong to the child's own
+    // AST and will be updated by the child's own update() cycle.
+    if (rootNode !== this._root && rootNode.localName.startsWith(leanweb.componentPrefix)) {
+      return;
     }
     // Walk all descendant elements and process lw-* directives.
     // With shadow DOM, the shadow boundary naturally prevents walking into
@@ -218,10 +243,12 @@ export default class LWElement extends HTMLElement {
           this.updateBind(node);
           this.updateModel(node);
         }
-        // Light DOM boundary: process directives on child components above
-        // (e.g. lw-if, lw-class owned by this parent), but don't descend
-        // into their internal DOM which belongs to the child's own ast.
-        if (node !== rootNode && node.localName.startsWith(leanweb.componentPrefix)) {
+        // Light DOM boundary: in non-shadow DOM mode, the child component's
+        // internal DOM is in the light DOM, so FILTER_REJECT prevents walking
+        // into it. In shadow DOM mode, the shadow boundary already isolates
+        // child internals, and we must not reject here so the TreeWalker can
+        // still visit slotted content (light DOM children owned by this parent).
+        if (!this.ast.shadowDom && node !== rootNode && node.localName.startsWith(leanweb.componentPrefix)) {
           return NodeFilter.FILTER_REJECT;
         }
         return NodeFilter.FILTER_ACCEPT;
@@ -268,27 +295,26 @@ export default class LWElement extends HTMLElement {
       return;
     }
     eventNode['lw_event_bound'] = true;
-    const me = this;
     for (const attr of eventNode.attributes) {
       const attrName = attr.name;
       const attrValue = attr.value;
       if (attrName.startsWith('lw-on:')) {
         const interpolation = this.ast[attrValue];
         interpolation.lwValue.split(',').forEach(eventType => {
-          eventNode.addEventListener(eventType.trim(), (event => {
+          eventNode.addEventListener(eventType.trim(), event => {
             const context = this._getNodeContext(eventNode);
             const eventContext = { '$event': event, '$node': eventNode };
             const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
             const promises = parsed.filter(p => typeof p?.then === 'function' && typeof p?.finally === 'function');
             if (parsed.length > promises.length) {
-              me.update();
+              this.update();
             }
             promises.forEach(p => {
               p?.finally(() => {
-                me.update();
+                this.update();
               });
             });
-          }).bind(me));
+          });
         });
       }
     }
@@ -532,9 +558,6 @@ export default class LWElement extends HTMLElement {
         node.setAttribute('lw-for-parent', key);
         node.setAttribute('lw-context', '');
         currentNode.insertAdjacentElement('afterend', node);
-      }
-      if (item && typeof item === 'object') {
-        item.getDom = () => node;
       }
       currentNode = node;
       const itemContext = { [interpolation.itemExpr]: item };

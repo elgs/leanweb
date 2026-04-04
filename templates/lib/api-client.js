@@ -3,15 +3,15 @@
 // to overwrite on Leanweb upgrade.
 
 class APIClient {
-  constructor(baesUrl, sendToken = false, defaultHeaders = {}) {
-    this.baesUrl = baesUrl;
+  constructor(baseUrl, sendToken = false, defaultHeaders = {}) {
+    this.baseUrl = baseUrl;
     this.sendToken = sendToken;
     this.defaultHeaders = defaultHeaders;
   }
 
   async _fetch(method, url = '', data = {}, headers = {}) {
     if (!url.toLowerCase().startsWith('https://') && !url.toLowerCase().startsWith('http://')) {
-      url = this.baesUrl + url;
+      url = this.baseUrl + url;
     }
 
     if (method === 'GET' && data && typeof data === 'object') {
@@ -30,7 +30,7 @@ class APIClient {
     if (this.sendToken) {
       const token = localStorage.getItem('access_token');
       if (token) {
-        headers['authorization'] = token;
+        headers['authorization'] = `Bearer ${token}`;
       } else {
         return null;
       }

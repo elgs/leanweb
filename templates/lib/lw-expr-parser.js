@@ -65,7 +65,8 @@ const updateOperators = (operator, prefix) => {
 
 const callFunction = (node, context) => {
   const callee = evalNode(node.callee, context);
-  if (node.callee.type === 'OptionalMemberExpression' && (callee === void 0 || callee === null)) {
+  if ((callee === void 0 || callee === null) &&
+    (node.type === 'OptionalCallExpression' || node.callee.type === 'OptionalMemberExpression')) {
     return void 0;
   }
   const args = [];
