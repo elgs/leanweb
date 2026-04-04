@@ -144,18 +144,26 @@ export default class LWElement extends HTMLElement {
       }
     });
 
-    if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
-      leanweb.componentsListeningOnUrlChanges.push(this);
-    }
-
     this._eventBusListeners = [];
+    this._registerListeners();
+  }
+
+  _registerListeners() {
     this._eventBusListeners.push(leanweb.eventBus.addEventListener('update', _ => {
       this.update();
     }));
-
-    this._eventBusListeners.push(leanweb.eventBus.addEventListener(ast.componentFullName, _ => {
+    this._eventBusListeners.push(leanweb.eventBus.addEventListener(this.ast.componentFullName, _ => {
       this.update();
     }));
+    if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
+      leanweb.componentsListeningOnUrlChanges.push(this);
+    }
+  }
+
+  connectedCallback() {
+    if (this._eventBusListeners.length === 0) {
+      this._registerListeners();
+    }
   }
 
   disconnectedCallback() {
