@@ -44,7 +44,7 @@ function createInstance(LWElement, root, ast) {
   const instance = Object.create(LWElement.prototype);
   instance._root = root;
   instance.ast = ast;
-  for (const method of ['update', 'updateEval', 'updateIf', 'updateClass', 'updateBind', 'updateModel', 'updateFor', '_bindModels', '_bindEvents', '_bindInputs', '_getNodeContext', '_restoreIfPlaceholders']) {
+  for (const method of ['update', 'updateEval', 'updateIf', 'updateClass', 'updateBind', 'updateModel', 'updateFor', '_bindModels', '_bindEvents', '_bindInputs', '_getNodeContext', '_restoreIfPlaceholders', '_removeIfNode', '_applyIfRemovals']) {
     if (LWElement.prototype[method]) {
       instance[method] = LWElement.prototype[method].bind(instance);
     }
@@ -203,6 +203,49 @@ describe('LWElement', () => {
         instance.update();
         assert.equal(root.contains(elem), true, 'element restored when true');
         assert.equal(elem.innerText, 'hello', 'directives processed after restore');
+      });
+
+      it('should process all lw-if siblings even when earlier ones are false', async () => {
+        setupDOM();
+        const LWElement = await loadLWElement();
+        const doc = globalThis.document;
+
+        // Simulates a dashboard with multiple panels, only one visible at a time.
+        const root = doc.createElement('div');
+        const panelA = doc.createElement('div');
+        panelA.setAttribute('lw-elem', '');
+        panelA.setAttribute('lw-if', 'kA');
+        panelA.setAttribute('lw', 'kText');
+        const panelB = doc.createElement('div');
+        panelB.setAttribute('lw-elem', '');
+        panelB.setAttribute('lw-if', 'kB');
+        panelB.setAttribute('lw', 'kText');
+        const panelC = doc.createElement('div');
+        panelC.setAttribute('lw-elem', '');
+        panelC.setAttribute('lw-if', 'kC');
+        panelC.setAttribute('lw', 'kText');
+        root.appendChild(panelA);
+        root.appendChild(panelB);
+        root.appendChild(panelC);
+        doc.body.appendChild(root);
+
+        const ast = makeAST({
+          shadowDom,
+          componentFullName: 'app-dashboard',
+          'kA': { ast: [{ type: 'ExpressionStatement', expression: { type: 'BooleanLiteral', value: false } }], loc: {} },
+          'kB': { ast: [{ type: 'ExpressionStatement', expression: { type: 'BooleanLiteral', value: true } }], loc: {} },
+          'kC': { ast: [{ type: 'ExpressionStatement', expression: { type: 'BooleanLiteral', value: false } }], loc: {} },
+          'kText': { ast: [{ type: 'ExpressionStatement', expression: { type: 'StringLiteral', value: 'content' } }], loc: {} },
+        });
+
+        globalThis.leanweb.componentPrefix = 'app-';
+        const instance = createInstance(LWElement, root, ast);
+        instance.update();
+
+        assert.equal(root.contains(panelA), false, 'panelA should be removed (false)');
+        assert.equal(root.contains(panelB), true, 'panelB should remain (true)');
+        assert.equal(panelB.innerText, 'content', 'panelB directives should be processed');
+        assert.equal(root.contains(panelC), false, 'panelC should be removed (false)');
       });
 
       it('should not restore lw-if placeholders inside child components', async () => {

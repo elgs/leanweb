@@ -198,6 +198,11 @@ export default class LWElement extends HTMLElement {
     // TreeWalker never visits its own root, so we handle it manually here.
     // Skipped when rootNode === this._root because the component's own root
     // element is owned by the parent component's TreeWalker, not ours.
+    // Nodes whose lw-if evaluated to false.  We defer DOM removal until
+    // after the TreeWalker finishes so we don't detach the walker's current
+    // navigation pointer (which would stop the walk).
+    const toRemove = [];
+
     if (rootNode !== this._root) {
       if (rootNode.hasAttribute('lw-elem')) {
         if (rootNode.hasAttribute('lw-elem-bind')) {
@@ -205,16 +210,16 @@ export default class LWElement extends HTMLElement {
           this._bindEvents(rootNode);
           this._bindInputs(rootNode);
         }
-        if (rootNode.hasAttribute('lw-if')) {
-          this.updateIf(rootNode);
-          if (!rootNode.parentNode) return; // removed from DOM by updateIf
-        }
-        this.updateEval(rootNode);
-        this.updateClass(rootNode);
-        this.updateBind(rootNode);
-        this.updateModel(rootNode);
-        if (rootNode.hasAttribute('lw-for')) {
-          this.updateFor(rootNode);
+        if (rootNode.hasAttribute('lw-if') && !this.updateIf(rootNode)) {
+          toRemove.push(rootNode);
+        } else {
+          this.updateEval(rootNode);
+          this.updateClass(rootNode);
+          this.updateBind(rootNode);
+          this.updateModel(rootNode);
+          if (rootNode.hasAttribute('lw-for')) {
+            this.updateFor(rootNode);
+          }
         }
       }
     }
@@ -222,6 +227,7 @@ export default class LWElement extends HTMLElement {
     // element), don't walk its descendants — they belong to the child's own
     // AST and will be updated by the child's own update() cycle.
     if (rootNode !== this._root && rootNode.localName.startsWith(leanweb.componentPrefix)) {
+      this._applyIfRemovals(toRemove);
       return;
     }
     // Walk all descendant elements and process lw-* directives.
@@ -243,9 +249,9 @@ export default class LWElement extends HTMLElement {
             this._bindEvents(node);
             this._bindInputs(node);
           }
-          if (node.hasAttribute('lw-if')) {
-            this.updateIf(node);
-            if (!node.parentNode) return NodeFilter.FILTER_REJECT; // removed from DOM
+          if (node.hasAttribute('lw-if') && !this.updateIf(node)) {
+            toRemove.push(node);
+            return NodeFilter.FILTER_REJECT;
           }
           this.updateEval(node);
           this.updateClass(node);
@@ -264,6 +270,13 @@ export default class LWElement extends HTMLElement {
       }
     });
     while (treeWalker.nextNode()) { }
+    this._applyIfRemovals(toRemove);
+  }
+
+  _applyIfRemovals(toRemove) {
+    for (const node of toRemove) {
+      this._removeIfNode(node);
+    }
   }
 
   _bindMethods() {
@@ -449,31 +462,28 @@ export default class LWElement extends HTMLElement {
   }
 
   // attribute: lw-if: astKey
-  // When false, removes the element from DOM and replaces it with a comment
-  // placeholder. When true, restores the element from the placeholder.
+  // Returns true if the condition is true (element should stay), false if the
+  // element should be removed.  The actual DOM removal is deferred so it
+  // doesn't break the TreeWalker's navigation during the walk.
   updateIf(ifNode) {
     const key = ifNode.getAttribute('lw-if');
     if (!key) {
-      return;
+      return true;
     }
     const context = this._getNodeContext(ifNode);
     const interpolation = this.ast[key];
     const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
+    return !!parsed[0];
+  }
 
-    if (parsed[0]) {
-      // Element is already in the DOM and condition is true — nothing to do.
-      setTimeout(() => {
-        ifNode.turnedOn?.call(ifNode);
-      });
-    } else {
-      // Replace element with a comment placeholder.
-      const placeholder = document.createComment('lw-if');
-      placeholder['lw-if-element'] = ifNode;
-      ifNode.parentNode.replaceChild(placeholder, ifNode);
-      setTimeout(() => {
-        ifNode.turnedOff?.call(ifNode);
-      });
-    }
+  // Replace an element with a comment placeholder.
+  _removeIfNode(ifNode) {
+    const placeholder = document.createComment('lw-if');
+    placeholder['lw-if-element'] = ifNode;
+    ifNode.parentNode.replaceChild(placeholder, ifNode);
+    setTimeout(() => {
+      ifNode.turnedOff?.call(ifNode);
+    });
   }
 
   // Scans for lw-if comment placeholders and restores elements whose
