@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 
@@ -390,4 +390,141 @@ describe('LWElement', () => {
       });
     });
   }
+
+  describe('_bindMethods async wrapper', () => {
+    it('should auto-call update() when an async method completes', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+
+      const root = doc.createElement('div');
+      doc.body.appendChild(root);
+
+      const ast = makeAST({ componentFullName: 'app-async' });
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      let updateCount = 0;
+      const originalUpdate = instance.update;
+      instance.update = function () {
+        updateCount++;
+        return originalUpdate.call(this);
+      };
+
+      // Add an async method and call _bindMethods
+      instance.loadData = async function () {
+        return 'done';
+      };
+      LWElement.prototype._bindMethods.call(instance);
+
+      assert.equal(updateCount, 0);
+      await instance.loadData();
+      assert.equal(updateCount, 1, 'update() should be called after async method completes');
+    });
+
+    it('should not wrap sync methods with update()', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+
+      const root = doc.createElement('div');
+      doc.body.appendChild(root);
+
+      const ast = makeAST({ componentFullName: 'app-sync' });
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      let updateCount = 0;
+      const originalUpdate = instance.update;
+      instance.update = function () {
+        updateCount++;
+        return originalUpdate.call(this);
+      };
+
+      instance.doWork = function () {
+        return 'done';
+      };
+      LWElement.prototype._bindMethods.call(instance);
+
+      instance.doWork();
+      assert.equal(updateCount, 0, 'update() should not be called after sync method');
+    });
+  });
+
+  describe('_bindEvents', () => {
+    it('should call update() after event handler runs', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+
+      const root = doc.createElement('div');
+      const btn = doc.createElement('button');
+      btn.setAttribute('lw-elem', '');
+      btn.setAttribute('lw-elem-bind', '');
+      btn.setAttribute('lw-on:click', 'k1');
+      root.appendChild(btn);
+      doc.body.appendChild(root);
+
+      const ast = makeAST({
+        componentFullName: 'app-sync-event',
+        'k1': {
+          ast: [{ type: 'ExpressionStatement', expression: { type: 'NumericLiteral', value: 42 } }],
+          lwValue: 'click',
+          loc: {},
+        },
+      });
+
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      let updateCount = 0;
+      const originalUpdate = instance.update;
+      instance.update = function () {
+        updateCount++;
+        return originalUpdate.call(this);
+      };
+
+      instance._bindEvents(btn);
+      btn.click();
+
+      assert.equal(updateCount, 1, 'should call update() after event handler');
+    });
+  });
+
+  describe('_restoreIfPlaceholders with detached placeholders', () => {
+    it('should clean up placeholders that are no longer in the DOM', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+
+      const root = doc.createElement('div');
+      const container = doc.createElement('div');
+      const elem = doc.createElement('div');
+      elem.setAttribute('lw-elem', '');
+      elem.setAttribute('lw-if', 'k1');
+      container.appendChild(elem);
+      root.appendChild(container);
+      doc.body.appendChild(root);
+
+      const ast = makeAST({
+        shadowDom: false,
+        componentFullName: 'app-detach',
+        'k1': { ast: [{ type: 'ExpressionStatement', expression: { type: 'BooleanLiteral', value: false } }], loc: {} },
+      });
+
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      // First update removes the element and creates a placeholder
+      instance.update();
+      assert.equal(instance._ifPlaceholders.size, 1, 'placeholder should be tracked');
+
+      // Simulate lw-for removing the container (detaches the placeholder)
+      container.remove();
+
+      // Next update should clean up the stale placeholder
+      instance.update();
+      assert.equal(instance._ifPlaceholders.size, 0, 'stale placeholder should be removed from set');
+    });
+  });
 });

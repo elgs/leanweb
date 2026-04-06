@@ -494,6 +494,10 @@ export default class LWElement extends HTMLElement {
   // Restores lw-if placeholders whose condition has become true.
   _restoreIfPlaceholders() {
     for (const placeholder of this._ifPlaceholders) {
+      if (!this._root.contains(placeholder)) {
+        this._ifPlaceholders.delete(placeholder);
+        continue;
+      }
       const ifNode = placeholder['lw-if-element'];
       const key = ifNode.getAttribute('lw-if');
       if (!key) continue;
