@@ -75,7 +75,7 @@ const buildModule = (projectPath) => {
           if (cssFileExists) {
             cssString += fs.readFileSync(cssFilename, 'utf8');
           }
-          cssString += '\n[lw-false],[lw-for]{display:none !important;}\n';
+          cssString += '\n[lw-for]{display:none !important;}\n';
           const componentFullName = project.name + '-' + cmp.replace(/\//g, '-');
           if (!useShadowDom) {
             cssString = cssString.replace(/:host\(([^)]*)\)/g, '&$1').replace(/:host/g, '&');

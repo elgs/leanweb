@@ -190,6 +190,10 @@ export default class LWElement extends HTMLElement {
   }
 
   update(rootNode = this._root) {
+    // Restore any lw-if placeholders whose condition is now true before
+    // walking the tree, so the restored elements get processed normally.
+    this._restoreIfPlaceholders(rootNode);
+
     // Process rootNode itself when called from updateFor with a cloned node.
     // TreeWalker never visits its own root, so we handle it manually here.
     // Skipped when rootNode === this._root because the component's own root
@@ -203,15 +207,14 @@ export default class LWElement extends HTMLElement {
         }
         if (rootNode.hasAttribute('lw-if')) {
           this.updateIf(rootNode);
+          if (!rootNode.parentNode) return; // removed from DOM by updateIf
         }
-        if (!rootNode.hasAttribute('lw-false')) {
-          this.updateEval(rootNode);
-          this.updateClass(rootNode);
-          this.updateBind(rootNode);
-          this.updateModel(rootNode);
-          if (rootNode.hasAttribute('lw-for')) {
-            this.updateFor(rootNode);
-          }
+        this.updateEval(rootNode);
+        this.updateClass(rootNode);
+        this.updateBind(rootNode);
+        this.updateModel(rootNode);
+        if (rootNode.hasAttribute('lw-for')) {
+          this.updateFor(rootNode);
         }
       }
     }
@@ -242,9 +245,7 @@ export default class LWElement extends HTMLElement {
           }
           if (node.hasAttribute('lw-if')) {
             this.updateIf(node);
-          }
-          if (node.hasAttribute('lw-false')) {
-            return NodeFilter.FILTER_REJECT;
+            if (!node.parentNode) return NodeFilter.FILTER_REJECT; // removed from DOM
           }
           this.updateEval(node);
           this.updateClass(node);
@@ -448,7 +449,8 @@ export default class LWElement extends HTMLElement {
   }
 
   // attribute: lw-if: astKey
-  // lw-false: '' (if false)
+  // When false, removes the element from DOM and replaces it with a comment
+  // placeholder. When true, restores the element from the placeholder.
   updateIf(ifNode) {
     const key = ifNode.getAttribute('lw-if');
     if (!key) {
@@ -458,16 +460,59 @@ export default class LWElement extends HTMLElement {
     const interpolation = this.ast[key];
     const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
 
-    const hasLwFalse = ifNode.hasAttribute('lw-false');
     if (parsed[0]) {
-      hasLwFalse && ifNode.removeAttribute('lw-false');
+      // Element is already in the DOM and condition is true — nothing to do.
       setTimeout(() => {
         ifNode.turnedOn?.call(ifNode);
       });
     } else {
-      !hasLwFalse && ifNode.setAttribute('lw-false', '');
+      // Replace element with a comment placeholder.
+      const placeholder = document.createComment('lw-if');
+      placeholder['lw-if-element'] = ifNode;
+      ifNode.parentNode.replaceChild(placeholder, ifNode);
       setTimeout(() => {
         ifNode.turnedOff?.call(ifNode);
+      });
+    }
+  }
+
+  // Scans for lw-if comment placeholders and restores elements whose
+  // condition has become true.
+  _restoreIfPlaceholders(rootNode) {
+    const walker = document.createTreeWalker(
+      rootNode,
+      NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_COMMENT,
+      !this.ast.shadowDom ? {
+        acceptNode: node => {
+          // In light DOM mode, don't cross into child component subtrees.
+          if (node.nodeType === 1 /* Element */ && node !== rootNode && node.localName.startsWith(leanweb.componentPrefix)) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      } : null
+    );
+    const toRestore = [];
+    while (walker.nextNode()) {
+      const comment = walker.currentNode;
+      if (comment.nodeType !== 8 /* Comment */) continue;
+      if (comment.data === 'lw-if' && comment['lw-if-element']) {
+        const ifNode = comment['lw-if-element'];
+        const key = ifNode.getAttribute('lw-if');
+        if (!key) continue;
+        const context = this._getNodeContext(ifNode);
+        const interpolation = this.ast[key];
+        const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
+        if (parsed[0]) {
+          toRestore.push(comment);
+        }
+      }
+    }
+    for (const comment of toRestore) {
+      const ifNode = comment['lw-if-element'];
+      comment.parentNode.replaceChild(ifNode, comment);
+      setTimeout(() => {
+        ifNode.turnedOn?.call(ifNode);
       });
     }
   }
