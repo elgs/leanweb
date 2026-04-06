@@ -44,6 +44,7 @@ function createInstance(LWElement, root, ast) {
   const instance = Object.create(LWElement.prototype);
   instance._root = root;
   instance.ast = ast;
+  instance._ifPlaceholders = new Set();
   for (const method of ['update', 'updateEval', 'updateIf', 'updateClass', 'updateBind', 'updateModel', 'updateFor', '_bindModels', '_bindEvents', '_bindInputs', '_getNodeContext', '_restoreIfPlaceholders', '_removeIfNode', '_applyIfRemovals']) {
     if (LWElement.prototype[method]) {
       instance[method] = LWElement.prototype[method].bind(instance);
