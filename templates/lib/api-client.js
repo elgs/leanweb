@@ -1,8 +1,8 @@
 // Please don't modify this file. Create one outside of the lib directory with
-// your project speicific configurations. Files in the lib directory is subject
+// your project specific configurations. Files in the lib directory is subject
 // to overwrite on Leanweb upgrade.
 
-class APIClient {
+export class APIClient {
   constructor(baseUrl, sendToken = false, defaultHeaders = {}) {
     this.baseUrl = baseUrl;
     this.sendToken = sendToken;
@@ -18,29 +18,40 @@ class APIClient {
       // encode data and append to url
       const queryString = paramsToQueryString(data);
       data = null;
-      if (url.endsWith('?')) {
-        url += queryString;
-      } else if (url.indexOf('?') >= 0) {
-        url += ('&' + queryString);
-      } else {
-        url += ('?' + queryString);
+      if (queryString) {
+        if (url.endsWith('?')) {
+          url += queryString;
+        } else if (url.indexOf('?') >= 0) {
+          url += ('&' + queryString);
+        } else {
+          url += ('?' + queryString);
+        }
       }
     }
 
+    const requestHeaders = { ...this.defaultHeaders, ...headers };
     if (this.sendToken) {
       const token = localStorage.getItem('access_token');
-      if (token) {
-        headers['authorization'] = `Bearer ${token}`;
-      } else {
-        return null;
+      if (!token) {
+        throw new Error('No access token found in localStorage.');
       }
+      requestHeaders['authorization'] = `Bearer ${token}`;
     }
     const response = await fetch(url, {
       method,
-      headers: { ...this.defaultHeaders, ...headers },
+      headers: requestHeaders,
       body: data ? JSON.stringify(data) : null,
     });
-    return response.json();
+    const text = await response.text();
+    if (!response.ok) {
+      const error = new Error(`HTTP ${response.status}${response.statusText ? ' ' + response.statusText : ''}`);
+      error.status = response.status;
+      error.body = text;
+      throw error;
+    }
+    // 204 No Content and other empty bodies resolve to null instead of a
+    // JSON.parse error.
+    return text ? JSON.parse(text) : null;
   }
 
   post(url, data, headers) { return this._fetch('POST', url, data, headers); }
@@ -56,10 +67,10 @@ const paramsToQueryString = (params) => {
     const v = params[k];
     if (Array.isArray(v)) {
       return v.reduce((vacc, vcurr) => {
-        return `${vacc}${k}=${encodeURIComponent(vcurr)}&`;
+        return `${vacc}${encodeURIComponent(k)}=${encodeURIComponent(vcurr)}&`;
       }, '');
     } else {
-      return `${k}=${encodeURIComponent(v)}&`;
+      return `${encodeURIComponent(k)}=${encodeURIComponent(v)}&`;
     }
   }).reduce((acc, curr) => acc + curr, '').slice(0, -1);
 };

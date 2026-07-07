@@ -422,6 +422,46 @@ describe('LWElement', () => {
       assert.equal(updateCount, 1, 'update() should be called after async method completes');
     });
 
+    it('should update() without leaking an unhandled rejection when an async method rejects', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+
+      const root = doc.createElement('div');
+      doc.body.appendChild(root);
+
+      const ast = makeAST({ componentFullName: 'app-async-reject' });
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      let updateCount = 0;
+      const originalUpdate = instance.update;
+      instance.update = function () {
+        updateCount++;
+        return originalUpdate.call(this);
+      };
+
+      instance.failToLoad = async function () {
+        throw new Error('boom');
+      };
+      LWElement.prototype._bindMethods.call(instance);
+
+      const unhandled = [];
+      const onUnhandled = reason => unhandled.push(reason);
+      process.on('unhandledRejection', onUnhandled);
+      try {
+        // The caller handles the rejection; the wrapper's side chain must not
+        // report it a second time as unhandled.
+        await assert.rejects(() => instance.failToLoad(), /boom/);
+        // Give the wrapper's side chain time to surface a leak.
+        await new Promise(resolve => setTimeout(resolve, 20));
+        assert.equal(updateCount, 1, 'update() should still be called after the async method rejects');
+        assert.equal(unhandled.length, 0, 'no unhandled rejection should leak from the wrapper');
+      } finally {
+        process.removeListener('unhandledRejection', onUnhandled);
+      }
+    });
+
     it('should not wrap sync methods with update()', async () => {
       setupDOM();
       const LWElement = await loadLWElement();
@@ -488,6 +528,42 @@ describe('LWElement', () => {
       btn.click();
 
       assert.equal(updateCount, 1, 'should call update() after event handler');
+    });
+  });
+
+  describe('_bindModels number input', () => {
+    it('should set null (not 0) on the model when the input is cleared', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+
+      const root = doc.createElement('div');
+      const input = doc.createElement('input');
+      input.type = 'number';
+      input.setAttribute('lw-elem', '');
+      input.setAttribute('lw-elem-bind', '');
+      input.setAttribute('lw-model', 'k1');
+      root.appendChild(input);
+      doc.body.appendChild(root);
+
+      const ast = makeAST({
+        componentFullName: 'app-num',
+        'k1': { ast: [{ type: 'ExpressionStatement', expression: { type: 'Identifier', name: 'amount' } }], loc: {} },
+      });
+
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+      instance.amount = 5;
+
+      instance._bindModels(input);
+
+      input.value = '42';
+      input.dispatchEvent(new globalThis.window.Event('input', { bubbles: true }));
+      assert.equal(instance.amount, 42);
+
+      input.value = '';
+      input.dispatchEvent(new globalThis.window.Event('input', { bubbles: true }));
+      assert.equal(instance.amount, null, 'clearing the input should yield null, not 0');
     });
   });
 

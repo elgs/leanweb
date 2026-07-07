@@ -59,5 +59,11 @@ Please consider running 'npm i leanweb -g' to upgrade your local leanweb tools.`
   }
   const targetData = utils.targets[target];
   const command = `node --trace-deprecation ${__dirname}/commands/${targetData.file} ${args.slice(3).join(' ')}`;
-  utils.exec(command);
+  try {
+    utils.exec(command);
+  } catch (e) {
+    // stdio is inherited, so the command already printed its error;
+    // just propagate its exit code.
+    process.exitCode = e.status ?? 1;
+  }
 })();

@@ -63,8 +63,11 @@ const buildModule = (projectPath) => {
   };
 
   const buildHTML = () => {
-    try {
-      project.components.forEach(cmp => {
+    // A failing component must not abort the others, but the build still has
+    // to exit non-zero so scripts and CI can detect it.
+    let failed = false;
+    project.components.forEach(cmp => {
+      try {
         const cmpName = utils.getComponentName(cmp);
         const htmlFilename = `${utils.dirs.build}/components/${cmp}/${cmpName}.html`;
         const htmlFileExists = fs.existsSync(htmlFilename);
@@ -97,9 +100,13 @@ const buildModule = (projectPath) => {
           ast.builderVersion = leanwebPackageJSON.version;
           utils.writeIfChanged(`${utils.dirs.build}/components/${cmp}/ast.js`, `export default ${JSON.stringify(ast, null, 0)};`);
         }
-      });
-    } catch (e) {
-      console.error('Error in buildHTML:', e);
+      } catch (e) {
+        failed = true;
+        console.error(`Error building component ${cmp}:`, e.message ?? e);
+      }
+    });
+    if (failed) {
+      process.exitCode = 1;
     }
   };
 

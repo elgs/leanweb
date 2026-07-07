@@ -19,7 +19,10 @@ import * as utils from './utils.js';
   const leanwebJSON = require(leanwebJSONPath);
   const pages = args.slice(2);
 
-  const projectName = path.basename(path.resolve());
+  // Use the configured project name, not the directory name — the generated
+  // page links assets by project name (see generate.js), and the two differ
+  // when the project was initialized with an explicit name.
+  const projectName = leanwebJSON.name;
 
   leanwebJSON.pages = leanwebJSON.pages ?? [];
   for (const pageJSON of leanwebJSON.pages) {

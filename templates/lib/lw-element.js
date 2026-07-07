@@ -290,7 +290,11 @@ export default class LWElement extends HTMLElement {
       if (bound[Symbol.toStringTag] === 'AsyncFunction') {
         this[name] = (...args) => {
           const result = bound(...args);
-          result.finally(() => this.update());
+          // finally must attach directly to result so update() runs before
+          // the caller's own await continuation; the trailing catch keeps
+          // this side chain from re-reporting a rejection the caller already
+          // handles on the returned promise.
+          result.finally(() => this.update()).catch(() => { });
           return result;
         };
       } else {
@@ -316,8 +320,8 @@ export default class LWElement extends HTMLElement {
         inputNode[interpolation.lwValue] = parsed[0];
       }
     }
-    inputNode?.inputReady?.call(this);
-    inputNode?.update?.call(this);
+    inputNode?.inputReady?.call(inputNode);
+    inputNode?.update?.call(inputNode);
   }
 
   // properties:
@@ -375,7 +379,10 @@ export default class LWElement extends HTMLElement {
       if (modelNode.type === 'number' || modelNode.type === 'range') {
         // set do_not_update mark for cases when user inputs 0.01, 0.0 will not be evaluated prematurely
         modelNode.do_not_update = true;
-        object[propertyExpr] = modelNode.value * 1;
+        // valueAsNumber is NaN for an empty or partially-typed field; map it
+        // to null so clearing the input doesn't coerce the model to 0.
+        const parsedNumber = modelNode.valueAsNumber;
+        object[propertyExpr] = Number.isNaN(parsedNumber) ? null : parsedNumber;
       } else if (modelNode.type === 'checkbox') {
         if (Array.isArray(object[propertyExpr])) {
           if (modelNode.checked) {
@@ -501,7 +508,10 @@ export default class LWElement extends HTMLElement {
       const ifNode = placeholder['lw-if-element'];
       const key = ifNode.getAttribute('lw-if');
       if (!key) continue;
-      const context = this._getNodeContext(ifNode);
+      // The removed node is detached, so its own context lookup would miss
+      // any enclosing lw-for scope; resolve the context from the placeholder's
+      // position in the live tree instead.
+      const context = this._getNodeContext(placeholder.parentElement ?? ifNode);
       const interpolation = this.ast[key];
       const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
       if (parsed[0]) {

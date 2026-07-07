@@ -226,6 +226,26 @@ describe('lw-expr-parser', () => {
       eval1('obj.val = 42', ctx);
       assert.equal(ctx.obj.val, 42);
     });
+
+    it('should evaluate to the assigned value', () => {
+      assert.equal(eval1('x = 5', { x: 0 }), 5);
+      assert.equal(eval1('x += 5', { x: 10 }), 15);
+      assert.equal(eval1('obj.val = 42', { obj: { val: 0 } }), 42);
+    });
+
+    it('should handle chained assignment', () => {
+      const ctx = { a: 0, b: 0 };
+      eval1('b = a = 1', ctx);
+      assert.equal(ctx.a, 1);
+      assert.equal(ctx.b, 1, 'chained assignment should propagate the value, not undefined');
+    });
+
+    it('should evaluate logical assignment to the resulting value', () => {
+      assert.equal(eval1('x ??= 7', { x: null }), 7);
+      assert.equal(eval1('x ??= 7', { x: 3 }), 3);
+      assert.equal(eval1('x ||= 9', { x: 0 }), 9);
+      assert.equal(eval1('x &&= 9', { x: 1 }), 9);
+    });
   });
 
   describe('update operations', () => {

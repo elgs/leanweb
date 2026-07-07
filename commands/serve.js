@@ -16,7 +16,13 @@ const https = process.env.https;
 
 const build = (eventType, filename) => {
   // console.log(eventType + ': ', filename);
-  utils.exec(`npx leanweb build ${env}`);
+  try {
+    utils.exec(`npx leanweb build ${env}`);
+  } catch (e) {
+    // Build now exits non-zero on template errors; keep the dev server
+    // alive — the next file change retries the build.
+    console.error('Build failed. Watching for changes...');
+  }
 };
 
 const throttledBuild = utils.throttle(build);
