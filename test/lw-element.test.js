@@ -45,13 +45,19 @@ function createInstance(LWElement, root, ast) {
   instance._root = root;
   instance.ast = ast;
   instance._ifPlaceholders = new Set();
-  for (const method of ['update', 'updateEval', 'updateIf', 'updateClass', 'updateBind', 'updateModel', 'updateFor', '_bindModels', '_bindEvents', '_bindInputs', '_getNodeContext', '_restoreIfPlaceholders', '_removeIfNode', '_applyIfRemovals']) {
+  for (const method of ['update', 'updateEval', 'updateIf', 'updateClass', 'updateBind', 'updateModel', 'updateFor', '_bindModels', '_bindEvents', '_bindInputs', '_getNodeContext', '_restoreIfPlaceholders', '_removeIfNode', '_restoreIfNode', '_applyIfRemovals']) {
     if (LWElement.prototype[method]) {
       instance[method] = LWElement.prototype[method].bind(instance);
     }
   }
   return instance;
 }
+
+// Babel-style expression AST builders for interpolation entries.
+const expr = e => ({ type: 'ExpressionStatement', expression: e });
+const ident = name => ({ type: 'Identifier', name });
+const member = (objName, propName) => ({ type: 'MemberExpression', computed: false, object: ident(objName), property: ident(propName) });
+const nextTick = () => new Promise(resolve => setTimeout(resolve, 0));
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
@@ -601,6 +607,249 @@ describe('LWElement', () => {
       // Next update should clean up the stale placeholder
       instance.update();
       assert.equal(instance._ifPlaceholders.size, 0, 'stale placeholder should be removed from set');
+    });
+  });
+
+  describe('nested lw-if park/restore', () => {
+    // DOM: root > outer(lw-if kOuter) > inner(lw-if kInner, lw kText)
+    // with both conditions driven by closure variables.
+    function setupNested() {
+      const doc = globalThis.document;
+      const root = doc.createElement('div');
+      const container = doc.createElement('div');
+      const outer = doc.createElement('div');
+      outer.setAttribute('lw-elem', '');
+      outer.setAttribute('lw-if', 'kOuter');
+      const inner = doc.createElement('span');
+      inner.setAttribute('lw-elem', '');
+      inner.setAttribute('lw-if', 'kInner');
+      inner.setAttribute('lw', 'kText');
+      outer.appendChild(inner);
+      container.appendChild(outer);
+      root.appendChild(container);
+      doc.body.appendChild(root);
+
+      const state = { outerOn: true, innerOn: true };
+      const ast = makeAST({
+        componentFullName: 'app-nested',
+        'kOuter': { get ast() { return [expr({ type: 'BooleanLiteral', value: state.outerOn })]; }, loc: {} },
+        'kInner': { get ast() { return [expr({ type: 'BooleanLiteral', value: state.innerOn })]; }, loc: {} },
+        'kText': { ast: [expr({ type: 'StringLiteral', value: 'HELLO' })], loc: {} },
+      });
+      return { root, container, outer, inner, state, ast };
+    }
+
+    it('should restore nested lw-if content in the same update pass', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const { root, outer, inner, state, ast } = setupNested();
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      instance.update();
+      state.innerOn = false;
+      instance.update();
+      state.outerOn = false;
+      instance.update();
+      assert.equal(root.contains(outer), false, 'outer parked');
+
+      // Turn both back on with a SINGLE update: the inner element must come
+      // back in the same pass, not one update later.
+      state.outerOn = true;
+      state.innerOn = true;
+      instance.update();
+      assert.equal(root.contains(outer), true, 'outer restored');
+      assert.equal(root.contains(inner), true, 'inner restored in the same update pass');
+      assert.equal(inner.innerText, 'HELLO', 'inner directives processed after restore');
+    });
+
+    it('should keep dormant placeholders alive while their ancestor is parked', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const { root, outer, inner, state, ast } = setupNested();
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      instance.update();
+      state.innerOn = false;
+      instance.update();
+      state.outerOn = false;
+      instance.update();
+      // A few idle updates while parked must not garbage-collect the dormant
+      // inner entry (the original orphaning bug).
+      instance.update();
+      instance.update();
+
+      // Restore the ancestor with the inner condition still false.
+      state.outerOn = true;
+      instance.update();
+      assert.equal(root.contains(outer), true, 'outer restored');
+      assert.equal(root.contains(inner), false, 'inner still parked');
+      assert.equal(instance._ifPlaceholders.size, 1, 'inner entry is tracked again');
+
+      state.innerOn = true;
+      instance.update();
+      assert.equal(root.contains(inner), true, 'inner restores after its ancestor came back');
+      assert.equal(inner.innerText, 'HELLO');
+    });
+
+    it('should release all entries in one update when a parked subtree is removed for good', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const { root, container, state, ast } = setupNested();
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      instance.update();
+      state.innerOn = false;
+      instance.update();
+      state.outerOn = false;
+      instance.update();
+      assert.equal(instance._ifPlaceholders.size, 1, 'outer entry tracked (inner is stashed on it)');
+
+      // Remove the subtree that holds the outer placeholder — like an lw-for
+      // shrink would. One update must drop the whole chain, not one level
+      // per pass.
+      container.remove();
+      instance.update();
+      assert.equal(instance._ifPlaceholders.size, 0, 'dead chain released in a single update');
+    });
+
+    it('should survive a turnedOff hook reparenting the parked element', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+      const { root, outer, inner, state, ast } = setupNested();
+      const pool = doc.createElement('div');
+      outer.turnedOff = function () { pool.appendChild(this); };
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      instance.update();
+      state.innerOn = false;
+      instance.update();
+      state.outerOn = false;
+      instance.update();
+      await nextTick(); // let turnedOff move the parked element into the pool
+      assert.equal(pool.contains(outer), true, 'hook moved the parked element');
+      instance.update(); // idle pass must not orphan the dormant inner entry
+
+      state.outerOn = true;
+      state.innerOn = true;
+      instance.update();
+      assert.equal(root.contains(outer), true, 'outer restored from the pool');
+      assert.equal(root.contains(inner), true, 'inner survived the reparenting');
+    });
+
+    it('should drop registry entries whose element lost its lw-if attribute', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const { root, outer, state, ast } = setupNested();
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+
+      instance.update();
+      state.outerOn = false;
+      instance.update();
+      assert.equal(instance._ifPlaceholders.size, 1);
+
+      outer.removeAttribute('lw-if');
+      instance.update();
+      assert.equal(instance._ifPlaceholders.size, 0, 'keyless entry dropped instead of rescanned forever');
+    });
+  });
+
+  describe('lw-for rows with lw-if', () => {
+    function setupFor(rowIfEntry) {
+      const doc = globalThis.document;
+      const root = doc.createElement('div');
+      const container = doc.createElement('div');
+      const forNode = doc.createElement('div');
+      forNode.setAttribute('lw-elem', '');
+      forNode.setAttribute('lw-for', 'kFor');
+      forNode.setAttribute('lw-if', 'kIf');
+      forNode.setAttribute('lw', 'kRowText');
+      container.appendChild(forNode);
+      root.appendChild(container);
+      doc.body.appendChild(root);
+
+      const ast = makeAST({
+        componentFullName: 'app-rows',
+        'kFor': { astItems: [expr(ident('items'))], itemExpr: 'item', indexExpr: 'index', loc: {} },
+        'kIf': rowIfEntry,
+        'kRowText': { ast: [expr(ident('item'))], loc: {} },
+      });
+      return { root, container, ast };
+    }
+    const rowsOf = container => [...container.querySelectorAll('[lw-for-parent]')];
+    const commentsOf = container => [...container.childNodes].filter(n => n.nodeType === 8);
+
+    it('should keep updating when a row lw-if references the loop item', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const { root, container, ast } = setupFor({ ast: [expr(member('item', 'visible'))], loc: {} });
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+      instance.items = [{ visible: false }];
+
+      // The parked row's registry entry must not brick later updates by
+      // evaluating "item.visible" without the loop context.
+      instance.update();
+      instance.update();
+      instance.update();
+      assert.equal(rowsOf(container).length, 0, 'row hidden while item.visible is false');
+
+      instance.items[0].visible = true;
+      instance.update();
+      assert.equal(rowsOf(container).length, 1, 'row appears when item.visible becomes true');
+    });
+
+    it('should keep rendering when a middle item is falsy and preserve row order', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const { root, container, ast } = setupFor({ ast: [expr(ident('item'))], loc: {} });
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+      instance.items = ['a', '', 'c'];
+
+      instance.update();
+      instance.update();
+      assert.deepEqual(rowsOf(container).map(n => n.innerText), ['a', 'c'],
+        'truthy rows render around the parked middle row');
+      assert.equal(commentsOf(container).length, 1, 'middle row parked as one placeholder');
+
+      instance.items = ['a', 'b', 'c'];
+      instance.update();
+      assert.deepEqual(rowsOf(container).map(n => n.innerText), ['a', 'b', 'c'],
+        'restored row keeps its position and gets the fresh item');
+    });
+
+    it('should not grow the registry or DOM while a row lw-if stays false', async () => {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const { root, container, ast } = setupFor({ get ast() { return [expr(ident('show'))]; }, loc: {} });
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+      instance.items = ['a'];
+      instance.show = false;
+
+      for (let i = 0; i < 3; i++) {
+        instance.update();
+        assert.equal(instance._ifPlaceholders.size, 1, `registry stable after update #${i + 1}`);
+        assert.equal(commentsOf(container).length, 1, `one placeholder after update #${i + 1}`);
+        assert.equal(rowsOf(container).length, 0);
+      }
+
+      instance.show = true;
+      instance.update();
+      assert.deepEqual(rowsOf(container).map(n => n.innerText), ['a'], 'exactly one row after restore');
+      assert.equal(commentsOf(container).length, 0, 'no stray placeholder comments');
+
+      instance.show = false;
+      instance.update();
+      assert.equal(rowsOf(container).length, 0, 'row parked again');
+      assert.equal(commentsOf(container).length, 1);
+      assert.equal(instance._ifPlaceholders.size, 1);
     });
   });
 });

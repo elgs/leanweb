@@ -84,14 +84,18 @@ const hasMethod = (obj, name) => {
   return !!desc && typeof desc.value === 'function';
 }
 
-const nextAllSiblings = (el, selector) => {
-  const siblings = [];
+// Row slots created by updateFor after a template node: the live row element,
+// or the comment placeholder of a row whose lw-if is currently false.
+const nextAllRowSlots = (el, key) => {
+  const slots = [];
   while (el = el.nextSibling) {
-    if (el.nodeType === Node.ELEMENT_NODE && (!selector || el.matches(selector))) {
-      siblings.push(el);
+    if (el.nodeType === Node.ELEMENT_NODE && el.getAttribute('lw-for-parent') === key) {
+      slots.push(el);
+    } else if (el.nodeType === Node.COMMENT_NODE && el['lw-if-element']?.getAttribute('lw-for-parent') === key) {
+      slots.push(el);
     }
   }
-  return siblings;
+  return slots;
 };
 
 export default class LWElement extends HTMLElement {
@@ -212,7 +216,11 @@ export default class LWElement extends HTMLElement {
           this._bindInputs(rootNode);
         }
         if (rootNode.hasAttribute('lw-if') && !this.updateIf(rootNode)) {
-          toRemove.push(rootNode);
+          // The whole subtree is leaving the DOM — park it without processing
+          // its descendants, mirroring the FILTER_REJECT below for non-root
+          // nodes. No walker is running yet, so the removal needs no deferral.
+          this._removeIfNode(rootNode);
+          return;
         } else {
           this.updateEval(rootNode);
           this.updateClass(rootNode);
@@ -228,7 +236,6 @@ export default class LWElement extends HTMLElement {
     // element), don't walk its descendants — they belong to the child's own
     // AST and will be updated by the child's own update() cycle.
     if (rootNode !== this._root && rootNode.localName.startsWith(leanweb.componentPrefix)) {
-      this._applyIfRemovals(toRemove);
       return;
     }
     // Walk all descendant elements and process lw-* directives.
@@ -489,8 +496,25 @@ export default class LWElement extends HTMLElement {
 
   // Replace an element with a comment placeholder.
   _removeIfNode(ifNode) {
+    if (!ifNode.parentNode) {
+      return;
+    }
     const placeholder = document.createComment('lw-if');
     placeholder['lw-if-element'] = ifNode;
+    ifNode['lw-if-placeholder'] = placeholder;
+    // Registry entries whose placeholders sit inside the subtree being
+    // detached (e.g. a page card while another page is shown) can't restore
+    // while this ancestor is off. Move them onto this placeholder so they
+    // leave the per-update sweep but come back with the ancestor (see
+    // _restoreIfNode); their own stashes ride along, so nesting is handled.
+    const dormant = new Set();
+    for (const p of this._ifPlaceholders) {
+      if (ifNode.contains(p)) {
+        dormant.add(p);
+        this._ifPlaceholders.delete(p);
+      }
+    }
+    placeholder['lw-dormant-placeholders'] = dormant;
     ifNode.parentNode.replaceChild(placeholder, ifNode);
     this._ifPlaceholders.add(placeholder);
     setTimeout(() => {
@@ -498,28 +522,47 @@ export default class LWElement extends HTMLElement {
     });
   }
 
+  // Put a parked element back at its placeholder's position and wake the
+  // entries that were parked inside its subtree.
+  _restoreIfNode(placeholder) {
+    const ifNode = placeholder['lw-if-element'];
+    placeholder.parentNode.replaceChild(ifNode, placeholder);
+    this._ifPlaceholders.delete(placeholder);
+    // A for..of over a Set visits entries added during iteration, so a sweep
+    // in progress re-evaluates the woken entries in this same pass.
+    placeholder['lw-dormant-placeholders']?.forEach(p => this._ifPlaceholders.add(p));
+    setTimeout(() => {
+      ifNode.turnedOn?.call(ifNode);
+    });
+  }
+
   // Restores lw-if placeholders whose condition has become true.
   _restoreIfPlaceholders() {
     for (const placeholder of this._ifPlaceholders) {
       if (!this._root.contains(placeholder)) {
+        // The placeholder's spot left this component's tree for good (e.g. a
+        // removed lw-for row). Placeholders inside a parked lw-if subtree are
+        // not in this registry — they live on the ancestor's placeholder and
+        // return with it (see _removeIfNode) — so nothing reachable is lost.
         this._ifPlaceholders.delete(placeholder);
         continue;
       }
       const ifNode = placeholder['lw-if-element'];
       const key = ifNode.getAttribute('lw-if');
-      if (!key) continue;
-      // The removed node is detached, so its own context lookup would miss
-      // any enclosing lw-for scope; resolve the context from the placeholder's
-      // position in the live tree instead.
-      const context = this._getNodeContext(placeholder.parentElement ?? ifNode);
+      if (!key) {
+        // No condition to evaluate — the entry can never restore.
+        this._ifPlaceholders.delete(placeholder);
+        continue;
+      }
+      // The removed node is detached, so its own context lookup would miss an
+      // enclosing lw-for scope. Use the context captured on the node (lw-for
+      // rows, refreshed by updateFor each pass), falling back to the
+      // placeholder's position in the live tree.
+      const context = ifNode['lw-context'] ?? this._getNodeContext(placeholder.parentElement ?? ifNode);
       const interpolation = this.ast[key];
       const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
       if (parsed[0]) {
-        placeholder.parentNode.replaceChild(ifNode, placeholder);
-        this._ifPlaceholders.delete(placeholder);
-        setTimeout(() => {
-          ifNode.turnedOn?.call(ifNode);
-        });
+        this._restoreIfNode(placeholder);
       }
     }
   }
@@ -601,32 +644,58 @@ export default class LWElement extends HTMLElement {
     const context = this._getNodeContext(forNode);
     const interpolation = this.ast[key];
     const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0] ?? [];
-    const rendered = nextAllSiblings(forNode, `[lw-for-parent="${key}"]`);
+    const rendered = nextAllRowSlots(forNode, key);
     for (let i = items.length; i < rendered.length; ++i) {
+      // A parked surplus row's registry entry goes with its placeholder.
+      this._ifPlaceholders.delete(rendered[i]);
       rendered[i].remove();
     }
 
     let currentNode = forNode;
     items.forEach((item, index) => {
       let node;
+      let placeholder = null;
       if (rendered.length > index) {
         node = rendered[index];
+        if (node.nodeType === Node.COMMENT_NODE) {
+          placeholder = node;
+          node = placeholder['lw-if-element'];
+        }
       } else {
         node = forNode.cloneNode(true);
         node.removeAttribute('lw-for');
         // node.removeAttribute('lw-elem');
         node.setAttribute('lw-for-parent', key);
         node.setAttribute('lw-context', '');
-        currentNode.insertAdjacentElement('afterend', node);
+        // after() also works when the anchor is a parked row's comment.
+        currentNode.after(node);
       }
-      currentNode = node;
+      currentNode = placeholder ?? node;
       const itemContext = { [interpolation.itemExpr]: item };
       if (interpolation.indexExpr) {
         itemContext[interpolation.indexExpr] = index;
       }
 
       node['lw-context'] = [itemContext, ...context];
-      this.update(node);
+      if (placeholder) {
+        // The row is parked. update() must not run on the detached row —
+        // context lookups only work in the live tree — so re-evaluate its
+        // lw-if against the fresh item context here and restore it in place
+        // (keeping its position) when the condition has become true.
+        const ifKey = node.getAttribute('lw-if');
+        if (ifKey && parser.evaluate(this.ast[ifKey].ast, node['lw-context'], this.ast[ifKey].loc)[0]) {
+          this._restoreIfNode(placeholder);
+          currentNode = node;
+          this.update(node);
+        }
+      } else {
+        this.update(node);
+        if (!node.parentNode) {
+          // update() parked this row; anchor the walk on its placeholder so
+          // the next item still inserts at a live position.
+          currentNode = node['lw-if-placeholder'] ?? currentNode;
+        }
+      }
     });
   }
 }
