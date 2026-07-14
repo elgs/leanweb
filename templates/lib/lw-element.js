@@ -776,8 +776,10 @@ export default class LWElement extends HTMLElement {
     // reorders, insertions and removals, so node-bound state (focus, hover,
     // CSS transitions, half-typed inputs) travels with its item. The key
     // expression sees the loop variable (and index, and component state) and
-    // must yield defined, unique values. Without lw-key, behavior is exactly
-    // the positional reuse it has always been.
+    // must yield defined, unique values (the builder rejects an empty one).
+    // For lists holding stable objects, the item itself is a fine key:
+    // lw-key="item". Without lw-key, behavior is exactly the positional
+    // reuse it has always been.
     const keyAstKey = template.getAttribute('lw-key');
     const slotElement = slot => slot.nodeType === Node.COMMENT_NODE ? slot['lw-if-element'] : slot;
     let byKey = null;

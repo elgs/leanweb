@@ -76,7 +76,10 @@ removals — focus, hover, CSS transitions and half-typed inputs travel with
 their item instead of sticking to a position. The key expression sees the
 loop variable (and index, and component state) and must yield defined,
 unique values; rows with duplicate or `undefined` keys fall back to being
-recreated.
+recreated. For lists holding stable objects, the item itself is a fine key
+(`lw-key="item"`); when items are recreated on every render — rows
+re-fetched from a server — key by a stable field like `row.id`, since
+object identity never matches across fetches.
 
 ## Debugging
 

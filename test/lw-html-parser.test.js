@@ -149,3 +149,12 @@ describe('lw-html-parser', () => {
     });
   });
 });
+
+describe('lw-key validation', () => {
+  it('should reject an empty lw-key at build time', async () => {
+    const { parse } = await import(`../lib/lw-html-parser.js?t=${Date.now()}`);
+    assert.throws(() => parse('<div lw-for="item in items" lw-key></div>'), /lw-key requires an expression/);
+    assert.throws(() => parse('<div lw-for="item in items" lw-key=""></div>'), /lw-key requires an expression/);
+    assert.doesNotThrow(() => parse('<div lw-for="item in items" lw-key="item.id"></div>'));
+  });
+});
