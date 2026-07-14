@@ -293,3 +293,126 @@ describe('expression errors', () => {
     assert.ok(thrown.context, 'raw context rides along');
   });
 });
+
+describe('lw-for template extraction', () => {
+  const anchorsOf = container => [...container.childNodes].filter(n => n.nodeType === 8 && n.textContent === 'lw-for');
+  const rowsOf = container => [...container.querySelectorAll('[lw-for-parent]')];
+
+  function setupList() {
+    const doc = globalThis.document;
+    const root = doc.createElement('div');
+    const container = doc.createElement('div');
+    const forNode = doc.createElement('div');
+    forNode.setAttribute('lw-elem', '');
+    forNode.setAttribute('lw-for', 'kFor');
+    forNode.setAttribute('lw', 'kText');
+    container.appendChild(forNode);
+    root.appendChild(container);
+    doc.body.appendChild(root);
+    const ast = makeAST({
+      componentFullName: 'app-list',
+      'kFor': { astItems: [expr(ident('items'))], itemExpr: 'item', loc: {} },
+      'kText': { ast: [expr(ident('item'))], loc: {} },
+    });
+    return { root, container, ast };
+  }
+
+  it('should remove the template from the DOM after the first render', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const { root, container, ast } = setupList();
+    globalThis.leanweb.componentPrefix = 'app-';
+    const instance = createInstance(LWElement, root, ast);
+    instance.items = ['a', 'b'];
+
+    instance.update();
+    assert.equal(container.querySelector('[lw-for]'), null, 'template element is gone');
+    assert.equal(anchorsOf(container).length, 1, 'one comment anchor holds its place');
+    assert.deepEqual(rowsOf(container).map(n => n.innerText), ['a', 'b']);
+
+    instance.items = ['a', 'b', 'c'];
+    instance.update();
+    assert.deepEqual(rowsOf(container).map(n => n.innerText), ['a', 'b', 'c'], 'anchor-driven renders keep working');
+    instance.items = ['c'];
+    instance.update();
+    assert.deepEqual(rowsOf(container).map(n => n.innerText), ['c']);
+    assert.equal(anchorsOf(container).length, 1, 'still exactly one anchor');
+  });
+
+  it('should keep nested lw-for lists rendering through extraction', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const doc = globalThis.document;
+    const root = doc.createElement('div');
+    const container = doc.createElement('div');
+    const outer = doc.createElement('div');
+    outer.setAttribute('lw-elem', '');
+    outer.setAttribute('lw-for', 'kOuter');
+    const inner = doc.createElement('span');
+    inner.setAttribute('lw-elem', '');
+    inner.setAttribute('lw-for', 'kInner');
+    inner.setAttribute('lw', 'kSub');
+    outer.appendChild(inner);
+    container.appendChild(outer);
+    root.appendChild(container);
+    doc.body.appendChild(root);
+
+    const ast = makeAST({
+      componentFullName: 'app-nested',
+      'kOuter': { astItems: [expr(ident('lists'))], itemExpr: 'list', loc: {} },
+      'kInner': { astItems: [expr(member('list', 'subs'))], itemExpr: 'sub', loc: {} },
+      'kSub': { ast: [expr(ident('sub'))], loc: {} },
+    });
+    globalThis.leanweb.componentPrefix = 'app-';
+    const instance = createInstance(LWElement, root, ast);
+    instance.lists = [{ subs: ['a1', 'a2'] }, { subs: ['b1'] }];
+
+    instance.update();
+    instance.update();
+    const rows = [...container.querySelectorAll('div[lw-for-parent]')];
+    assert.equal(rows.length, 2, 'two outer rows');
+    assert.deepEqual([...rows[0].querySelectorAll('span[lw-for-parent]')].map(n => n.innerText), ['a1', 'a2']);
+    assert.deepEqual([...rows[1].querySelectorAll('span[lw-for-parent]')].map(n => n.innerText), ['b1']);
+    assert.equal(container.querySelector('[lw-for]'), null, 'no template element anywhere');
+
+    instance.lists[1].subs.push('b2');
+    instance.update();
+    const rows2 = [...container.querySelectorAll('div[lw-for-parent]')];
+    assert.deepEqual([...rows2[1].querySelectorAll('span[lw-for-parent]')].map(n => n.innerText), ['b1', 'b2'], 'nested anchor keeps rendering');
+  });
+
+  it('should keep a list working across park and restore of its ancestor', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const { root, container, ast } = setupList();
+    globalThis.leanweb.componentPrefix = 'app-';
+    const instance = createInstance(LWElement, root, ast);
+    instance.items = ['a'];
+    instance.update();
+    assert.equal(rowsOf(container).length, 1);
+
+    instance._removeIfNode(container); // park the whole list's ancestor
+    assert.equal(container.parentNode, null, 'ancestor parked');
+
+    instance.items = ['a', 'b', 'c'];
+    instance._restoreIfNode(container['lw-if-placeholder']); // bring it back
+    instance.update();
+    assert.deepEqual(rowsOf(container).map(n => n.innerText), ['a', 'b', 'c'],
+      'the dormant anchor returned with the ancestor and renders fresh data');
+  });
+
+  it('should drop the registry entry when the list leaves for good', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const { root, container, ast } = setupList();
+    globalThis.leanweb.componentPrefix = 'app-';
+    const instance = createInstance(LWElement, root, ast);
+    instance.items = ['a'];
+    instance.update();
+    assert.equal(instance._forTemplates.size, 1);
+
+    container.remove();
+    instance.update();
+    assert.equal(instance._forTemplates.size, 0, 'truly-gone anchor swept from the registry');
+  });
+});

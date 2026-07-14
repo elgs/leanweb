@@ -172,8 +172,10 @@ const cleanNote = `Usage: leanweb clean
 This will remove the build and dist directory.
 `;
 
-const upgradeNote = `Usage: leanweb upgrade
+const upgradeNote = `Usage: leanweb upgrade [--diff]
 This will upgrade leanweb runtime in the src/lib directory.
+--diff shows what would change (per-file unified diffs, local
+modifications included) without writing anything.
 `;
 
 const destroyNote = `Usage leanweb destroy project-name

@@ -32,7 +32,9 @@ plus the component lifecycle around `lw-if` — so nothing about rendering is
    attributes and then calls the child's `update()`. Parent renders, child
    renders — host state flows into children without manual
    `updateComponents()` plumbing. (Children are still never *walked into*:
-   their internal DOM belongs to their own AST.)
+   their internal DOM belongs to their own AST.) A component that must not follow its
+   parent's renders simply shouldn't live in that parent's template —
+   siblings only hear from each other through the bus.
 
 Everything else — mutating state outside a handler, `setTimeout` callbacks,
 WebSocket messages — needs an explicit `this.update()` or a

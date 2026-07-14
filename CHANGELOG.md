@@ -1,5 +1,26 @@
 # Changelog
 
+## 4.2.0 — 2026-07-13
+
+### Changed
+
+- **`lw-for` templates leave the DOM after their first render.** The template
+  element is swapped for a comment anchor (like `lw-if` placeholders) that
+  carries it for cloning and drives later renders. Templates no longer
+  pollute `querySelector` results, row counts, CSS matching or the
+  accessibility tree — test selectors like `tr:not([lw-for])` are no longer
+  necessary — and component instances that only ever existed inside a
+  template release their subscriptions. Anchors park and restore with their
+  ancestors like every other placeholder.
+
+### Added
+
+- **`lw upgrade --diff`.** A dry run for upgrades: per-file unified diffs of
+  the project's `lib/` against the CLI's runtime, flagging project-only files
+  (which upgrades keep). Upgrading previously overwrote local modifications —
+  vendored bug fixes, experiments — with no warning of what was lost.
+
+
 ## 4.1.0 — 2026-07-13
 
 ### Added

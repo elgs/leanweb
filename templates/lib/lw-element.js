@@ -154,6 +154,7 @@ export default class LWElement extends HTMLElement {
     });
 
     this._ifPlaceholders = new Set();
+    this._forTemplates = new Set();
     this._eventBusListeners = [];
     this._registerListeners();
   }
@@ -226,6 +227,9 @@ export default class LWElement extends HTMLElement {
     // after the TreeWalker finishes so we don't detach the walker's current
     // navigation pointer (which would stop the walk).
     const toRemove = [];
+    // lw-for templates rendered this pass; extracted from the DOM after the
+    // walk (see _extractForTemplates) for the same navigation-safety reason.
+    const toExtract = [];
 
     if (rootNode !== this._root) {
       if (rootNode.hasAttribute('lw-elem')) {
@@ -247,6 +251,10 @@ export default class LWElement extends HTMLElement {
           this.updateModel(rootNode);
           if (rootNode.hasAttribute('lw-for')) {
             this.updateFor(rootNode);
+            // A template is inert — never walk into it; move it out of the
+            // DOM and let its placeholder drive future renders.
+            this._extractForTemplates([rootNode]);
+            return;
           }
         }
       }
@@ -269,6 +277,7 @@ export default class LWElement extends HTMLElement {
         if (node.hasAttribute('lw-elem')) {
           if (node.hasAttribute('lw-for')) {
             this.updateFor(node);
+            toExtract.push(node);
             return NodeFilter.FILTER_REJECT;
           }
           if (node.hasAttribute('lw-for-parent')) {
@@ -308,11 +317,51 @@ export default class LWElement extends HTMLElement {
     });
     while (treeWalker.nextNode()) { }
     this._applyIfRemovals(toRemove);
+    this._extractForTemplates(toExtract);
+    this._updateForPlaceholders(rootNode);
   }
 
   _applyIfRemovals(toRemove) {
     for (const node of toRemove) {
       this._removeIfNode(node);
+    }
+  }
+
+  // After its first render, an lw-for template leaves the DOM for good: a
+  // comment placeholder anchors the rows and carries the detached template
+  // for cloning. Templates therefore never pollute selectors, row counts,
+  // CSS or the accessibility tree — and component instances that only ever
+  // existed inside the template (never real rows) release their
+  // subscriptions on the way out.
+  _extractForTemplates(templates) {
+    this._forTemplates ??= new Set();
+    for (const template of templates) {
+      if (!template.parentNode) {
+        continue;
+      }
+      const placeholder = document.createComment('lw-for');
+      placeholder['lw-for-template'] = template;
+      template.replaceWith(placeholder);
+      this._forTemplates.add(placeholder);
+    }
+  }
+
+  // Re-renders every extracted lw-for whose placeholder sits under rootNode.
+  // An entry whose placeholder left the component for good goes away with
+  // its rows; entries inside a parked ancestor are dormant on that
+  // ancestor's placeholder (see _removeIfNode), not in this registry.
+  _updateForPlaceholders(rootNode = this._root) {
+    if (!this._forTemplates) {
+      return;
+    }
+    for (const placeholder of this._forTemplates) {
+      if (!this._root.contains(placeholder)) {
+        this._forTemplates.delete(placeholder);
+        continue;
+      }
+      if (rootNode === this._root || rootNode.contains(placeholder)) {
+        this.updateFor(placeholder);
+      }
     }
   }
 
@@ -544,6 +593,18 @@ export default class LWElement extends HTMLElement {
       }
     }
     placeholder['lw-dormant-placeholders'] = dormant;
+    // Same treatment for extracted lw-for anchors inside the subtree: they
+    // leave the per-update sweep and come back with the ancestor.
+    const dormantFors = new Set();
+    if (this._forTemplates) {
+      for (const p of this._forTemplates) {
+        if (ifNode.contains(p)) {
+          dormantFors.add(p);
+          this._forTemplates.delete(p);
+        }
+      }
+    }
+    placeholder['lw-dormant-for-templates'] = dormantFors;
     if (leanweb.debug) console.debug('[leanweb] park', this.ast.componentFullName, '<' + ifNode.localName + '>');
     parkingInProgress = true;
     try {
@@ -567,6 +628,10 @@ export default class LWElement extends HTMLElement {
     // A for..of over a Set visits entries added during iteration, so a sweep
     // in progress re-evaluates the woken entries in this same pass.
     placeholder['lw-dormant-placeholders']?.forEach(p => this._ifPlaceholders.add(p));
+    placeholder['lw-dormant-for-templates']?.forEach(p => {
+      this._forTemplates ??= new Set();
+      this._forTemplates.add(p);
+    });
     setTimeout(() => {
       ifNode.turnedOn?.call(ifNode);
     });
@@ -692,11 +757,16 @@ export default class LWElement extends HTMLElement {
   // child propery:
   // lw-context: localContext
   updateFor(forNode) {
-    const key = forNode.getAttribute('lw-for');
+    // forNode is the lw-for element on its FIRST render; afterwards the
+    // template lives detached on a comment placeholder and forNode is that
+    // comment (_extractForTemplates). Either way it anchors the rows.
+    const isPlaceholder = forNode.nodeType === Node.COMMENT_NODE;
+    const template = isPlaceholder ? forNode['lw-for-template'] : forNode;
+    const key = template.getAttribute('lw-for');
     if (!key) {
       return;
     }
-    const context = this._getNodeContext(forNode);
+    const context = this._getNodeContext(isPlaceholder ? forNode.parentElement : template);
     const interpolation = this.ast[key];
     const items = parser.evaluate(interpolation.astItems, context, interpolation.loc)[0] ?? [];
     const rendered = nextAllRowSlots(forNode, key);
@@ -708,7 +778,7 @@ export default class LWElement extends HTMLElement {
     // expression sees the loop variable (and index, and component state) and
     // must yield defined, unique values. Without lw-key, behavior is exactly
     // the positional reuse it has always been.
-    const keyAstKey = forNode.getAttribute('lw-key');
+    const keyAstKey = template.getAttribute('lw-key');
     const slotElement = slot => slot.nodeType === Node.COMMENT_NODE ? slot['lw-if-element'] : slot;
     let byKey = null;
     if (keyAstKey) {
@@ -757,7 +827,7 @@ export default class LWElement extends HTMLElement {
           }
         }
       } else {
-        node = forNode.cloneNode(true);
+        node = template.cloneNode(true);
         node.removeAttribute('lw-for');
         // node.removeAttribute('lw-elem');
         node.setAttribute('lw-for-parent', key);

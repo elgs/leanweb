@@ -782,7 +782,9 @@ describe('LWElement', () => {
       return { root, container, ast };
     }
     const rowsOf = container => [...container.querySelectorAll('[lw-for-parent]')];
-    const commentsOf = container => [...container.childNodes].filter(n => n.nodeType === 8);
+    // Count only lw-if placeholders: since template extraction, the lw-for
+    // template itself is anchored by an 'lw-for' comment.
+    const commentsOf = container => [...container.childNodes].filter(n => n.nodeType === 8 && n.textContent === 'lw-if');
 
     it('should keep updating when a row lw-if references the loop item', async () => {
       setupDOM();
