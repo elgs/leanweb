@@ -222,15 +222,28 @@ const immediateContext = (node, context) => {
 
 const evalNode = (node, context) => nodeHandlers[node.type](node, context);
 
+// Component tag currently evaluating, set by lw-element so a failed
+// expression can say where it came from.
+let errorLabel = '';
+const setErrorLabel = label => { errorLabel = label; };
+
 const evaluate = (ast, context = {}, loc = {}) => {
   try {
     return ast.map(astNode => evalNode(astNode, context));
   } catch (e) {
-    throw { error: e.message, location: loc, ast, context };
+    // A real Error, so the console shows a message and a stack instead of
+    // "Uncaught [object Object]". The raw pieces ride along for tooling.
+    const where = [errorLabel, loc?.startLine ? `line ${loc.startLine}` : ''].filter(Boolean).join(' ');
+    const err = new Error(`[leanweb] expression failed${where ? ` (${where})` : ''}: ${e.message}`);
+    err.cause = e;
+    err.location = loc;
+    err.ast = ast;
+    err.context = context;
+    throw err;
   }
 };
 
-export { evaluate };
+export { evaluate, setErrorLabel };
 
 //   module.exports = { evaluate };
 // const parser = require('@babel/parser');

@@ -1,5 +1,35 @@
 # Changelog
 
+## 4.1.0 — 2026-07-13
+
+### Added
+
+- **Keyed `lw-for`.** `lw-key="item.id"` on an `lw-for` element matches rows
+  to items by identity instead of position: node-bound state (focus, hover,
+  CSS transitions, half-typed inputs) travels with its item through reorders,
+  insertions and removals. Without `lw-key`, behavior is unchanged.
+- **Parent → child update propagation.** A parent's update now hands each
+  child component it reaches an `update()` after refreshing its bound
+  attributes — host state flows into children without manual
+  `leanweb.updateComponents()` plumbing.
+- **`leanweb.debug`.** Logs `updateComponents` dispatches and every `lw-if`
+  park/restore with the owning component.
+- `docs/rendering.md` — the complete rendering model (every place the
+  runtime calls `update()` for you) and the `lw-if` park lifecycle.
+
+### Changed
+
+- **Parking is now a pause, not a teardown.** A component hidden by `lw-if`
+  keeps its event-bus and hash subscriptions while parked, so pokes sent
+  while it is hidden still reach it; subscriptions are released on real
+  removal, and parked subtrees whose return position is destroyed are swept
+  on the next update.
+- **Template expression failures throw real `Error`s** naming the component
+  and template line (previously a plain object surfaced as
+  "Uncaught [object Object]"). The raw location/AST/context ride along on
+  the error.
+
+
 ## 4.0.8 — 2026-07-13
 
 ### Fixed
