@@ -18,9 +18,9 @@ const verbose = process.env.verbose || false;
 
 const project = require(`${process.cwd()}/${utils.dirs.src}/leanweb.json`);
 
-utils.exec(`npx leanweb clean`);
+utils.selfExec('clean');
 try {
-  utils.exec(`npx leanweb build ${env}`);
+  utils.selfExec('build', env);
 } catch (e) {
   console.error('Build failed. Aborting dist.');
   process.exit(1);

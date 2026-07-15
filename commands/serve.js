@@ -17,7 +17,7 @@ const https = process.env.https;
 const build = (eventType, filename) => {
   // console.log(eventType + ': ', filename);
   try {
-    utils.exec(`npx leanweb build ${env}`);
+    utils.selfExec('build', env);
   } catch (e) {
     // Build now exits non-zero on template errors; keep the dev server
     // alive — the next file change retries the build.

@@ -16,7 +16,7 @@ import * as utils from './commands/utils.js';
   const args = process.argv;
 
   if (args.length < 3) {
-    utils.exec('npx leanweb help');
+    utils.selfExec('help');
     return;
   }
 

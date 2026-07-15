@@ -3,6 +3,9 @@ import path from 'path';
 import net from 'net';
 import fs from 'fs';
 import fse from 'fs-extra';
+import { fileURLToPath } from 'url';
+
+const commandsDir = path.dirname(fileURLToPath(import.meta.url));
 
 export const dirs = {
   src: 'src',
@@ -35,6 +38,13 @@ export const writeIfChanged = (file, string) => {
 };
 
 export const exec = command => execSync(command, { encoding: 'utf8', stdio: 'inherit' });
+
+// Run a sibling command of THIS installation. Commands used to re-enter
+// through `npx leanweb ...`, which resolves to whatever npx finds — the
+// published package, not necessarily the copy that is already running
+// (silent version skew with a linked or older/newer install).
+export const selfExec = (target, args = '') =>
+  exec(`node "${path.join(commandsDir, target + '.js')}" ${args}`.trim());
 
 export const getComponentName = cmp => {
   const indexOfLastSlash = cmp.lastIndexOf('/');
