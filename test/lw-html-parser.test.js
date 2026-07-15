@@ -158,3 +158,23 @@ describe('lw-key validation', () => {
     assert.doesNotThrow(() => parse('<div lw-for="item in items" lw-key="item.id"></div>'));
   });
 });
+
+describe('lw-slot validation', () => {
+  it('should allow a single slot, even under lw-if', () => {
+    assert.doesNotThrow(() => parse('<div><lw-slot></lw-slot></div>'));
+    assert.doesNotThrow(() => parse('<div lw-if="open"><lw-slot></lw-slot></div>'));
+  });
+
+  it('should reject more than one slot per template', () => {
+    assert.throws(() => parse('<div><lw-slot></lw-slot><lw-slot></lw-slot></div>'), /at most one lw-slot/);
+  });
+
+  it('should reject a slot anywhere inside an lw-for element', () => {
+    assert.throws(() => parse('<div lw-for="i in items"><lw-slot></lw-slot></div>'), /lw-slot cannot sit inside an lw-for/);
+    assert.throws(() => parse('<div lw-for="i in items"><div><lw-slot></lw-slot></div></div>'), /lw-slot cannot sit inside an lw-for/);
+  });
+
+  it('should allow a slot after an lw-for sibling', () => {
+    assert.doesNotThrow(() => parse('<div><span lw-for="i in items">x</span><lw-slot></lw-slot></div>'));
+  });
+});

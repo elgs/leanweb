@@ -128,6 +128,18 @@ export default class LWElement extends HTMLElement {
       });
       this._root = this.shadowRoot;
     } else {
+      // Light-DOM content projection: the element's initial children — the
+      // markup the PARENT's template placed between this component's tags —
+      // are captured before the template renders and re-homed into the
+      // template's <lw-slot>. They stay the parent's: parent context, parent
+      // expressions, parent updates (the parent walks them at this
+      // component's boundary; this component's own walker skips them). This
+      // mirrors what shadow-DOM mode already gets from native <slot>.
+      // Without an <lw-slot>, children stay ahead of the template untouched,
+      // exactly as before.
+      const initial = [...this.childNodes];
+      const projected = initial.some(n => n.nodeType !== Node.TEXT_NODE || n.textContent.trim()) ? initial : null;
+      projected?.forEach(n => n.remove());
       this.appendChild(node.content);
       if (!LWElement._injectedStyles) {
         LWElement._injectedStyles = new Set();
@@ -139,6 +151,21 @@ export default class LWElement extends HTMLElement {
         document.head.appendChild(style);
       }
       this._root = this;
+      if (projected) {
+        const slot = this._findSlot();
+        if (slot) {
+          this['lw-projected-roots'] = [];
+          for (const n of projected) {
+            if (n.nodeType === Node.ELEMENT_NODE) {
+              n.setAttribute('lw-projected', '');
+              this['lw-projected-roots'].push(n);
+            }
+          }
+          slot.append(...projected);
+        } else {
+          this.prepend(...projected);
+        }
+      }
     }
 
     this._bindMethods();
@@ -200,6 +227,21 @@ export default class LWElement extends HTMLElement {
     this._eventBusListeners = [];
   }
 
+  // The template's own <lw-slot>: the first one that doesn't belong to a
+  // nested component inside this template.
+  _findSlot() {
+    for (const slot of this._root.querySelectorAll('lw-slot')) {
+      let el = slot.parentElement;
+      while (el && el !== this && !el.localName.startsWith(leanweb.componentPrefix)) {
+        el = el.parentElement;
+      }
+      if (el === this) {
+        return slot;
+      }
+    }
+    return null;
+  }
+
   _getNodeContext(node) {
     const contextNode = node.closest('[lw-context]');
     // contextNode must be inside this component's root, not the root itself.
@@ -233,6 +275,15 @@ export default class LWElement extends HTMLElement {
 
     if (rootNode !== this._root) {
       if (rootNode.hasAttribute('lw-elem')) {
+        // lw-for first, mirroring the walker: a template is inert — its
+        // bindings only make sense inside a row context. Render the rows,
+        // move the template out of the DOM and let its placeholder drive
+        // future renders. (Reached when a projected root is an lw-for.)
+        if (rootNode.hasAttribute('lw-for')) {
+          this.updateFor(rootNode);
+          this._extractForTemplates([rootNode]);
+          return;
+        }
         if (rootNode.hasAttribute('lw-elem-bind')) {
           this._bindModels(rootNode);
           this._bindEvents(rootNode);
@@ -249,13 +300,6 @@ export default class LWElement extends HTMLElement {
           this.updateClass(rootNode);
           this.updateBind(rootNode);
           this.updateModel(rootNode);
-          if (rootNode.hasAttribute('lw-for')) {
-            this.updateFor(rootNode);
-            // A template is inert — never walk into it; move it out of the
-            // DOM and let its placeholder drive future renders.
-            this._extractForTemplates([rootNode]);
-            return;
-          }
         }
       }
     }
@@ -265,6 +309,7 @@ export default class LWElement extends HTMLElement {
     // parent renders, child renders.
     if (rootNode !== this._root && rootNode.localName.startsWith(leanweb.componentPrefix)) {
       if (typeof rootNode.update === 'function') rootNode.update();
+      this._updateProjected(rootNode);
       return;
     }
     // Walk all descendant elements and process lw-* directives.
@@ -274,6 +319,11 @@ export default class LWElement extends HTMLElement {
     const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
       acceptNode: node => {
         parser.setErrorLabel(this.ast.componentFullName);
+        // Projected content belongs to the parent that wrote it; the
+        // component it was projected into never processes it.
+        if (node.hasAttribute('lw-projected')) {
+          return NodeFilter.FILTER_REJECT;
+        }
         if (node.hasAttribute('lw-elem')) {
           if (node.hasAttribute('lw-for')) {
             this.updateFor(node);
@@ -303,6 +353,7 @@ export default class LWElement extends HTMLElement {
         // renders — children updated by their own cycle from here).
         if (node !== rootNode && node.localName.startsWith(leanweb.componentPrefix)) {
           if (typeof node.update === 'function') node.update();
+          this._updateProjected(node);
           // Light DOM: the child's internal DOM is in the light DOM, so
           // FILTER_REJECT prevents walking into it. With shadow DOM the
           // boundary already isolates child internals, and we must not
@@ -319,6 +370,31 @@ export default class LWElement extends HTMLElement {
     this._applyIfRemovals(toRemove);
     this._extractForTemplates(toExtract);
     this._updateForPlaceholders(rootNode);
+  }
+
+  // Content this component projected into a child stays this component's:
+  // after the child refreshed its own DOM, walk each projected root with
+  // THIS component's context and AST. (A root parked by one of our own
+  // lw-ifs is detached; its placeholder brings it back through the normal
+  // sweep.)
+  _updateProjected(childEl) {
+    childEl['lw-projected-roots']?.forEach(p => {
+      if (p.isConnected) {
+        this.update(p);
+      }
+    });
+  }
+
+  // True when a node that left this component's tree is riding inside a
+  // subtree some OTHER component parked: parked subtrees carry an
+  // 'lw-if-placeholder' marker at their detached root. The marker is cleared
+  // on restore and on teardown, so dead subtrees still purge normally.
+  _parkedElsewhere(node) {
+    let top = node;
+    while (top.parentNode) {
+      top = top.parentNode;
+    }
+    return !!top['lw-if-placeholder'];
   }
 
   _applyIfRemovals(toRemove) {
@@ -356,7 +432,9 @@ export default class LWElement extends HTMLElement {
     }
     for (const placeholder of this._forTemplates) {
       if (!this._root.contains(placeholder)) {
-        this._forTemplates.delete(placeholder);
+        if (!this._parkedElsewhere(placeholder)) {
+          this._forTemplates.delete(placeholder);
+        }
         continue;
       }
       if (rootNode === this._root || rootNode.contains(placeholder)) {
@@ -624,6 +702,8 @@ export default class LWElement extends HTMLElement {
     const ifNode = placeholder['lw-if-element'];
     if (leanweb.debug) console.debug('[leanweb] restore', this.ast.componentFullName, '<' + ifNode.localName + '>');
     placeholder.parentNode.replaceChild(ifNode, placeholder);
+    // Drop the parked marker (see _parkedElsewhere); re-set on the next park.
+    delete ifNode['lw-if-placeholder'];
     this._ifPlaceholders.delete(placeholder);
     // A for..of over a Set visits entries added during iteration, so a sweep
     // in progress re-evaluates the woken entries in this same pass.
@@ -649,6 +729,9 @@ export default class LWElement extends HTMLElement {
           el._teardown();
         }
       }
+      // The subtree is gone for good: clear the parked marker so any other
+      // component whose placeholder rode inside purges too (_parkedElsewhere).
+      delete rootEl['lw-if-placeholder'];
     }
     placeholder?.['lw-dormant-placeholders']?.forEach(p => this._teardownParked(p));
   }
@@ -661,10 +744,16 @@ export default class LWElement extends HTMLElement {
         // removed lw-for row). Placeholders inside a parked lw-if subtree are
         // not in this registry — they live on the ancestor's placeholder and
         // return with it (see _removeIfNode) — so nothing reachable is lost.
+        // Exception: OUR placeholder can sit inside a subtree ANOTHER
+        // component parked (projected content under a child's hidden
+        // chrome). That subtree can come back; stay dormant until it does or
+        // is torn down for good (see _parkedElsewhere).
         // Parked components kept their subscriptions (see
         // disconnectedCallback); now that they can never return, release them.
-        this._teardownParked(placeholder);
-        this._ifPlaceholders.delete(placeholder);
+        if (!this._parkedElsewhere(placeholder)) {
+          this._teardownParked(placeholder);
+          this._ifPlaceholders.delete(placeholder);
+        }
         continue;
       }
       const ifNode = placeholder['lw-if-element'];

@@ -81,6 +81,50 @@ recreated. For lists holding stable objects, the item itself is a fine key
 re-fetched from a server — key by a stable field like `row.id`, since
 object identity never matches across fetches.
 
+## Content projection: `lw-slot` *(4.3)*
+
+A component template may contain one `<lw-slot>`. Markup a parent writes
+between the component's tags is re-homed into that slot when the component
+constructs — but it stays the parent's:
+
+```html
+<!-- parent template -->
+<app-card>
+  <p lw>summary</p>
+  <button lw-on:click="save()">Save</button>
+</app-card>
+
+<!-- app-card template -->
+<div class="card">
+  <h3 lw>title</h3>
+  <lw-slot></lw-slot>
+</div>
+```
+
+`summary` and `save()` resolve against the *parent*; `title` against the
+card. The parent renders projected content on its own updates: after handing
+the card its update at the component boundary, it walks each projected
+subtree with its own state and AST. The card's own walker skips anything
+marked `lw-projected`, so the card needs no knowledge of what was projected
+into it. This is the light-DOM equivalent of what `shadowDom: true` projects
+already get from native `<slot>`.
+
+Rules and consequences:
+
+- **One slot per template**, enforced at build time. A slot may not sit
+  inside an `lw-for` (templates are extracted and cloned per row, which
+  would strand the projected content); a slot under the component's own
+  `lw-if` is fine — projected content parks and restores with it.
+- **All directives work in projected content** — `lw`, `lw-if`, `lw-for`,
+  `lw-on:` — evaluated with parent context, registered on the parent.
+  Projected `lw-if` placeholders and `lw-for` anchors that end up inside a
+  subtree the *child* parks stay dormant until the child restores it; they
+  are only swept once the subtree is gone for good.
+- **No slot, no change**: a component without `<lw-slot>` keeps its initial
+  children where they were (ahead of the rendered template), exactly as
+  before 4.3. Whitespace-only children don't count as projection.
+- `lw-slot` renders with `display: contents` — it takes no box of its own.
+
 ## Debugging
 
 Set `leanweb.debug = true` to log `updateComponents` dispatches and every

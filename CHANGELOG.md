@@ -1,5 +1,26 @@
 # Changelog
 
+## 4.3.0 — 2026-07-15
+
+### Added
+
+- **Content projection without shadow DOM: `lw-slot`.** A component template
+  may contain one `<lw-slot>`; markup the parent writes between the
+  component's tags is re-homed into it at construction while remaining the
+  parent's — parent context, parent expressions, parent updates, parent
+  event handlers. The receiving component's walker skips projected content
+  (`lw-projected`), so its own AST never sees it. All directives work inside
+  projected markup, including `lw-if` (parks/restores through the slot) and
+  `lw-for` (extraction and re-renders driven by the parent). Build-time
+  validation: at most one slot per template, and never inside an `lw-for`.
+  Components without a slot keep their initial children in place, untouched —
+  existing templates are unaffected. `lw-slot` gets `display: contents` in
+  the injected stylesheet. Docs: `docs/rendering.md`.
+- A projected placeholder or `lw-for` anchor riding inside a subtree that the
+  *receiving* component parks (its own `lw-if` over the slot) now stays
+  dormant instead of being swept as dead, and returns when the child restores
+  it; truly removed subtrees still purge.
+
 ## 4.2.0 — 2026-07-13
 
 ### Changed
