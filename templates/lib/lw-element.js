@@ -131,12 +131,16 @@ export default class LWElement extends HTMLElement {
       // Light-DOM content projection: the element's initial children — the
       // markup the PARENT's template placed between this component's tags —
       // are captured before the template renders and re-homed into the
-      // template's <lw-slot>. They stay the parent's: parent context, parent
+      // template's <lw-slot>s. They stay the parent's: parent context, parent
       // expressions, parent updates (the parent walks them at this
       // component's boundary; this component's own walker skips them). This
-      // mirrors what shadow-DOM mode already gets from native <slot>.
-      // Without an <lw-slot>, children stay ahead of the template untouched,
-      // exactly as before.
+      // mirrors what shadow-DOM mode already gets from native <slot>:
+      // a child with slot="name" lands in <lw-slot name="name">, everything
+      // else (text nodes included) in the unnamed default slot. A slot's own
+      // template children are fallback content — component-owned, rendered
+      // by this component's walker — kept only when nothing was projected
+      // into that slot. Without any <lw-slot>, children stay ahead of the
+      // template untouched, exactly as before.
       const initial = [...this.childNodes];
       const projected = initial.some(n => n.nodeType !== Node.TEXT_NODE || n.textContent.trim()) ? initial : null;
       projected?.forEach(n => n.remove());
@@ -152,16 +156,36 @@ export default class LWElement extends HTMLElement {
       }
       this._root = this;
       if (projected) {
-        const slot = this._findSlot();
-        if (slot) {
+        const slots = this._findSlots();
+        if (slots.size) {
           this['lw-projected-roots'] = [];
+          const assigned = new Map();
+          const homeless = [];
           for (const n of projected) {
+            let name = '';
             if (n.nodeType === Node.ELEMENT_NODE) {
               n.setAttribute('lw-projected', '');
               this['lw-projected-roots'].push(n);
+              name = n.getAttribute('slot') || '';
+            }
+            // A name with no matching slot falls back to the default slot,
+            // and with no default slot to the pre-template prepend below.
+            const slot = slots.get(name) || slots.get('');
+            if (slot) {
+              if (!assigned.has(slot)) {
+                assigned.set(slot, []);
+              }
+              assigned.get(slot).push(n);
+            } else {
+              homeless.push(n);
             }
           }
-          slot.append(...projected);
+          for (const [slot, nodes] of assigned) {
+            slot.replaceChildren(...nodes);
+          }
+          if (homeless.length) {
+            this.prepend(...homeless);
+          }
         } else {
           this.prepend(...projected);
         }
@@ -227,19 +251,24 @@ export default class LWElement extends HTMLElement {
     this._eventBusListeners = [];
   }
 
-  // The template's own <lw-slot>: the first one that doesn't belong to a
-  // nested component inside this template.
-  _findSlot() {
+  // The template's own <lw-slot>s — those that don't belong to a nested
+  // component inside this template — keyed by name attribute ('' is the
+  // default slot). First slot of each name wins.
+  _findSlots() {
+    const slots = new Map();
     for (const slot of this._root.querySelectorAll('lw-slot')) {
       let el = slot.parentElement;
       while (el && el !== this && !el.localName.startsWith(leanweb.componentPrefix)) {
         el = el.parentElement;
       }
       if (el === this) {
-        return slot;
+        const name = slot.getAttribute('name') || '';
+        if (!slots.has(name)) {
+          slots.set(name, slot);
+        }
       }
     }
-    return null;
+    return slots;
   }
 
   _getNodeContext(node) {

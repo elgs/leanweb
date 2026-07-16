@@ -165,8 +165,13 @@ describe('lw-slot validation', () => {
     assert.doesNotThrow(() => parse('<div lw-if="open"><lw-slot></lw-slot></div>'));
   });
 
-  it('should reject more than one slot per template', () => {
-    assert.throws(() => parse('<div><lw-slot></lw-slot><lw-slot></lw-slot></div>'), /at most one lw-slot/);
+  it('should allow multiple slots with distinct names', () => {
+    assert.doesNotThrow(() => parse('<div><lw-slot name="a"></lw-slot><lw-slot name="b"></lw-slot><lw-slot></lw-slot></div>'));
+  });
+
+  it('should reject duplicate slot names and duplicate default slots', () => {
+    assert.throws(() => parse('<div><lw-slot></lw-slot><lw-slot></lw-slot></div>'), /at most one default/);
+    assert.throws(() => parse('<div><lw-slot name="a"></lw-slot><lw-slot name="a"></lw-slot></div>'), /duplicate name="a"/);
   });
 
   it('should reject a slot anywhere inside an lw-for element', () => {

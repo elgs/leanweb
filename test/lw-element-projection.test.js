@@ -320,4 +320,132 @@ describe('content projection (lw-slot)', () => {
     host.update();
     assert.equal(host._ifPlaceholders.size, 0, 'dead subtree purged');
   });
+
+  // A pane with a named slot carrying fallback content of its own, plus a
+  // default slot. Fallback is the PANE's: its expression lives in the pane's
+  // AST and renders from pane state.
+  function definePane(LWElement, win) {
+    class Pane extends LWElement {
+      constructor() {
+        super(makeAST({
+          componentFullName: 'app-pane',
+          html: '<div class="head"><lw-slot name="extra"><em class="fb" lw-elem lw="kFb"></em></lw-slot></div><div class="body"><lw-slot></lw-slot></div>',
+          'kFb': { ast: [expr(ident('fb'))], loc: {} },
+        }));
+        this.fb = 'fallback';
+      }
+    }
+    win.customElements.define('app-pane', Pane);
+  }
+
+  it('should distribute children into named slots and the rest into the default', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const win = globalThis.window;
+    definePane(LWElement, win);
+    const host = defineHost(LWElement, win, {
+      html: '<app-pane><button slot="extra" class="act" lw-elem lw="kAct"></button> <span class="main" lw-elem lw="kMain"></span></app-pane>',
+      ast: {
+        'kAct': { ast: [expr(ident('act'))], loc: {} },
+        'kMain': { ast: [expr(ident('main'))], loc: {} },
+      },
+      fields: { act: 'go', main: 'body' },
+    });
+    await tick();
+
+    const pane = host.querySelector('app-pane');
+    const act = pane.querySelector('.act');
+    const main = pane.querySelector('.main');
+    assert.equal(act.parentElement, pane.querySelector('.head > lw-slot'), 'slot="extra" landed in the named slot');
+    assert.equal(main.parentElement, pane.querySelector('.body > lw-slot'), 'unnamed child landed in the default slot');
+    assert.equal(act.innerText, 'go', 'named-slotted content rendered from HOST state');
+    assert.equal(main.innerText, 'body');
+    assert.equal(pane['lw-projected-roots'].length, 2, 'both roots tracked');
+    assert.ok([...pane.querySelector('.body > lw-slot').childNodes].some(n => n.nodeType === Node.TEXT_NODE),
+      'stray text rides along into the default slot');
+
+    host.act = 'go!';
+    host.update();
+    assert.equal(act.innerText, 'go!', 'host updates reach named-slotted content');
+  });
+
+  it('should keep fallback content, component-rendered, when a slot gets nothing', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const win = globalThis.window;
+    definePane(LWElement, win);
+    const host = defineHost(LWElement, win, {
+      html: '<app-pane><span class="main" lw-elem lw="kMain"></span></app-pane>',
+      ast: { 'kMain': { ast: [expr(ident('main'))], loc: {} } },
+      fields: { main: 'm' },
+    });
+    await tick();
+
+    const pane = host.querySelector('app-pane');
+    const fb = pane.querySelector('.fb');
+    assert.ok(fb, 'fallback kept in the unfilled slot');
+    assert.equal(fb.innerText, 'fallback', 'fallback rendered from the PANE state');
+    assert.ok(!fb.hasAttribute('lw-projected'), 'fallback is component-owned, not projected');
+    assert.equal(pane.querySelector('.main').innerText, 'm');
+
+    pane.fb = 'changed';
+    pane.update();
+    assert.equal(fb.innerText, 'changed', 'pane updates drive its own fallback');
+  });
+
+  it('should replace fallback content when the slot is filled', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const win = globalThis.window;
+    definePane(LWElement, win);
+    const host = defineHost(LWElement, win, {
+      html: '<app-pane><b slot="extra" class="given" lw-elem lw="kG"></b></app-pane>',
+      ast: { 'kG': { ast: [expr(ident('g'))], loc: {} } },
+      fields: { g: 'supplied' },
+    });
+    await tick();
+
+    const pane = host.querySelector('app-pane');
+    assert.equal(pane.querySelector('.fb'), null, 'fallback gone');
+    const given = pane.querySelector('.given');
+    assert.equal(given.parentElement, pane.querySelector('.head > lw-slot'));
+    assert.equal(given.innerText, 'supplied', 'rendered from host state');
+    // The pane's walker must not choke on its removed fallback expression.
+    pane.update();
+    assert.equal(given.innerText, 'supplied');
+  });
+
+  it('should route an unmatched slot name to the default slot, or ahead of the template without one', async () => {
+    setupDOM();
+    const LWElement = await loadLWElement();
+    const win = globalThis.window;
+    definePane(LWElement, win);
+    class Rigid extends LWElement {
+      constructor() {
+        super(makeAST({
+          componentFullName: 'app-rigid',
+          html: '<div class="chrome"><lw-slot name="only"></lw-slot></div>',
+        }));
+      }
+    }
+    win.customElements.define('app-rigid', Rigid);
+    const host = defineHost(LWElement, win, {
+      html: '<app-pane><i slot="nope" class="lost" lw-elem lw="kL"></i></app-pane><app-rigid><i slot="nope" class="lost" lw-elem lw="kL"></i></app-rigid>',
+      ast: { 'kL': { ast: [expr(ident('l'))], loc: {} } },
+      fields: { l: 'found' },
+    });
+    await tick();
+
+    const pane = host.querySelector('app-pane');
+    const inPane = pane.querySelector('.lost');
+    assert.equal(inPane.parentElement, pane.querySelector('.body > lw-slot'), 'fell back to the default slot');
+    assert.equal(inPane.innerText, 'found');
+
+    const rigid = host.querySelector('app-rigid');
+    const inRigid = rigid.querySelector('.lost');
+    assert.equal(inRigid.parentElement, rigid, 'no default slot: sits ahead of the template');
+    assert.equal(rigid.firstElementChild, inRigid);
+    assert.ok(inRigid.hasAttribute('lw-projected'), 'still projected and host-rendered');
+    assert.equal(inRigid.innerText, 'found');
+  });
 });

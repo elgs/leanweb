@@ -83,20 +83,21 @@ object identity never matches across fetches.
 
 ## Content projection: `lw-slot` *(4.3)*
 
-A component template may contain one `<lw-slot>`. Markup a parent writes
-between the component's tags is re-homed into that slot when the component
+A component template may contain `<lw-slot>`s. Markup a parent writes
+between the component's tags is re-homed into them when the component
 constructs — but it stays the parent's:
 
 ```html
 <!-- parent template -->
 <app-card>
+  <button slot="actions" lw-on:click="save()">Save</button>
   <p lw>summary</p>
-  <button lw-on:click="save()">Save</button>
 </app-card>
 
 <!-- app-card template -->
 <div class="card">
   <h3 lw>title</h3>
+  <lw-slot name="actions"></lw-slot>
   <lw-slot></lw-slot>
 </div>
 ```
@@ -109,12 +110,27 @@ marked `lw-projected`, so the card needs no knowledge of what was projected
 into it. This is the light-DOM equivalent of what `shadowDom: true` projects
 already get from native `<slot>`.
 
+Distribution mirrors native slots: a child with `slot="name"` lands in
+`<lw-slot name="name">`; every other child — text nodes included — lands in
+the unnamed *default* slot. A `slot=` name with no matching `lw-slot` falls
+back to the default slot, and without a default slot the node is left ahead
+of the rendered template.
+
+A slot's own template children are **fallback content**: they stay — owned
+and rendered by the component itself, like the rest of its template — when
+nothing is projected into that slot, and are replaced when something is.
+
+```html
+<lw-slot name="empty-message"><p lw>defaultEmptyText()</p></lw-slot>
+```
+
 Rules and consequences:
 
-- **One slot per template**, enforced at build time. A slot may not sit
-  inside an `lw-for` (templates are extracted and cloned per row, which
-  would strand the projected content); a slot under the component's own
-  `lw-if` is fine — projected content parks and restores with it.
+- **One slot per name** (one unnamed default), enforced at build time. A
+  slot may not sit inside an `lw-for` (templates are extracted and cloned
+  per row, which would strand the projected content); a slot under the
+  component's own `lw-if` is fine — projected content parks and restores
+  with it.
 - **All directives work in projected content** — `lw`, `lw-if`, `lw-for`,
   `lw-on:` — evaluated with parent context, registered on the parent.
   Projected `lw-if` placeholders and `lw-for` anchors that end up inside a
@@ -123,6 +139,10 @@ Rules and consequences:
 - **No slot, no change**: a component without `<lw-slot>` keeps its initial
   children where they were (ahead of the rendered template), exactly as
   before 4.3. Whitespace-only children don't count as projection.
+- **Mind the HTML parser** around tables: `<tr>`/`<td>` written directly
+  under a component tag are dropped by fragment parsing, and an `<lw-slot>`
+  directly inside `<table>`/`<tbody>` is foster-parented out. Project the
+  whole `<table>` into a slot that sits in a plain container instead.
 - `lw-slot` renders with `display: contents` — it takes no box of its own.
 
 ## Debugging
