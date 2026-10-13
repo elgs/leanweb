@@ -573,6 +573,157 @@ describe('LWElement', () => {
     });
   });
 
+  describe('updateModel number input', () => {
+    // A number field shows the user's own text, which runs a step ahead of
+    // the number it spells while a decimal is being typed ("19." on the way
+    // to "19.99", "19.0" on the way to "19.05"). Browsers answer a script
+    // write of that same number by re-spelling the text from the value and
+    // moving the caret (Chrome parks it at the START), so a re-render landing
+    // between two keystrokes, from a timer or a settled async method, used to
+    // scramble the entry: "19.99" arrived as "9919". The write-back compared
+    // the field's text with the model's number, which never matched, so it
+    // wrote on every re-render. It must write only when the number changed.
+    async function boundField(type, attrs = {}) {
+      setupDOM();
+      const LWElement = await loadLWElement();
+      const doc = globalThis.document;
+      const root = doc.createElement('div');
+      const input = doc.createElement('input');
+      input.type = type;
+      for (const [name, value] of Object.entries(attrs)) input.setAttribute(name, value);
+      input.setAttribute('lw-elem', '');
+      input.setAttribute('lw-elem-bind', '');
+      input.setAttribute('lw-model', 'k1');
+      root.appendChild(input);
+      doc.body.appendChild(root);
+      const ast = makeAST({
+        componentFullName: 'app-num',
+        'k1': { ast: [expr(ident('amount'))], loc: {} },
+      });
+      globalThis.leanweb.componentPrefix = 'app-';
+      const instance = createInstance(LWElement, root, ast);
+      instance._bindModels(input);
+      // Every write the runtime makes to the field's value, in order.
+      const valueProp = Object.getOwnPropertyDescriptor(globalThis.window.HTMLInputElement.prototype, 'value');
+      const writes = [];
+      Object.defineProperty(input, 'value', {
+        configurable: true,
+        get() { return valueProp.get.call(this); },
+        set(v) { writes.push(String(v)); valueProp.set.call(this, v); },
+      });
+      // What a keystroke does: the field's text changes, then its input
+      // event carries the number into the model.
+      const typed = text => {
+        valueProp.set.call(input, text);
+        input.dispatchEvent(new globalThis.window.Event('input', { bubbles: true }));
+      };
+      return { instance, input, writes, typed };
+    }
+
+    it('leaves the field alone when a settled async method re-renders mid-typing', async () => {
+      const { instance, input, writes, typed } = await boundField('number');
+      instance.amount = 12.5;
+      typed('19.0');
+      assert.equal(instance.amount, 19);
+      writes.length = 0;
+      // A fetch that happens to finish between two keystrokes: the wrapper
+      // around every async method calls update() when it settles.
+      instance.refresh = async function () {};
+      instance.constructor.prototype._bindMethods.call(instance);
+      await instance.refresh();
+      assert.deepEqual(writes, [], 'the same number must not be written back over the user\'s text');
+      assert.equal(input.value, '19.0', 'the text stays as typed');
+    });
+
+    it('leaves the field alone when a timer re-renders mid-typing', async () => {
+      const { instance, input, writes, typed } = await boundField('number');
+      typed('19.0');
+      writes.length = 0;
+      instance.update();
+      assert.deepEqual(writes, []);
+      assert.equal(input.value, '19.0');
+    });
+
+    it('never writes the field during the keystroke\'s own re-render', async () => {
+      const { instance, input, writes, typed } = await boundField('number');
+      typed('0.0');
+      assert.equal(instance.amount, 0);
+      assert.deepEqual(writes, [], 'the input listener re-renders with the field marked do_not_update');
+      assert.equal(input.value, '0.0');
+    });
+
+    it('still writes a number the model changed to', async () => {
+      const { instance, input, writes, typed } = await boundField('number');
+      typed('19.0');
+      writes.length = 0;
+      instance.amount = 20;
+      instance.update();
+      assert.deepEqual(writes, ['20']);
+      assert.equal(input.value, '20');
+    });
+
+    it('reads a numeric string in the model as its number', async () => {
+      const { instance, input, writes, typed } = await boundField('number');
+      typed('19.0');
+      writes.length = 0;
+      instance.amount = '19';
+      instance.update();
+      assert.deepEqual(writes, [], '"19" and 19.0 are the same number');
+      instance.amount = '19.5';
+      instance.update();
+      assert.deepEqual(writes, ['19.5']);
+    });
+
+    it('treats an empty field and an empty model as the same nothing', async () => {
+      const { instance, input, writes, typed } = await boundField('number');
+      typed('');
+      assert.equal(instance.amount, null);
+      writes.length = 0;
+      instance.update();
+      assert.deepEqual(writes, [], 'null model, empty field: nothing to write');
+      instance.amount = undefined;
+      instance.update();
+      assert.deepEqual(writes, [], 'undefined model, empty field: nothing to write');
+      assert.equal(input.value, '');
+    });
+
+    it('writes 0 into an empty field: zero is a number', async () => {
+      const { instance, input, writes, typed } = await boundField('number');
+      typed('');
+      writes.length = 0;
+      instance.amount = 0;
+      instance.update();
+      assert.deepEqual(writes, ['0']);
+      assert.equal(input.value, '0');
+    });
+
+    it('applies the same rule to a range field', async () => {
+      const { instance, input, writes, typed } = await boundField('range', { min: '0', max: '100' });
+      typed('50');
+      assert.equal(instance.amount, 50);
+      writes.length = 0;
+      instance.update();
+      assert.deepEqual(writes, [], 'the slider already sits at the model\'s number');
+      instance.amount = 70;
+      instance.update();
+      assert.deepEqual(writes, ['70']);
+      assert.equal(input.value, '70');
+    });
+
+    it('keeps text fields on the string comparison', async () => {
+      const { instance, input, writes, typed } = await boundField('text');
+      typed('abc');
+      assert.equal(instance.amount, 'abc');
+      writes.length = 0;
+      instance.update();
+      assert.deepEqual(writes, [], 'same text, no write');
+      instance.amount = 'abcd';
+      instance.update();
+      assert.deepEqual(writes, ['abcd']);
+      assert.equal(input.value, 'abcd');
+    });
+  });
+
   describe('_restoreIfPlaceholders with detached placeholders', () => {
     it('should clean up placeholders that are no longer in the DOM', async () => {
       setupDOM();

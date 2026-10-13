@@ -642,6 +642,24 @@ export default class LWElement extends HTMLElement {
       }
     } else {
       const newValue = parsed[0] ?? '';
+      if (modelNode.type === 'number' || modelNode.type === 'range') {
+        // A number field shows the user's own text, which runs a step ahead
+        // of the number it spells while a decimal is being typed ("19." on
+        // the way to "19.99", "19.0" on the way to "19.05"). Chrome answers a
+        // script write of that same number by replacing the text with the
+        // number's own spelling and parking the caret at the START, so the
+        // next digit lands in front of the first: a re-render from a timer or
+        // a finished fetch landing mid-typing turned "19.99" into "9919".
+        // Write only when the number itself differs; until then the text is
+        // the user's. An empty field and an empty model are the same nothing.
+        const shown = modelNode.valueAsNumber;
+        const wanted = newValue === '' ? NaN : Number(newValue);
+        if (shown === wanted || (Number.isNaN(shown) && Number.isNaN(wanted))) {
+          return;
+        }
+        modelNode.value = newValue;
+        return;
+      }
       if (modelNode.value !== newValue) {
         modelNode.value = newValue;
       }

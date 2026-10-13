@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **`lw-model` no longer rewrites a number field that already shows the
+  model's number.** The write-back for `number` and `range` fields compared
+  the field's text with the model's number, which never matched, so every
+  re-render wrote the number back into the field. Browsers answer a script
+  write into a focused number field by re-spelling its text from the value
+  and moving the caret (Chrome parks it at the start), so a re-render landing
+  between two keystrokes, from a timer, a finished fetch or any settled async
+  method, scrambled a half-typed decimal: `19.99` could arrive as `9919`. The
+  write-back now compares numbers (`valueAsNumber` against the model) and
+  writes only when the number itself changed. An empty field and an empty
+  model are the same nothing, `0` is a number, and text fields are unchanged.
+
 ## 4.3.0 — 2026-07-15
 
 ### Added
